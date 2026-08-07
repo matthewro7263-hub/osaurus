@@ -3925,7 +3925,7 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
                 let recovered = try? recoverAddress(
                     payload: signedPayload,
                     signature: sigBytes,
-                    domainPrefix: "Intelligence Signed Pairing"
+                    domainPrefix: "Osaurus Signed Pairing"
                 ),
                 recovered == req.connectorAddress
             else {

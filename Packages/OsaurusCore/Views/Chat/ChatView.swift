@@ -9653,7 +9653,7 @@ private enum PairingClient {
             let recovered = try? recoverAddress(
                 payload: pairingServerSigningPayload(agentAddress: decoded.agentAddress, nonce: nonce),
                 signature: sigBytes,
-                domainPrefix: "Intelligence Signed Pairing Server"
+                domainPrefix: "Osaurus Signed Pairing Server"
             ),
             recovered.lowercased() == expectedAddress.lowercased()
         else {

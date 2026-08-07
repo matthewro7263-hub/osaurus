@@ -79,11 +79,11 @@ public struct AgentInvite: Codable, Sendable, Equatable {
     /// Unix-seconds expiry (UTC). Server enforces; receiver clock skew is irrelevant.
     public let exp: Int64
     /// 65-byte recoverable secp256k1 signature (hex), produced via the
-    /// `Intelligence Signed Invite` domain prefix over the canonical signing string.
+    /// `Osaurus Signed Invite` domain prefix over the canonical signing string.
     public let sig: String
 
     public static let currentVersion: Int = 1
-    public static let signingDomain: String = "Intelligence Signed Invite"
+    public static let signingDomain: String = "Osaurus Signed Invite"
 
     public init(
         v: Int = AgentInvite.currentVersion,
