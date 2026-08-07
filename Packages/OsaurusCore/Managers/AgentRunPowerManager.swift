@@ -8,7 +8,7 @@
 
 import Foundation
 
-/// Owns Osaurus' idle-system-sleep assertion for active agent work.
+/// Owns Intelligence' idle-system-sleep assertion for active agent work.
 ///
 /// The display remains free to sleep. Explicit Sleep, closing a MacBook lid,
 /// shutdown, and low-power system actions are never overridden.

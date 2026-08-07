@@ -66,7 +66,7 @@ public actor OsaurusServer: Sendable {
     /// The port the server is actually bound to, or nil when stopped.
     /// Meaningful for callers that bind port 0 (ephemeral) — the eval
     /// harness does this so an in-process contract suite can never
-    /// collide with a user's running Osaurus on 1337.
+    /// collide with a user's running Intelligence on 1337.
     public func boundPort() -> Int? {
         channel?.localAddress?.port
     }
@@ -124,7 +124,7 @@ public actor OsaurusServer: Sendable {
 
         let ch = try await bootstrap.bind(host: config.host, port: config.port).get()
         self.channel = ch
-        print("[Osaurus] OsaurusServer started on http://\(config.host):\(config.port)")
+        print("[Intelligence] OsaurusServer started on http://\(config.host):\(config.port)")
     }
 
     /// Stop the server: close the listener, then close the per-connection
@@ -157,13 +157,13 @@ public actor OsaurusServer: Sendable {
         let remaining = childChannels.drain()
         if !remaining.isEmpty {
             print(
-                "[Osaurus] OsaurusServer force-closing \(remaining.count) connection(s) after \(budget)s drain budget"
+                "[Intelligence] OsaurusServer force-closing \(remaining.count) connection(s) after \(budget)s drain budget"
             )
             for ch in remaining {
                 ch.close(promise: nil)
             }
         }
-        print("[Osaurus] OsaurusServer stopped")
+        print("[Intelligence] OsaurusServer stopped")
         return true
     }
 
@@ -221,7 +221,7 @@ public actor OsaurusServer: Sendable {
                 hasKeys: !APIKeyManager.shared.listKeys().isEmpty
             )
         } catch {
-            print("[Osaurus] Failed to build validator: \(error). Falling back to empty validator.")
+            print("[Intelligence] Failed to build validator: \(error). Falling back to empty validator.")
             return .empty
         }
     }
@@ -303,7 +303,7 @@ final class ConnectionLimitHandler: ChannelInboundHandler {
             context.fireChannelActive()
         } else {
             NSLog(
-                "[Osaurus] Refusing connection — at max concurrent connections (%d)",
+                "[Intelligence] Refusing connection — at max concurrent connections (%d)",
                 Self.maxConcurrentConnections
             )
             context.close(promise: nil)

@@ -8,7 +8,7 @@
 //  is heartbeating; the REST polling receive path never opens one, so the bot
 //  looked permanently offline even when receive was healthy. This runtime
 //  opens a minimal intents-0 session whose sole job is to set the bot's
-//  presence to `online` while Osaurus runs. It receives no message events —
+//  presence to `online` while Intelligence runs. It receives no message events —
 //  inbound messages keep flowing through `DiscordPollingTransportRuntime` —
 //  and it deliberately does not publish transport health: platform presence
 //  is cosmetic and must not be conflated with receive diagnostics.

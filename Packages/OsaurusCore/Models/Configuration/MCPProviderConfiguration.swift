@@ -23,7 +23,7 @@ public enum MCPProviderAuthType: String, Codable, Sendable, CaseIterable {
 
 /// Transport used to talk to an MCP server.
 public enum MCPProviderTransport: String, Codable, Sendable, CaseIterable {
-    /// Remote HTTP/SSE server (default for Osaurus historically).
+    /// Remote HTTP/SSE server (default for Intelligence historically).
     case http
     /// Local stdio subprocess that speaks the MCP protocol over its stdin/stdout.
     case stdio
@@ -408,7 +408,7 @@ public enum MCPProviderConfigurationStore {
             do {
                 return try JSONDecoder().decode(MCPProviderConfiguration.self, from: Data(contentsOf: url))
             } catch {
-                print("[Osaurus] Failed to load MCPProviderConfiguration: \(error)")
+                print("[Intelligence] Failed to load MCPProviderConfiguration: \(error)")
             }
         }
         // CRITICAL: see RemoteProviderConfigurationStore.load — never
@@ -426,7 +426,7 @@ public enum MCPProviderConfigurationStore {
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
             try encoder.encode(configuration).write(to: url, options: [.atomic])
         } catch {
-            print("[Osaurus] Failed to save MCPProviderConfiguration: \(error)")
+            print("[Intelligence] Failed to save MCPProviderConfiguration: \(error)")
         }
     }
 

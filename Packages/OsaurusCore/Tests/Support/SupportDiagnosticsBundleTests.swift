@@ -42,7 +42,7 @@ struct SupportDiagnosticsBundleTests {
             durationMs: 250,
             requestBody: #"{"prompt":"\#(privatePrompt)","api_key":"\#(secretToken)"}"#,
             responseBody: privateResponse,
-            userAgent: "Osaurus Authorization: Basic \(basicToken)",
+            userAgent: "Intelligence Authorization: Basic \(basicToken)",
             pluginId: "search-plugin",
             model: "provider/model",
             inputTokens: 12,

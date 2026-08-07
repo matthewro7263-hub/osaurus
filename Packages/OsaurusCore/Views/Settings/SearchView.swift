@@ -169,7 +169,7 @@ struct SearchView: View {
 
     private func providerDisplayName(_ id: String?) -> String {
         guard let id, !id.isEmpty else { return L("built-in sources") }
-        if id == OsaurusRouterSearchBackend.providerId { return L("Osaurus Premium") }
+        if id == OsaurusRouterSearchBackend.providerId { return L("Intelligence Premium") }
         return manager.definition(id: id)?.name ?? id
     }
 
@@ -246,7 +246,7 @@ struct SearchView: View {
             return "Off — searches use the providers and built-in sources below."
         }
         return
-            "Searches go through Osaurus first — search credits, then your wallet — and fall back to the sources below."
+            "Searches go through Intelligence first — search credits, then your wallet — and fall back to the sources below."
     }
 
     private func relativeTime(_ date: Date) -> String {

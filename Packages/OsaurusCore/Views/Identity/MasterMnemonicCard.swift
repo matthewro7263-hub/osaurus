@@ -192,7 +192,7 @@ struct MasterMnemonicCard: View {
         }
         lines.append("")
         lines.append("Keep this phrase secret. Anyone with these 24 words can take over")
-        lines.append("your Osaurus identity. Osaurus cannot recover this phrase for you.")
+        lines.append("your Intelligence identity. Intelligence cannot recover this phrase for you.")
         return lines.joined(separator: "\n") + "\n"
     }
 }

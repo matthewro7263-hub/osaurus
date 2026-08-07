@@ -77,11 +77,11 @@ struct ModelPickerTabTests {
             .fromRemoteModel(modelId: "openai/gpt-4o", providerName: "OpenAI", providerId: openAIId),
             .fromRemoteModel(modelId: "anthropic/claude-opus-4", providerName: "Anthropic", providerId: anthropicId),
             .foundation(),
-            .fromRemoteModel(modelId: "osaurus/llama-3.3", providerName: "Osaurus", providerId: osaurusId),
+            .fromRemoteModel(modelId: "osaurus/llama-3.3", providerName: "Intelligence", providerId: osaurusId),
         ]
 
         let tabs = items.groupedByTab()
-        #expect(tabs.map(\.title) == ["Local", "Osaurus", "OpenAI", "Anthropic"])
+        #expect(tabs.map(\.title) == ["Local", "Intelligence", "OpenAI", "Anthropic"])
     }
 
     @Test func providerTab_modelsSortedByDisplayName() {
@@ -159,16 +159,16 @@ struct ModelPickerTabTests {
     /// Regression: the model lists refresh asynchronously while the picker is
     /// open, so a tab can briefly vanish mid-refresh. An explicit user
     /// selection must survive that transient absence — previously the "Local"
-    /// tab snapped back to "Osaurus" when Local momentarily disappeared.
+    /// tab snapped back to "Intelligence" when Local momentarily disappeared.
     @Test func resolveCommittedTabKey_keepsExplicitSelectionWhenTabTransientlyMissing() {
         let osaurusId = RemoteProviderManager.osaurusRouterProviderId
         let osaurusModel = ModelPickerItem(
             id: "osaurus/llama-3.3",
             displayName: "llama-3.3",
-            source: .remote(providerName: "Osaurus", providerId: osaurusId)
+            source: .remote(providerName: "Intelligence", providerId: osaurusId)
         )
         // Mid-refresh snapshot: local discovery briefly returned nothing, so
-        // only the Osaurus tab is present.
+        // only the Intelligence tab is present.
         let tabsWithoutLocal = [osaurusModel].groupedByTab()
         #expect(tabsWithoutLocal.contains { $0.key == "local" } == false)
 
@@ -186,7 +186,7 @@ struct ModelPickerTabTests {
         let osaurus = ModelPickerItem(
             id: "osaurus/llama-3.3",
             displayName: "llama-3.3",
-            source: .remote(providerName: "Osaurus", providerId: osaurusId)
+            source: .remote(providerName: "Intelligence", providerId: osaurusId)
         )
         let tabs = [local, osaurus].groupedByTab()
 

@@ -70,7 +70,7 @@ public enum BrowserPluginMigration {
         config.pluginProfilesMigrated = true
         BrowserConfigurationStore.save(config)
         if migratedCount > 0 {
-            print("[Osaurus] Migrated \(migratedCount) browser profile(s) from osaurus.browser")
+            print("[Intelligence] Migrated \(migratedCount) browser profile(s) from osaurus.browser")
         }
     }
 }

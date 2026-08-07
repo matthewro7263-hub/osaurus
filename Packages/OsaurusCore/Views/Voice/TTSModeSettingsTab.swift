@@ -21,7 +21,7 @@ struct TTSModeSettingsTab: View {
         case failure(String)
     }
     @State private var connectionTest: ConnectionTestState = .idle
-    @State private var previewText: String = "Hello from Osaurus. Text to speech is now ready."
+    @State private var previewText: String = "Hello from Intelligence. Text to speech is now ready."
     @State private var previewMessageId = UUID()
 
     private func displayName(for voice: String) -> String {

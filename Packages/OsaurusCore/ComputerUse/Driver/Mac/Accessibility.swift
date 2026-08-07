@@ -220,10 +220,10 @@ final class AccessibilityManager: @unchecked Sendable {
     /// `truncated`) once this elapses so a capture still returns promptly.
     static let traversalDeadline: TimeInterval = 2.0
 
-    /// Osaurus's own process id.
+    /// Intelligence's own process id.
     static let selfPid: Int32 = ProcessInfo.processInfo.processIdentifier
 
-    /// Whether `pid` is Osaurus itself. The native driver must NEVER resolve the
+    /// Whether `pid` is Intelligence itself. The native driver must NEVER resolve the
     /// current process's AX tree on the off-main driver queue: querying our own
     /// elements re-enters AppKit/SwiftUI accessibility *in-process*, which
     /// evaluates SwiftUI `body` and trips its main-thread assertion
@@ -590,14 +590,14 @@ final class AccessibilityManager: @unchecked Sendable {
     /// Begins a new snapshot. Element IDs in the result are valid until the cache
     /// rotates them out (after the next snapshot beyond the retention limit).
     func traverse(filter: ElementFilter, search: SearchOptions? = nil) -> TraversalResult {
-        // Never traverse our own process: resolving Osaurus's AX tree re-enters
+        // Never traverse our own process: resolving Intelligence's AX tree re-enters
         // SwiftUI/AppKit accessibility in-process (evaluating `body`), which
         // traps on the off-main driver queue — and we never perceive our own UI.
         if Self.isSelf(filter.pid) {
             return TraversalResult(
                 snapshotId: beginNewSnapshot(pid: filter.pid),
                 pid: filter.pid,
-                app: getAppName(for: filter.pid) ?? "Osaurus",
+                app: getAppName(for: filter.pid) ?? "Intelligence",
                 focusedWindow: nil,
                 elementCount: 0,
                 truncated: false,
@@ -1677,7 +1677,7 @@ func getActiveWindow() -> MacActiveWindowInfo? {
     let pid = frontApp.processIdentifier
     let appName = frontApp.localizedName ?? "Unknown"
 
-    // When Osaurus itself is frontmost there's no external active window to
+    // When Intelligence itself is frontmost there's no external active window to
     // report, and resolving our own AX tree off-main traps in SwiftUI (see
     // `AccessibilityManager.isSelf`). Returning nil also keeps callers that seed
     // a target pid from the frontmost app (e.g. the Computer Use loop) from

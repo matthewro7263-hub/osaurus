@@ -3,7 +3,7 @@
 //  osaurus
 //
 //  User-visible diagnostics for local model discovery and runtime readiness.
-//  This is intentionally host-side only: it explains what Osaurus can prove
+//  This is intentionally host-side only: it explains what Intelligence can prove
 //  from catalog metadata and local bundle files without rewriting model_type
 //  values or pretending vmlx supports an architecture it does not.
 //
@@ -284,14 +284,14 @@ enum ModelCompatibilityDiagnostics {
             return SourceStatus(
                 kind: .external,
                 title: externalSource,
-                detail: L("Referenced in place; Osaurus does not copy or mutate this bundle.")
+                detail: L("Referenced in place; Intelligence does not copy or mutate this bundle.")
             )
         }
         if isLocal {
             return SourceStatus(
                 kind: .osaurusLocal,
-                title: L("Osaurus local models"),
-                detail: L("Stored under the configured Osaurus model directory.")
+                title: L("Intelligence local models"),
+                detail: L("Stored under the configured Intelligence model directory.")
             )
         }
         return SourceStatus(
@@ -360,7 +360,7 @@ enum ModelCompatibilityDiagnostics {
                 kind: .needsDownload,
                 reason: .needsDownload,
                 title: L("Download required"),
-                detail: L("Osaurus cannot prove runtime behavior until the model bundle is local.")
+                detail: L("Intelligence cannot prove runtime behavior until the model bundle is local.")
             )
         case .incomplete:
             return RuntimeStatus(
@@ -384,7 +384,7 @@ enum ModelCompatibilityDiagnostics {
                     title: L("Not an MLX model"),
                     detail:
                         L(
-                            "This bundle isn't in MLX format, so the local engine (vmlx) can't load it. Osaurus runs MLX-format weights only — convert it with mlx_lm or pick an MLX build of the model."
+                            "This bundle isn't in MLX format, so the local engine (vmlx) can't load it. Intelligence runs MLX-format weights only — convert it with mlx_lm or pick an MLX build of the model."
                         )
                 )
             }
@@ -443,13 +443,13 @@ enum ModelCompatibilityDiagnostics {
             return ToolUseStatus(
                 status: .unproven,
                 title: L("Tool use unproven"),
-                detail: L("Download or import the model before Osaurus can inspect or prove local tool use.")
+                detail: L("Download or import the model before Intelligence can inspect or prove local tool use.")
             )
         case .incomplete:
             return ToolUseStatus(
                 status: .failed,
                 title: L("Tool use blocked"),
-                detail: L("The bundle is incomplete, so Osaurus cannot run a tool-call proof.")
+                detail: L("The bundle is incomplete, so Intelligence cannot run a tool-call proof.")
             )
         case .available:
             break
@@ -460,7 +460,7 @@ enum ModelCompatibilityDiagnostics {
             return ToolUseStatus(
                 status: .failed,
                 title: L("Tool use blocked"),
-                detail: L("Runtime preflight blocks this bundle, so Osaurus cannot run a tool-call proof.")
+                detail: L("Runtime preflight blocks this bundle, so Intelligence cannot run a tool-call proof.")
             )
         case .partial:
             return ToolUseStatus(
@@ -475,7 +475,7 @@ enum ModelCompatibilityDiagnostics {
             return ToolUseStatus(
                 status: .unproven,
                 title: L("Tool use unproven"),
-                detail: L("The bundle still needs a live tool-call proof before Osaurus should call it tool-use capable.")
+                detail: L("The bundle still needs a live tool-call proof before Intelligence should call it tool-use capable.")
             )
         case .unproven:
             break
@@ -503,7 +503,7 @@ enum ModelCompatibilityDiagnostics {
                 detail: String(
                     format:
                         L(
-                            "The bundle declares a tool-call parser (%@), but Osaurus still needs a live tool-call proof before marking it proven."
+                            "The bundle declares a tool-call parser (%@), but Intelligence still needs a live tool-call proof before marking it proven."
                         ),
                     parser
                 )
@@ -555,7 +555,7 @@ enum ModelCompatibilityDiagnostics {
                 title: L("Unsupported Hunyuan Dense"),
                 detail:
                     L(
-                        "Unsupported local model type: hunyuan_v1_dense. Osaurus needs vmlx Hunyuan Dense support before this model can run locally."
+                        "Unsupported local model type: hunyuan_v1_dense. Intelligence needs vmlx Hunyuan Dense support before this model can run locally."
                     )
             )
         }
@@ -571,7 +571,7 @@ enum ModelCompatibilityDiagnostics {
                 title: L("Unsupported LongCat family"),
                 detail:
                     L(
-                        "LongCat local bundles require native vmlx architecture, processor, cache, and media-path support before Osaurus should offer them as runnable."
+                        "LongCat local bundles require native vmlx architecture, processor, cache, and media-path support before Intelligence should offer them as runnable."
                     )
             )
         }

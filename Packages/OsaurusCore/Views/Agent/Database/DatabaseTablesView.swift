@@ -221,7 +221,7 @@ struct DatabaseTablesView: View {
                         tableListRow(table, isSystem: false)
                     }
                     if !systemTables.isEmpty {
-                        Text("System (managed by Osaurus)", bundle: .module)
+                        Text("System (managed by Intelligence)", bundle: .module)
                             .font(.system(size: 9, weight: .bold))
                             .tracking(0.5)
                             .foregroundColor(theme.tertiaryText)

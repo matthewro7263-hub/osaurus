@@ -2,7 +2,7 @@
 //  SettingsConfigurationDomain.swift
 //  osaurus
 //
-//  Default-agent configure tool for general Osaurus settings. One tool,
+//  Default-agent configure tool for general Intelligence settings. One tool,
 //  `osaurus_settings`, with two actions across six scopes:
 //   - get — current values for a scope (secrets never included)
 //   - set — apply a partial `settings` object to a scope
@@ -41,7 +41,7 @@ enum SettingsConfigurationDomain {
         id: "settings",
         displayName: "App & Server Settings",
         summary:
-            "Change general Osaurus settings: server (port, generation defaults, cache, concurrency), the default agent's model/persona, chat (incl. core model), app shell, memory, and voice/TTS.",
+            "Change general Intelligence settings: server (port, generation defaults, cache, concurrency), the default agent's model/persona, chat (incl. core model), app shell, memory, and voice/TTS.",
         menuHint: "get / set server, default-agent, chat, app, memory, or voice settings",
         searchKeywords: [
             "settings", "preferences", "configure", "server port", "expose to network",

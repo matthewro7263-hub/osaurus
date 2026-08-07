@@ -15,7 +15,7 @@ import Foundation
 /// funnel can join the path choice to the first message sent, and so the chosen
 /// path can pin its model after onboarding finishes.
 enum BrainSource: Equatable {
-    /// The managed Osaurus Router — hosted models that are ready with no
+    /// The managed Intelligence Router — hosted models that are ready with no
     /// download or key. The onboarding default.
     case osaurus
     /// A local MLX model running on this Mac.

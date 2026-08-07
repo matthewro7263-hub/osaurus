@@ -10,7 +10,7 @@
 //  Why: accessibility/automation plugin code is synchronous C that Swift
 //  cancellation cannot unblock. In-process, a wedged AX call blocks the
 //  shared accessibility queue forever and can only be "recovered" by
-//  restarting Osaurus. Out-of-process, the app kills this helper on
+//  restarting Intelligence. Out-of-process, the app kills this helper on
 //  deadline and respawns it — a hard reset with a process-sized blast
 //  radius instead of an app-sized one.
 //

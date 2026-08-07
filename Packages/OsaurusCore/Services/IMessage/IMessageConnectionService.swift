@@ -136,7 +136,7 @@ enum IMessageConnectionServiceError: LocalizedError, Equatable, Sendable {
         case .writeDisabled:
             return "iMessage write access is disabled in settings."
         case .sendConfirmationRequired:
-            return "`confirm_send` must be true before Osaurus sends an iMessage."
+            return "`confirm_send` must be true before Intelligence sends an iMessage."
         case .messageTooLong:
             return "iMessage content is too long, even after splitting into multiple messages."
         case .emptyMessage:
@@ -332,7 +332,7 @@ final class IMessageConnectionService: @unchecked Sendable {
         }
         if !fda {
             failures.append(
-                "Grant Full Disk Access so Osaurus can read the Messages database for iMessage receive/read."
+                "Grant Full Disk Access so Intelligence can read the Messages database for iMessage receive/read."
             )
         }
         // imsg has no sign-in probe, so sign-in state is unknown rather than
@@ -342,7 +342,7 @@ final class IMessageConnectionService: @unchecked Sendable {
         )
         if config.writeEnabled && !automation {
             failures.append(
-                "Grant Messages Automation so Osaurus can send iMessages through Messages.app."
+                "Grant Messages Automation so Intelligence can send iMessages through Messages.app."
             )
         }
         if config.receivePollingEnabled && config.readableChatIds.isEmpty {
@@ -358,7 +358,7 @@ final class IMessageConnectionService: @unchecked Sendable {
         }
         if config.advancedActionsEnabled {
             notes.append(
-                "Advanced iMessage actions require SIP and system-wide Library Validation to be disabled. Osaurus never changes those protections; this is an operator-selected security tradeoff."
+                "Advanced iMessage actions require SIP and system-wide Library Validation to be disabled. Intelligence never changes those protections; this is an operator-selected security tradeoff."
             )
         }
 

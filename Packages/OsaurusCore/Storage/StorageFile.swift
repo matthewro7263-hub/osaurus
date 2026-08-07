@@ -14,7 +14,7 @@ import os
 public enum StorageFile {
     private static let log = Logger(subsystem: "ai.osaurus", category: "storage.file")
 
-    /// The sidecar paths SQLite can create alongside `path`. Osaurus databases
+    /// The sidecar paths SQLite can create alongside `path`. Intelligence databases
     /// run in WAL mode (`-wal`/`-shm`); the `-journal` rollback sidecar is
     /// included defensively so a stale journal from a non-WAL/older file (or a
     /// mode change) can't re-attach to a freshly swapped database.

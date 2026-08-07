@@ -102,7 +102,7 @@ struct CreditsRedeemCodeCard: View {
             )
 
             if !isEnabled {
-                Text("Set up an Osaurus Identity to redeem codes.", bundle: .module)
+                Text("Set up an Intelligence Identity to redeem codes.", bundle: .module)
                 .font(.system(size: 11))
                 .foregroundColor(theme.tertiaryText)
             } else if case .failure(let message) = redemption.state {

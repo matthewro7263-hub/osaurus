@@ -535,7 +535,7 @@ final class TelegramAPIClient: TelegramAPIClientProtocol, @unchecked Sendable {
             .appendingPathComponent(method)
         var request = URLRequest(url: url)
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue("Osaurus Telegram Native Agent Channel", forHTTPHeaderField: "User-Agent")
+        request.setValue("Intelligence Telegram Native Agent Channel", forHTTPHeaderField: "User-Agent")
         request.timeoutInterval = 30
         return request
     }

@@ -6,10 +6,10 @@
 //  (private-API) actions require the operator to disable: System Integrity
 //  Protection (SIP) and system-wide Library Validation.
 //
-//  This probe ONLY reads state. Osaurus never disables SIP or Library
+//  This probe ONLY reads state. Intelligence never disables SIP or Library
 //  Validation, and never runs a privileged command to change them. The setup
 //  UI surfaces this state with an explicit security warning so the operator
-//  makes the tradeoff themselves, in Recovery, outside Osaurus.
+//  makes the tradeoff themselves, in Recovery, outside Intelligence.
 //
 
 import Foundation

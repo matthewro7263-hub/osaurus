@@ -2,7 +2,7 @@
 //  OsaurusHelpToolTests.swift
 //  OsaurusCoreTests
 //
-//  Pins the bundled Osaurus guide corpus and the `osaurus_help` read tool:
+//  Pins the bundled Intelligence guide corpus and the `osaurus_help` read tool:
 //
 //   * The guide loads from `Resources/Guide/guide-*.md`, every topic has a
 //     title/summary/body, and the core topic ids the prompt and quick
@@ -139,7 +139,7 @@ struct OsaurusHelpToolTests {
         let result = try #require(dict["result"] as? [String: Any])
         #expect(result["id"] as? String == "getting-started")
         let content = try #require(result["content"] as? String)
-        #expect(content.contains("Osaurus"))
+        #expect(content.contains("Intelligence"))
     }
 
     @Test

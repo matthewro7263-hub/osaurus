@@ -4,7 +4,7 @@
 //
 //  LRU cache of prepared SQLite3 statements keyed by SQL text. Replaces
 //  the unused `cachedStatements: [String: OpaquePointer]` field that
-//  every Osaurus `*Database` class had but never populated. Saves a
+//  every Intelligence `*Database` class had but never populated. Saves a
 //  prepare+finalize for every repeated query — the chat-history /
 //  memory paths run hundreds of identical statements per session.
 //

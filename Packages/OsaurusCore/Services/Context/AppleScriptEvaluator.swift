@@ -261,7 +261,7 @@ public enum AppleScriptEvaluator {
                 return .skippedRun(
                     lane: config.lane,
                     reason:
-                        "liveProof environment not ready — \(detail). Grant Osaurus access to "
+                        "liveProof environment not ready — \(detail). Grant Intelligence access to "
                         + "the target app under System Settings → Privacy & Security → "
                         + "Automation, then re-run locally."
                 )

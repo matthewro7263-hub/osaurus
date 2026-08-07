@@ -43,7 +43,7 @@ struct CloudMediaModelDTO: Codable, Sendable {
         return MediaModelInfo(
             target: MediaModelTarget(backend: .osaurusCloud, modelID: id),
             displayName: displayName,
-            providerName: "Osaurus",
+            providerName: "Intelligence",
             kind: operation,
             constraints: constraints,
             pricing: pricing,

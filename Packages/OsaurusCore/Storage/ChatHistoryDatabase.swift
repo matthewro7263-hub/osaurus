@@ -368,7 +368,7 @@ public final class ChatHistoryDatabase: @unchecked Sendable {
     }
 
     /// v8: add `router_billing` — JSON `RouterBillingSummary` (cost, token
-    /// counts, status) for an Osaurus Router turn, so a reloaded chat still
+    /// counts, status) for an Intelligence Router turn, so a reloaded chat still
     /// shows a billed-but-empty turn and its "you were charged" notice rather
     /// than a silent gap. Nullable; metadata only (no prompt/response text).
     private func migrateToV8() throws {

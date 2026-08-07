@@ -722,7 +722,7 @@ struct ClaudePluginDetailView: View {
                     .font(.system(size: 12.5, weight: .semibold))
                     .foregroundColor(theme.primaryText)
                 Text(
-                    "This plugin declared: \(parts.joined(separator: ", ")). Osaurus stores the metadata but does not yet execute these surfaces.",
+                    "This plugin declared: \(parts.joined(separator: ", ")). Intelligence stores the metadata but does not yet execute these surfaces.",
                     bundle: .module
                 )
                 .font(.system(size: 11))

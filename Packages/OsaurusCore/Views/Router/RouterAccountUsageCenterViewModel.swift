@@ -86,7 +86,7 @@ final class RouterAccountUsageCenterViewModel: ObservableObject {
 
     func runSignedRequestDiagnostics() async {
         guard providerManager.isOsaurusRouterEnabled else {
-            message = L("Osaurus Router is off.")
+            message = L("Intelligence Router is off.")
             return
         }
         guard OsaurusIdentity.exists() else {

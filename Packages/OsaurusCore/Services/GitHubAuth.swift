@@ -6,7 +6,7 @@
 //  api.github.com are capped at 60 req/hour per IP, so browsing, importing,
 //  or updating a plugin repo (which fans out many Contents-API calls) trips a
 //  403 mid-flight. Sending a user token raises the limit to 5,000/hr. A token
-//  with no scopes is enough for the public plugin repos Osaurus reads.
+//  with no scopes is enough for the public plugin repos Intelligence reads.
 //
 
 import Foundation

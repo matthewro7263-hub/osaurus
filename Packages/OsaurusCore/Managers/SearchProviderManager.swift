@@ -620,7 +620,7 @@ public final class SearchProviderManager: ObservableObject {
 // MARK: - Hosted-first search results
 
 /// Which stack served a completed search, for the UI's visual states:
-/// premium = Osaurus Router hosted, custom = the user's own API/custom
+/// premium = Intelligence Router hosted, custom = the user's own API/custom
 /// providers, free = the bundled keyless scrapers.
 public enum WebSearchSource: String, Sendable, Equatable {
     case premium

@@ -305,7 +305,7 @@ final class ChatTurn: ObservableObject, Identifiable {
     /// completion as a successful final response.
     var terminalStopReason: String?
 
-    /// Osaurus Router billing snapshot captured from the in-stream summary
+    /// Intelligence Router billing snapshot captured from the in-stream summary
     /// frame (cost, token counts, status). Persisted so a reloaded chat still
     /// shows a billed-but-empty turn (and its "you were charged" notice)
     /// instead of a silent gap. Nil for local models and non-router providers.

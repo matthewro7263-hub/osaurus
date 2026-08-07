@@ -492,7 +492,7 @@ struct MemoryView: View {
                         .font(.system(size: 13))
                         .foregroundColor(theme.tertiaryText)
                     Text(
-                        "No identity yet. Chat with Osaurus and the memory system will build your identity from session distillations.",
+                        "No identity yet. Chat with Intelligence and the memory system will build your identity from session distillations.",
                         bundle: .module
                     )
                     .font(.system(size: 13))

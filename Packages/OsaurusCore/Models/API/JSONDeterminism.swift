@@ -2,7 +2,7 @@
 //  JSONDeterminism.swift
 //  osaurus
 //
-//  Centralised canonical-encoding contract for any JSON Osaurus emits where
+//  Centralised canonical-encoding contract for any JSON Intelligence emits where
 //  byte order matters: outbound HTTP bodies to remote model providers,
 //  tool-result strings replayed into the next-turn prompt, server responses
 //  to MCP / Anthropic / OpenAI / Ollama clients, and any payload hashed for

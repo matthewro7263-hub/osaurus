@@ -3,7 +3,7 @@
 //  osaurus
 //
 //  Zero-config proactive destinations. A user who connected a native
-//  channel already told Osaurus everything a proactive destination needs:
+//  channel already told Intelligence everything a proactive destination needs:
 //  which rooms the bot may WRITE to (the write allowlist) and which agent
 //  answers there (inbound dispatch). This resolver derives ask-first
 //  (`confirm` mode) destination bindings from that existing configuration

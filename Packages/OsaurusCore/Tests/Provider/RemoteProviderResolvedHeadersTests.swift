@@ -4,7 +4,7 @@
 //
 //  Coverage for `RemoteProvider.resolvedHeaders()` — specifically the OpenRouter
 //  attribution headers (`HTTP-Referer`, `X-OpenRouter-Title`) that get auto-
-//  injected so Osaurus shows up on openrouter.ai/rankings. The attribution
+//  injected so Intelligence shows up on openrouter.ai/rankings. The attribution
 //  block deliberately runs after the user-header merge so any user override
 //  still wins.
 //
@@ -28,7 +28,7 @@ struct RemoteProviderResolvedHeadersTests {
 
         let headers = provider.resolvedHeaders()
         #expect(headers["HTTP-Referer"] == "https://osaurus.ai")
-        #expect(headers["X-OpenRouter-Title"] == "Osaurus")
+        #expect(headers["X-OpenRouter-Title"] == "Intelligence")
     }
 
     @Test func nonOpenRouterHost_doesNotInjectAttributionHeaders() {
@@ -74,6 +74,6 @@ struct RemoteProviderResolvedHeadersTests {
 
         let headers = provider.resolvedHeaders()
         #expect(headers["HTTP-Referer"] == "https://osaurus.ai")
-        #expect(headers["X-OpenRouter-Title"] == "Osaurus")
+        #expect(headers["X-OpenRouter-Title"] == "Intelligence")
     }
 }

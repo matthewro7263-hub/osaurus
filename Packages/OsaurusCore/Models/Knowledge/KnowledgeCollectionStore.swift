@@ -48,7 +48,7 @@ public enum KnowledgeCollectionStore {
                 let data = try Data(contentsOf: file)
                 collections.append(try decoder.decode(KnowledgeCollection.self, from: data))
             } catch {
-                print("[Osaurus] Failed to load knowledge collection from \(file.lastPathComponent): \(error)")
+                print("[Intelligence] Failed to load knowledge collection from \(file.lastPathComponent): \(error)")
             }
         }
 
@@ -68,7 +68,7 @@ public enum KnowledgeCollectionStore {
             decoder.dateDecodingStrategy = .iso8601
             return try decoder.decode(KnowledgeCollection.self, from: data)
         } catch {
-            print("[Osaurus] Failed to load knowledge collection \(id): \(error)")
+            print("[Intelligence] Failed to load knowledge collection \(id): \(error)")
             return nil
         }
     }
@@ -85,7 +85,7 @@ public enum KnowledgeCollectionStore {
             let data = try encoder.encode(collection)
             try data.write(to: url, options: [.atomic])
         } catch {
-            print("[Osaurus] Failed to save knowledge collection \(collection.id): \(error)")
+            print("[Intelligence] Failed to save knowledge collection \(collection.id): \(error)")
         }
     }
 
@@ -97,7 +97,7 @@ public enum KnowledgeCollectionStore {
             try FileManager.default.removeItem(at: fileURL(for: id))
             return true
         } catch {
-            print("[Osaurus] Failed to delete knowledge collection \(id): \(error)")
+            print("[Intelligence] Failed to delete knowledge collection \(id): \(error)")
             return false
         }
     }

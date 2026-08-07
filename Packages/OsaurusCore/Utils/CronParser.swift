@@ -2,7 +2,7 @@
 //  CronParser.swift
 //  osaurus
 //
-//  A simple, dependency-free cron expression parser for Osaurus.
+//  A simple, dependency-free cron expression parser for Intelligence.
 //  Supports: * , - / and standard 5-field format.
 //
 

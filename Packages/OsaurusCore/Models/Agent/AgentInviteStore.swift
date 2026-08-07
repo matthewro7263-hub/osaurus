@@ -228,7 +228,7 @@ public enum AgentInviteStore {
             return try decoder.decode([IssuedInviteRecord].self, from: data)
                 .filter { $0.status != .revoked }
         } catch {
-            print("[Osaurus] Failed to load invite ledger for \(agentId): \(error)")
+            print("[Intelligence] Failed to load invite ledger for \(agentId): \(error)")
             return []
         }
     }
@@ -242,7 +242,7 @@ public enum AgentInviteStore {
             encoder.dateEncodingStrategy = .iso8601
             try encoder.encode(records).write(to: url, options: [.atomic])
         } catch {
-            print("[Osaurus] Failed to save invite ledger for \(agentId): \(error)")
+            print("[Intelligence] Failed to save invite ledger for \(agentId): \(error)")
         }
     }
 }

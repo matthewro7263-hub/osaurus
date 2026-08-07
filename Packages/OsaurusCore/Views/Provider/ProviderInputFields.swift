@@ -12,7 +12,7 @@
 import SwiftUI
 
 /// Labelled, themed text field used in provider sheets. Wraps a plain
-/// `TextField` with the standard Osaurus input chrome (rounded
+/// `TextField` with the standard Intelligence input chrome (rounded
 /// background, focus accent, monospace option for keys/hosts).
 struct ProviderTextField: View {
     @ObservedObject private var themeManager = ThemeManager.shared

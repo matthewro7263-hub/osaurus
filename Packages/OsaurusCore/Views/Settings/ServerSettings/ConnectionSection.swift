@@ -21,11 +21,11 @@ struct ConnectionSection: View {
         ServerSettingsCard(
             section: .connection,
             status: .engineReady,
-            blurb: "Where Osaurus listens for client requests. Changes restart the server."
+            blurb: "Where Intelligence listens for client requests. Changes restart the server."
         ) {
             SettingsStepperField(
                 label: "Listening Port",
-                help: "Most clients default to 1337 (Osaurus) or 11434 (Ollama-compatible).",
+                help: "Most clients default to 1337 (Intelligence) or 11434 (Ollama-compatible).",
                 text: $portText,
                 range: 1 ... 65535,
                 step: 1,

@@ -22,7 +22,7 @@ struct MCPClientToolPaginationTests {
             (tools: ["gamma"], nextCursor: "cursor-3"),
             (tools: ["delta"], nextCursor: nil),
         ])
-        let client = MCP.Client(name: "Osaurus", version: "1.0.0")
+        let client = MCP.Client(name: "Intelligence", version: "1.0.0")
         _ = try await client.connect(transport: transport)
         defer { Task { await client.disconnect() } }
 
@@ -37,7 +37,7 @@ struct MCPClientToolPaginationTests {
             pages: [(tools: ["alpha"], nextCursor: "stuck")],
             stuckCursor: "stuck"
         )
-        let client = MCP.Client(name: "Osaurus", version: "1.0.0")
+        let client = MCP.Client(name: "Intelligence", version: "1.0.0")
         _ = try await client.connect(transport: transport)
         defer { Task { await client.disconnect() } }
 

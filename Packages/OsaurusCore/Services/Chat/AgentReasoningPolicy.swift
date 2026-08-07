@@ -2,7 +2,7 @@
 //  AgentReasoningPolicy.swift
 //  osaurus
 //
-//  Resolves the one agent-specific reasoning default Osaurus owns. Ordinary
+//  Resolves the one agent-specific reasoning default Intelligence owns. Ordinary
 //  chat leaves an omitted thinking control to the model bundle. Agent/tool
 //  runs instead choose the direct rail for locally detected toggleable
 //  templates, unless the user or API explicitly chose a mode.

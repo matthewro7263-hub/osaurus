@@ -364,8 +364,8 @@ public final class OAuthLoopbackServer: @unchecked Sendable {
         let title = success ? "Sign-in complete" : "Sign-in failed"
         let message =
             success
-            ? "You can return to Osaurus."
-            : "Osaurus could not complete the sign-in. Please try again."
+            ? "You can return to Intelligence."
+            : "Intelligence could not complete the sign-in. Please try again."
         let body = """
             <!doctype html><html><head><meta charset="utf-8"><title>\(title)</title></head>
             <body style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding: 32px;">

@@ -87,13 +87,13 @@ final class MCPOAuthRegistrationTests: XCTestCase {
         let result = try await MCPOAuthRegistration.register(
             registrationEndpoint: "https://auth.example.com/register",
             redirectURI: "http://127.0.0.1:54321/callback",
-            clientName: "Osaurus",
+            clientName: "Intelligence",
             scopes: ["read", "write"]
         )
 
         XCTAssertEqual(result.clientId, "client_123")
         XCTAssertEqual(capture.url?.absoluteString, "https://auth.example.com/register")
-        XCTAssertEqual(capture.value(for: "client_name"), "Osaurus")
+        XCTAssertEqual(capture.value(for: "client_name"), "Intelligence")
         XCTAssertEqual(capture.value(for: "redirect_uris"), ["http://127.0.0.1:54321/callback"])
         XCTAssertEqual(capture.value(for: "grant_types"), ["authorization_code", "refresh_token"])
         XCTAssertEqual(capture.value(for: "response_types"), ["code"])

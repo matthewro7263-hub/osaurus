@@ -2,10 +2,10 @@
 //  OnboardingModelsProxy.swift
 //  osaurus
 //
-//  Client for the Osaurus model download proxy — an authenticated Hugging
+//  Client for the Intelligence model download proxy — an authenticated Hugging
 //  Face resolver used exclusively during onboarding. Anonymous HF downloads are
 //  heavily throttled, and during onboarding the user hasn't had a chance to
-//  add their own HF token yet; the proxy resolves files with Osaurus' own
+//  add their own HF token yet; the proxy resolves files with Intelligence' own
 //  server-side token (never shipped in the app) and returns a presigned CDN
 //  URL, so the model bytes flow directly from HF's CDN at full speed.
 //

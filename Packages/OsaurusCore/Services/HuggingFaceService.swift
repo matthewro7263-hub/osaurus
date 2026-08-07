@@ -111,7 +111,7 @@ actor HuggingFaceService {
     struct MatchedFile {
         let path: String
         let size: Int64
-        /// True when this file matches Osaurus's download patterns — i.e.
+        /// True when this file matches Intelligence's download patterns — i.e.
         /// it's part of what actually gets written to disk on download.
         /// `false` for repo extras (READMEs, alternate formats, etc.).
         var isDownloaded: Bool = true
@@ -204,7 +204,7 @@ actor HuggingFaceService {
     }
 
     /// Fetch every file in a repo (not just the download set), each marked
-    /// with whether Osaurus would download it. Used by the detail modal's
+    /// with whether Intelligence would download it. Used by the detail modal's
     /// "Files" section. Sorted largest-first so weights lead.
     func fetchAllFiles(
         repoId: String,

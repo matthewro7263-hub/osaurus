@@ -1502,7 +1502,7 @@ final class NativeStatsView: NSView {
 
 // MARK: - NativeEmptyResponseNoticeView
 
-/// Footer shown when the Osaurus Router billed a turn that produced no visible
+/// Footer shown when the Intelligence Router billed a turn that produced no visible
 /// text (and no reasoning/tools). Surfaces the charge honestly with a Retry
 /// affordance rather than letting the turn be silently dropped.
 final class NativeEmptyResponseNoticeView: NSView {
@@ -1925,7 +1925,7 @@ final class NativeMessageCellView: NSTableCellView {
         }
         nativeHeaderHeightConstraint?.constant = NativeCellHeightEstimator.headerInnerHeight(for: context.theme)
 
-        let displayName = role == .user ? "You" : (name.isEmpty ? L("Osaurus") : name)
+        let displayName = role == .user ? "You" : (name.isEmpty ? L("Intelligence") : name)
         nativeHeaderView?.configure(
             turnId: block.turnId,
             role: role,

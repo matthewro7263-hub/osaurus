@@ -4,7 +4,7 @@
 //
 //  The user-selected at-rest encryption posture for `~/.osaurus/`.
 //
-//  As of the SQLCipher walk-back, Osaurus stores local data **plaintext by
+//  As of the SQLCipher walk-back, Intelligence stores local data **plaintext by
 //  default** and relies on macOS FileVault for at-rest protection. Users who
 //  want file-level encryption can opt back in to SQLCipher (see
 //  `StorageSettingsView`), which re-introduces the Keychain-key dependency.

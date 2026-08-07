@@ -105,7 +105,7 @@ public final class OnboardingService: ObservableObject {
         // Bounded: `resetAllSessions` awaits WKWebsiteDataStore.removeData
         // completions that WebKit is not guaranteed to deliver (stale profile
         // UUIDs, wedged networking XPC). An unbounded await here pins the
-        // "Resetting Osaurus" spinner forever; on timeout we proceed — the
+        // "Resetting Intelligence" spinner forever; on timeout we proceed — the
         // root-directory deletion below removes the catalog regardless.
         setStep(.browser, .inProgress)
         let browserWipeCompleted = await runWithDeadline(seconds: 10) {
@@ -116,7 +116,7 @@ public final class OnboardingService: ObservableObject {
         }
         setStep(.browser, browserWipeCompleted ? .completed : .failed)
 
-        // wipe all Osaurus items from the Keychain
+        // wipe all Intelligence items from the Keychain
         setStep(.keychain, .inProgress)
         await journeyBeat()
         wipeKeychain()
@@ -183,7 +183,7 @@ public final class OnboardingService: ObservableObject {
         }.value
 
         // Terminate even when a directory failed to delete — bailing out here
-        // would leave the "Resetting Osaurus" spinner up forever, and the
+        // would leave the "Resetting Intelligence" spinner up forever, and the
         // Keychain and UserDefaults are already gone by this point. But a
         // failed wipe means user data (chats, memory, identity keys) survives
         // a reset the user believes completed, so block on a critical alert
@@ -214,7 +214,7 @@ public final class OnboardingService: ObservableObject {
         // main-queue block can never run further main-queue work — and the
         // quit teardown chain, its 22s watchdog, and the reply are all
         // MainActor tasks (main-queue blocks). Calling terminate from here
-        // deadlocks the entire quit (the "Quitting Osaurus" hang). From a
+        // deadlocks the entire quit (the "Quitting Intelligence" hang). From a
         // run-loop callout, AppKit's nested wait still drains the main
         // queue and the teardown completes normally.
         RunLoop.main.perform(inModes: [.common]) {
@@ -281,12 +281,12 @@ public final class OnboardingService: ObservableObject {
             }
         }
         lines.append(
-            L("Osaurus will now quit. You can delete the listed items manually in Finder.")
+            L("Intelligence will now quit. You can delete the listed items manually in Finder.")
         )
         return lines.joined(separator: "\n\n")
     }
 
-    /// Clear all known Osaurus Keychain services. The list lives in
+    /// Clear all known Intelligence Keychain services. The list lives in
     /// `OsaurusKeychainServices` next to the wrappers so a newly added
     /// secret store can't be silently missed by factory reset.
     private func wipeKeychain() {

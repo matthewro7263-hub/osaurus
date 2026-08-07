@@ -227,7 +227,7 @@ struct DiscordSettingsView: View {
     private var connectSectionContent: some View {
         VStack(alignment: .leading, spacing: 20) {
             Text(
-                "Osaurus polls Discord for new messages — no webhook or public URL is needed.",
+                "Intelligence polls Discord for new messages — no webhook or public URL is needed.",
                 bundle: .module
             )
             .font(.system(size: 12))
@@ -436,7 +436,7 @@ struct DiscordSettingsView: View {
                 )
                 SettingsToggle(
                     title: L("Continue Participating Threads"),
-                    description: L("Accept follow-ups after Osaurus has replied in a channel or thread."),
+                    description: L("Accept follow-ups after Intelligence has replied in a channel or thread."),
                     isOn: $inboundContinueThreads
                 )
                 SettingsToggle(
@@ -489,14 +489,14 @@ struct DiscordSettingsView: View {
     }
 
     /// Exact test message the user should send, mentioning the Discord bot
-    /// user (mentioning the Osaurus agent name is a frequent failure).
+    /// user (mentioning the Intelligence agent name is a frequent failure).
     private var testPromptRow: some View {
         let botName = discovery?.bot.username
         return AgentChannelCopyableCommand(
             command: "@\(botName ?? "your-discord-bot") hello",
             caption: botName == nil
-                ? L("Mention the Discord bot user, not the Osaurus agent name. Load from Discord to fill in the bot name.")
-                : L("Mention the Discord bot user, not the Osaurus agent name."),
+                ? L("Mention the Discord bot user, not the Intelligence agent name. Load from Discord to fill in the bot name.")
+                : L("Mention the Discord bot user, not the Intelligence agent name."),
             onCopied: { showStatus(L("Test message copied"), isError: false) }
         )
     }
@@ -973,7 +973,7 @@ struct DiscordSettingsView: View {
             L("Confirm the message was sent in a channel selected as Read, by a person in Authorized Senders."),
             L("Confirm the Message Content Intent is enabled on the bot's Developer Portal page."),
             L("Confirm the bot is a member of the server and can see the channel."),
-            L("Mention the Discord bot user, not the Osaurus agent name."),
+            L("Mention the Discord bot user, not the Intelligence agent name."),
             L("Remember the first poll after setup only arms the cursor; send a fresh message after saving."),
         ]
         if let warning = OsaurusRunningInstanceInspector.duplicateInstanceWarning(

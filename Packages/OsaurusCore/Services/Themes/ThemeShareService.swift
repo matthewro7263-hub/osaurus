@@ -33,7 +33,7 @@ public enum ThemeShareError: LocalizedError, Sendable {
     public var errorDescription: String? {
         switch self {
         case .noMasterKey:
-            return "No Osaurus identity is set up yet. Create one in Identity settings before sharing themes."
+            return "No Intelligence identity is set up yet. Create one in Identity settings before sharing themes."
         case .bodyTooLarge(let size):
             let mb = Double(size) / (1024 * 1024)
             return String(
@@ -220,7 +220,7 @@ public final class ThemeShareService {
 
     // MARK: - Helpers
 
-    /// Build the Osaurus deep link for a content hash.
+    /// Build the Intelligence deep link for a content hash.
     public nonisolated static func deepLink(for hash: String) -> URL {
         var components = URLComponents()
         components.scheme = deepLinkScheme

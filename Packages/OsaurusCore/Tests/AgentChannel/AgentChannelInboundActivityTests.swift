@@ -96,7 +96,7 @@ struct AgentChannelInboundActivityTests {
             stage: .dispatchSuppressed,
             reason: "mention_required"
         )
-        #expect(guidance?.contains("not the Osaurus agent name") == true)
+        #expect(guidance?.contains("not the Intelligence agent name") == true)
     }
 
     @Test func failedStageFallsBackToTheRecordedFailureMessage() {

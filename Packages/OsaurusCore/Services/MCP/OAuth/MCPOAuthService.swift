@@ -190,7 +190,7 @@ public enum MCPOAuthService {
                 let registration = try await MCPOAuthRegistration.register(
                     registrationEndpoint: registrationEndpoint,
                     redirectURI: redirectURI,
-                    clientName: "Osaurus",
+                    clientName: "Intelligence",
                     scopes: scopes
                 )
                 clientId = registration.clientId

@@ -214,7 +214,7 @@ enum TelegramConnectionServiceError: LocalizedError, Equatable, Sendable {
         case .writeDisabled:
             return "Telegram write access is disabled in settings."
         case .sendConfirmationRequired:
-            return "`confirm_send` must be true before Osaurus posts to Telegram."
+            return "`confirm_send` must be true before Intelligence posts to Telegram."
         case .sendBackpressure(let chatId):
             return "A Telegram send is already in flight for chat `\(chatId)`. Retry after the current send completes."
         case .messageTooLong:
@@ -693,7 +693,7 @@ final class TelegramConnectionService: @unchecked Sendable {
         if info.isRegistered {
             return "A webhook is registered for this bot (\(TelegramSecurity.redact(info.url, token: token))). Remove the webhook in Telegram settings or disable long polling."
         }
-        return "Another getUpdates consumer is polling this bot token (for example a plugin or a second Osaurus instance). Stop the other consumer and retry."
+        return "Another getUpdates consumer is polling this bot token (for example a plugin or a second Intelligence instance). Stop the other consumer and retry."
     }
 
     private func chatDiagnostics(

@@ -41,7 +41,7 @@ struct SwiftTransformersTokenizerLoader: TokenizerLoader, @unchecked Sendable {
 
 /// Adapts a `VMLXTokenizers.Tokenizer` to the
 /// `MLXLMCommon.Tokenizer` protocol. Keep the chat-template fallback logic in
-/// sync with vmlx's HuggingFace tokenizer bridge: Osaurus uses this loader in
+/// sync with vmlx's HuggingFace tokenizer bridge: Intelligence uses this loader in
 /// production instead of the macro bridge.
 private struct TokenizerBridge: MLXLMCommon.GenerationPromptControllableTokenizer, @unchecked Sendable {
     let upstream: any VMLXTokenizers.Tokenizer

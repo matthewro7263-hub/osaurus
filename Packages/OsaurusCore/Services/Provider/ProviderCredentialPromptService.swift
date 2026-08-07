@@ -47,7 +47,7 @@ public enum ProviderCredentialPromptMode: Sendable, Equatable {
 /// `preset` is the canonical key everywhere downstream — it disambiguates
 /// the five vendor presets (OpenRouter, DeepSeek, xAI, Venice, Ollama) that
 /// share `RemoteProviderType.openaiLegacy` and selects the right OAuth
-/// dispatch. `nil` means "no preset" (the special Osaurus-Agent peer path).
+/// dispatch. `nil` means "no preset" (the special Intelligence-Agent peer path).
 public struct ProviderCredentialRequest: Sendable {
     public let preset: ProviderPreset?
     public let providerType: RemoteProviderType

@@ -499,10 +499,10 @@ public struct ClaudePluginManifest: Sendable {
             || !auxMarkdownPaths.isEmpty
     }
 
-    /// True when the plugin ships at least one component Osaurus can actually
+    /// True when the plugin ships at least one component Intelligence can actually
     /// import: a skill, agent, command, or MCP server. Plugins composed only
     /// of `hooks` / `outputStyles` / `monitors` / `lspServers` / `themes` /
-    /// `bin` resolve to `false` here — there's nothing for Osaurus to install.
+    /// `bin` resolve to `false` here — there's nothing for Intelligence to install.
     /// Auxiliary markdown (CLAUDE.md/README) does NOT count, since those are
     /// only attached as references to skills that get imported.
     public var hasImportableComponents: Bool {
@@ -818,7 +818,7 @@ public enum GitHubSkillError: Error, LocalizedError {
     /// optional date carries the `X-RateLimit-Reset` value so the UI can
     /// tell the user when to try again.
     case rateLimited(resetAt: Date?)
-    /// The plugin resolved cleanly but ships nothing Osaurus can import
+    /// The plugin resolved cleanly but ships nothing Intelligence can import
     /// (only hooks / output styles / monitors / etc.). Carries the plugin
     /// name so the UI can name it in the message.
     case noImportableComponents(pluginName: String)
@@ -858,7 +858,7 @@ public enum GitHubSkillError: Error, LocalizedError {
             return "GitHub rate-limited this app. Wait an hour to retry.\(tokenHint)"
         case .noImportableComponents(let pluginName):
             return
-                "\(pluginName) has no components Osaurus can import (it only ships hooks, output styles, or other unsupported parts)."
+                "\(pluginName) has no components Intelligence can import (it only ships hooks, output styles, or other unsupported parts)."
         }
     }
 }

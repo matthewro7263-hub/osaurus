@@ -41,7 +41,7 @@ struct OnboardingTelemetryNamingTests {
     }
 
     /// `brain_source_selected`'s `source` dimension is a dashboard contract:
-    /// `hosted` (managed Osaurus default), `local`, and `provider_key` must
+    /// `hosted` (managed Intelligence default), `local`, and `provider_key` must
     /// stay distinguishable and stable.
     @Test func brain_source_values_match_the_documented_contract() {
         #expect(BrainSource.osaurus.telemetryValue == "hosted")

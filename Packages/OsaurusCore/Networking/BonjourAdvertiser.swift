@@ -2,7 +2,7 @@
 //  BonjourAdvertiser.swift
 //  osaurus
 //
-//  Advertises Osaurus agents as Bonjour (mDNS/DNS-SD) services on the local network,
+//  Advertises Intelligence agents as Bonjour (mDNS/DNS-SD) services on the local network,
 //  enabling other devices and apps to discover them without manual configuration.
 //
 
@@ -10,14 +10,14 @@ import Combine
 import Foundation
 import os
 
-/// Manages Bonjour advertisement of Osaurus agents.
+/// Manages Bonjour advertisement of Intelligence agents.
 /// Each agent is published as a `_osaurus._tcp` service carrying the agent's
 /// id, description, and crypto address in its TXT record.
 @MainActor
 public final class BonjourAdvertiser: NSObject {
     public static let shared = BonjourAdvertiser()
 
-    /// Bonjour service type for Osaurus agents.
+    /// Bonjour service type for Intelligence agents.
     public static let serviceType = "_osaurus._tcp."
 
     /// DNS-SD instance names are limited to 63 bytes. The UUID suffix

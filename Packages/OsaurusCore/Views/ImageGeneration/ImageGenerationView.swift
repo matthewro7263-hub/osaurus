@@ -204,7 +204,7 @@ private struct ImageGenerationSettingsTab: View {
                         }
                         if pickerItems.videoGenerationDelegateCandidates.isEmpty {
                             Text(
-                                "Connect a Venice API-key provider, or enable Osaurus Cloud when its media catalog is available.",
+                                "Connect a Venice API-key provider, or enable Intelligence Cloud when its media catalog is available.",
                                 bundle: .module
                             )
                             .font(.system(size: 11))

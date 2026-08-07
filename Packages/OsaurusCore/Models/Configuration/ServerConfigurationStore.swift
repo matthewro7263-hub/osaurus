@@ -40,7 +40,7 @@ enum ServerConfigurationStore {
             }
             return configuration
         } catch {
-            print("[Osaurus] Failed to load ServerConfiguration: \(error)")
+            print("[Intelligence] Failed to load ServerConfiguration: \(error)")
             return nil
         }
     }
@@ -59,10 +59,10 @@ enum ServerConfigurationStore {
                 data,
                 to: url,
                 synchronous: overrideDirectory != nil || OsaurusPaths.overrideRoot != nil,
-                onError: { print("[Osaurus] Failed to save ServerConfiguration: \($0)") }
+                onError: { print("[Intelligence] Failed to save ServerConfiguration: \($0)") }
             )
         } catch {
-            print("[Osaurus] Failed to save ServerConfiguration: \(error)")
+            print("[Intelligence] Failed to save ServerConfiguration: \(error)")
         }
     }
 

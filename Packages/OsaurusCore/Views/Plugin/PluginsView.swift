@@ -970,7 +970,7 @@ struct PluginsView: View {
                 // are hidden from Browse unless already installed — new users
                 // shouldn't be offered a plugin whose tools never register.
                 // Existing installs keep their card (with the "Built into
-                // Osaurus" banner) so the uninstall path stays reachable.
+                // Intelligence" banner) so the uninstall path stays reachable.
                 let browse = currentPlugins.filter {
                     Self.pluginMatchesQuery($0, query: query)
                         && ($0.isInstalled || !PluginManager.supersededPluginIds.contains($0.pluginId))
@@ -1309,7 +1309,7 @@ private struct PluginCard: View {
         if PluginManager.supersededPluginIds.contains(plugin.pluginId) && plugin.isInstalled {
             StatusCapsuleBadge(
                 icon: "checkmark.seal.fill",
-                text: L("Built into Osaurus"),
+                text: L("Built into Intelligence"),
                 color: theme.accentColor
             )
         } else if plugin.hasLoadError {
@@ -1979,7 +1979,7 @@ private struct PluginDetailView: View {
                     .foregroundColor(theme.accentColor)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Built into Osaurus", bundle: .module)
+                    Text("Built into Intelligence", bundle: .module)
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundColor(theme.primaryText)
                     Text(detail, bundle: .module)

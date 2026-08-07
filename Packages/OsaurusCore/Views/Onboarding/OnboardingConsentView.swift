@@ -38,7 +38,7 @@ struct ConsentBody: View {
             illustrationAsset: "osaurus-data",
             leftHeadline: "Help us squash bugs",
             leftBody:
-                "If Osaurus crashes, an anonymous report shows us what went wrong so we can fix it."
+                "If Intelligence crashes, an anonymous report shows us what went wrong so we can fix it."
         ) {
             VStack(alignment: .leading, spacing: OnboardingMetrics.cardSpacing) {
                 OnboardingRowCard(
@@ -121,7 +121,7 @@ struct ConsentCTA: View {
     let onFinish: () -> Void
 
     var body: some View {
-        OnboardingBrandButton(title: "Start using Osaurus", action: onFinish)
+        OnboardingBrandButton(title: "Start using Intelligence", action: onFinish)
             .fixedSize(horizontal: true, vertical: false)
     }
 }

@@ -54,7 +54,7 @@ public final class ClaudeMarketplaceService: ObservableObject {
 
     private let github: GitHubSkillService
 
-    /// Precomputed classification used to hide plugins Osaurus can't import.
+    /// Precomputed classification used to hide plugins Intelligence can't import.
     /// Injected for tests; defaults to the bundled catalog.
     private let importabilityCatalog: ClaudeMarketplaceImportabilityCatalog
 

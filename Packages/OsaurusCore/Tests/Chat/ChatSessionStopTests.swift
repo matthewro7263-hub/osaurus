@@ -77,7 +77,7 @@ struct ChatSessionStopTests {
         let user = ChatTurn(role: .user, content: "research these repositories")
         let progress = ChatTurn(
             role: .assistant,
-            content: "Got the Osaurus models. Now let me check the other two orgs."
+            content: "Got the Intelligence models. Now let me check the other two orgs."
         )
         ChatSession.excludeAbandonedTrackedTaskResponse(progress)
         let emptyContinuationBuffer = ChatTurn(role: .assistant, content: "")
@@ -93,7 +93,7 @@ struct ChatSessionStopTests {
             }
         }
 
-        #expect(progress.content == "Got the Osaurus models. Now let me check the other two orgs.")
+        #expect(progress.content == "Got the Intelligence models. Now let me check the other two orgs.")
         #expect(progress.modelContextExcluded)
         #expect(messages.map(\.role) == ["user"])
         #expect(messages.map(\.content) == ["research these repositories"])

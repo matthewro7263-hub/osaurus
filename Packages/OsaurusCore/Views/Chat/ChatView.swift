@@ -219,7 +219,7 @@ final class ChatSession: ObservableObject {
 
     @Published var lastStreamError: String?
 
-    /// Set when an Osaurus Router send fails because the account is out of
+    /// Set when an Intelligence Router send fails because the account is out of
     /// credits (HTTP 402 INSUFFICIENT_FUNDS). Drives the "out of credits"
     /// themed modal in ChatView. Cleared when the user dismisses it or tops up.
     @Published var insufficientFundsAlert = false
@@ -560,7 +560,7 @@ final class ChatSession: ObservableObject {
     /// Weak back-reference to the owning window state (set by ChatWindowState).
     weak var windowState: ChatWindowState?
 
-    /// True when this window is pointed at a paired/discovered remote Osaurus
+    /// True when this window is pointed at a paired/discovered remote Intelligence
     /// *agent* (Mode 2 — "talk to the agent"). The signal is the selected
     /// relay/discovered agent provider, which is set only by
     /// `connectToRelayAgent` / `connectToDiscoveredAgent` and cleared by
@@ -1146,7 +1146,7 @@ final class ChatSession: ObservableObject {
         if let model = effectiveModel, pickerItems.contains(where: { $0.id == model }) {
             selectedModel = model
         } else if Self.pendingLocalDefaultModelId(for: agentId, in: pickerItems.map(\.id)) != nil {
-            // First-run local setup includes temporary Osaurus Cloud access:
+            // First-run local setup includes temporary Intelligence Cloud access:
             // select the lower-cost capable Router model while the pinned
             // private model downloads. This is session-only — the agent's
             // durable default remains local, so the next picker rebuild
@@ -1241,7 +1241,7 @@ final class ChatSession: ObservableObject {
             ?? routerItems.first
     }
 
-    /// Session-scoped switch to an Osaurus Router model while the agent's
+    /// Session-scoped switch to an Intelligence Router model while the agent's
     /// pinned local default is still downloading. First-run invokes this
     /// automatically; the recovery UI can invoke it again after a connection
     /// failure. Connects the Router on demand when its catalog isn't populated
@@ -1382,7 +1382,7 @@ final class ChatSession: ObservableObject {
             newSelected = prev
         } else if Self.pendingLocalDefaultModelId(for: agentId, in: newOptionIds) != nil {
             // Pinned local default still downloading: first-run includes
-            // temporary Osaurus Cloud access, so adopt the catalog-driven
+            // temporary Intelligence Cloud access, so adopt the catalog-driven
             // lower-cost capable Router model as soon as it appears.
             newSelected = Self.osaurusRouterValueCandidate(in: newOptions)?.id
         } else {
@@ -1469,7 +1469,7 @@ final class ChatSession: ObservableObject {
         imageComposerSettings = settings
     }
 
-    /// True when the selected model is served by the managed Osaurus Router
+    /// True when the selected model is served by the managed Intelligence Router
     /// (the billed, identity-signed cloud provider). Drives the per-session
     /// spend indicator in the composer.
     var isOsaurusRouterSession: Bool {
@@ -1490,7 +1490,7 @@ final class ChatSession: ObservableObject {
         return item.displayName
     }
 
-    /// Total micro-USD billed by the Osaurus Router across this session's turns.
+    /// Total micro-USD billed by the Intelligence Router across this session's turns.
     /// Summed from each turn's persisted `routerBilling`, so it reflects both the
     /// live run and a reloaded session. The on-device ledger remains the exact
     /// source of truth if a single turn ever carried more than one charge.
@@ -1549,7 +1549,7 @@ final class ChatSession: ObservableObject {
     /// Mode 2 override for the per-turn header name baked into `visibleBlocks`.
     /// When non-nil (a remote agent owns the chat), thread headers show the
     /// remote agent's name instead of the local agent's — without it, blocks
-    /// always baked the local name and the thread read "Osaurus". `ChatView`
+    /// always baked the local name and the thread read "Intelligence". `ChatView`
     /// keeps this in sync with `ChatWindowState.effectiveChatIdentity`; nil
     /// restores the local-agent name.
     var threadAgentDisplayName: String?
@@ -1592,7 +1592,7 @@ final class ChatSession: ObservableObject {
 
     private func rebuildVisibleBlocksImpl() {
         let agent = AgentManager.shared.agent(for: agentId ?? Agent.defaultId)
-        let localName = agent?.isBuiltIn == true ? L("Osaurus") : (agent?.name ?? L("Osaurus"))
+        let localName = agent?.isBuiltIn == true ? L("Intelligence") : (agent?.name ?? L("Intelligence"))
         // In Mode 2 the remote agent owns the conversation, so its name heads
         // the thread; otherwise fall back to the local agent's name.
         let displayName = threadAgentDisplayName ?? localName
@@ -3372,7 +3372,7 @@ final class ChatSession: ObservableObject {
         // last-resort fallback when the sentinel never fires.
     }
 
-    /// Stamp an Osaurus Router billing event onto an assistant turn. Adopts the
+    /// Stamp an Intelligence Router billing event onto an assistant turn. Adopts the
     /// server-authoritative output-token count so the turn carries accurate
     /// stats and is preserved through run cleanup, and writes a durable,
     /// metadata-only ledger row the instant the charge lands (outcome is
@@ -4248,7 +4248,7 @@ final class ChatSession: ObservableObject {
                     currentTurn.unclosedReasoning = stats.unclosedReasoning
                 } else if let billing = StreamingBillingHint.decode(delta) {
                     uiBillingHintCount += 1
-                    // Osaurus Router billed this turn. Stamp it so the run can't
+                    // Intelligence Router billed this turn. Stamp it so the run can't
                     // silently drop a billed-but-empty turn (see
                     // `trimTrailingEmptyAssistantTurn`) and so the bubble can
                     // explain the charge. Adopt the server-authoritative output
@@ -4383,7 +4383,7 @@ final class ChatSession: ObservableObject {
             ? (uiSentinelOnlyCount > 0 ? "sentinel-only" : "empty")
             : "non-empty"
         print(
-            "[Osaurus][UI] Stream consumption completed: contentDeltas=\(uiDeltaCount) reasoningDeltas=\(uiReasoningDeltaCount) classification=\(uiStreamClassification) in \(String(format: "%.2f", totalTime))s, final contentLen=\(currentTurn.contentLength), toolSentinels=\(uiToolSentinelCount), reasoningItems=\(uiReasoningItemCount), stats=\(uiStatsHintCount), billing=\(uiBillingHintCount), prefill=\(uiPrefillHintCount), capturedTools=\(capturedInvocations.count)"
+            "[Intelligence][UI] Stream consumption completed: contentDeltas=\(uiDeltaCount) reasoningDeltas=\(uiReasoningDeltaCount) classification=\(uiStreamClassification) in \(String(format: "%.2f", totalTime))s, final contentLen=\(currentTurn.contentLength), toolSentinels=\(uiToolSentinelCount), reasoningItems=\(uiReasoningItemCount), stats=\(uiStatsHintCount), billing=\(uiBillingHintCount), prefill=\(uiPrefillHintCount), capturedTools=\(capturedInvocations.count)"
         )
 
         return (capturedInvocations, currentTurn)
@@ -4752,7 +4752,7 @@ final class ChatSession: ObservableObject {
         case .remoteProvider:
             return model.providerName
         case .osaurusCloud:
-            return "Osaurus Cloud"
+            return "Intelligence Cloud"
         }
     }
 
@@ -5943,7 +5943,7 @@ final class ChatSession: ObservableObject {
                         // Log tool success (truncated result)
                         let truncatedResult = resultText.prefix(500)
                         print(
-                            "[Osaurus][Tool] Success: \(inv.toolName) returned \(resultText.count) chars: \(truncatedResult)\(resultText.count > 500 ? "..." : "")"
+                            "[Intelligence][Tool] Success: \(inv.toolName) returned \(resultText.count) chars: \(truncatedResult)\(resultText.count > 500 ? "..." : "")"
                         )
 
                         // Turn persistence intentionally does NOT happen here.
@@ -5975,7 +5975,7 @@ final class ChatSession: ObservableObject {
                             )
                             let truncatedArgs = recordedArgs.prefix(200)
                             print(
-                                "[Osaurus][Tool] Executing: \(inv.toolName) with args: \(truncatedArgs)\(recordedArgs.count > 200 ? "..." : "")"
+                                "[Intelligence][Tool] Executing: \(inv.toolName) with args: \(truncatedArgs)\(recordedArgs.count > 200 ? "..." : "")"
                             )
 
                             if executionMode.usesSandboxTools {
@@ -6203,7 +6203,7 @@ final class ChatSession: ObservableObject {
                         // the MainActor so the calls genuinely overlap.
                         if !approved.isEmpty {
                             print(
-                                "[Osaurus][Tool] Executing batch of \(approved.count) in parallel: \(approved.map { $0.invocation.toolName }.joined(separator: ", "))"
+                                "[Intelligence][Tool] Executing batch of \(approved.count) in parallel: \(approved.map { $0.invocation.toolName }.joined(separator: ", "))"
                             )
                             let turnIdForTools = assistantTurn.id
                             let results = await AgentToolLoop.runBatchInParallel(
@@ -6598,7 +6598,7 @@ final class ChatSession: ObservableObject {
                                 return .toolCalls(invocations)
                             } catch let oversized as OversizedStreamingToolCall {
                                 print(
-                                    "[Osaurus] Oversized streamed tool call "
+                                    "[Intelligence] Oversized streamed tool call "
                                         + "tool=\(oversized.toolName ?? "unknown") "
                                         + "chars=\(oversized.argumentCharacters); retrying with chunking notice"
                                 )
@@ -6623,7 +6623,7 @@ final class ChatSession: ObservableObject {
                                 {
                                     transientRetries += 1
                                     print(
-                                        "[Osaurus] Transient stream error (retry \(transientRetries)/\(maxTransientRetries)): \(error.localizedDescription)"
+                                        "[Intelligence] Transient stream error (retry \(transientRetries)/\(maxTransientRetries)): \(error.localizedDescription)"
                                     )
                                     // Roll back any partial UI state from the failed
                                     // attempt so the retry starts clean.
@@ -7529,7 +7529,7 @@ struct ChatView: View {
         let _ = ChatPerfTrace.shared.count("body.ChatView")
         chatModeContent
             .themedAlert(
-                L("Do you want Osaurus to auto speak every reply in this chat?"),
+                L("Do you want Intelligence to auto speak every reply in this chat?"),
                 isPresented: $showAutoSpeakPrompt,
                 message: L("This only applies to this chat."),
                 primaryButton: .primary(L("Yes")) { session.autoSpeakAssistant = true },
@@ -7915,7 +7915,7 @@ struct ChatView: View {
                                     AppDelegate.shared?.showOnboardingWindow()
                                 },
                                 onRetryConnection: {
-                                    // Reconnect the managed Osaurus Router and any
+                                    // Reconnect the managed Intelligence Router and any
                                     // enabled providers, then re-resolve the picker.
                                     await RemoteProviderManager.shared.connectEnabledProviders()
                                     await session.refreshPickerItems()
@@ -8219,7 +8219,7 @@ struct ChatView: View {
         let manager = RemoteProviderManager.shared
 
         let providerId: UUID
-        // Reuse an existing Osaurus provider that already targets the same agent
+        // Reuse an existing Intelligence provider that already targets the same agent
         if let existing = manager.configuration.providers.first(where: {
             $0.providerType == .osaurus && $0.remoteAgentId == agent.id
         }) {
@@ -8362,7 +8362,7 @@ struct ChatView: View {
     /// "unable to type-check in reasonable time" threshold.
     /// Quick actions for the empty chat state: the active agent's own actions
     /// if defined, else the built-in defaults (configure-oriented for the
-    /// default Osaurus agent, chat-oriented for everything else).
+    /// default Intelligence agent, chat-oriented for everything else).
     private var emptyStateQuickActions: [AgentQuickAction] {
         windowState.activeAgent.chatQuickActions
             ?? (windowState.agentId == Agent.defaultId
@@ -8491,7 +8491,7 @@ struct ChatView: View {
         // store directly, so only *its* body re-runs on per-token updates
         // Use the effective chat identity so a Mode 2 remote conversation is
         // headed by the *remote* agent's name + mascot, not the local agent
-        // (which always rendered "Osaurus" with the local avatar).
+        // (which always rendered "Intelligence" with the local avatar).
         let identity = windowState.effectiveChatIdentity
         let displayName = identity.name
         let lastAssistantTurnId = session.lastAssistantTurnIdForThread
@@ -9268,7 +9268,7 @@ extension ChatView {
 
 /// Shown when a discovered peer claims Secure Channel support (`osc=1`) but
 /// advertised no crypto address to pin. We refuse the connection rather than
-/// proceed without any identity verification: a genuine, current Osaurus peer
+/// proceed without any identity verification: a genuine, current Intelligence peer
 /// always advertises its address alongside `osc=1`, so this combination means
 /// either a spoofed advertisement or a peer that must upgrade / assign an
 /// identity. Refusal-only — there is no "connect anyway".
@@ -9291,7 +9291,7 @@ private struct UnverifiablePeerSheet: View {
                 }
 
                 Text(
-                    "This agent advertised that it supports encryption but didn't include a verifiable identity, so it can't be paired securely. It may be impersonating another device, or the other device may need to update Osaurus.",
+                    "This agent advertised that it supports encryption but didn't include a verifiable identity, so it can't be paired securely. It may be impersonating another device, or the other device may need to update Intelligence.",
                     bundle: .module
                 )
                 .font(theme.font(size: 13))
@@ -9653,7 +9653,7 @@ private enum PairingClient {
             let recovered = try? recoverAddress(
                 payload: pairingServerSigningPayload(agentAddress: decoded.agentAddress, nonce: nonce),
                 signature: sigBytes,
-                domainPrefix: "Osaurus Signed Pairing Server"
+                domainPrefix: "Intelligence Signed Pairing Server"
             ),
             recovered.lowercased() == expectedAddress.lowercased()
         else {

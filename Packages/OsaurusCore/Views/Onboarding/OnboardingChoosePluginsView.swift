@@ -53,7 +53,7 @@ final class ChoosePluginsState: ObservableObject {
     ///
     /// Note: there is intentionally no "macOS Use" or "Browser" pick here.
     /// Controlling Mac apps (the Computer Use harness) and browsing the web
-    /// (Browser Use) are now CORE Osaurus capabilities, enabled per-agent
+    /// (Browser Use) are now CORE Intelligence capabilities, enabled per-agent
     /// and configured in their own Settings tabs — not installed as
     /// standalone plugins.
     static let curated: [OnboardingPluginPick] = [

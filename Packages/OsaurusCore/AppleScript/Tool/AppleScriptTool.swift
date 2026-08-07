@@ -16,7 +16,7 @@
 //  AND a model installed. Unlike `computer_use`, no blanket OS permission is
 //  preflighted at the tool boundary: AppleScript's Automation/Apple Events
 //  consent is triggered by the OS at script-send time and attributed to
-//  Osaurus, and the loop preflights the Accessibility grant PER SCRIPT — only
+//  Intelligence, and the loop preflights the Accessibility grant PER SCRIPT — only
 //  when a proposed script actually uses System Events UI scripting (see
 //  `AppleScriptAccessibility`), since most AppleScript needs no such grant.
 //

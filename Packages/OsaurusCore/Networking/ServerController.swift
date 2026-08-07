@@ -197,7 +197,7 @@ final class ServerController: ObservableObject {
             self.localNetworkAddress =
                 configuration.exposeToNetwork ? self.getLocalIPAddress() : "127.0.0.1"
 
-            print("[Osaurus] Starting NIO server on \(bindHost):\(configuration.port)")
+            print("[Intelligence] Starting NIO server on \(bindHost):\(configuration.port)")
 
             // Ensure any previous instance is shut down
             try await stopServerIfNeeded()
@@ -214,7 +214,7 @@ final class ServerController: ObservableObject {
             serverHealth = .running
             lastErrorMessage = nil
             FeatureTelemetry.serverStarted()
-            print("[Osaurus] NIO server started successfully on port \(configuration.port)")
+            print("[Intelligence] NIO server started successfully on port \(configuration.port)")
             // One-line record of the effective inference policy so any
             // benchmark or bug report can state exactly which knobs were in
             // force without scraping Settings. Values here are the resolved
@@ -226,7 +226,7 @@ final class ServerController: ObservableObject {
             case .never: idleResidency = "never"
             }
             print(
-                "[Osaurus] inference policy: maxBatchSize=\(InferenceFeatureFlags.mlxBatchEngineMaxBatchSize) "
+                "[Intelligence] inference policy: maxBatchSize=\(InferenceFeatureFlags.mlxBatchEngineMaxBatchSize) "
                     + "eviction=\(configuration.modelEvictionPolicy.rawValue) "
                     + "idleResidency=\(idleResidency)"
             )
@@ -258,7 +258,7 @@ final class ServerController: ObservableObject {
         // If nothing to stop, return
         guard serverActor != nil else { return }
         if !isRestarting { serverHealth = .stopping }
-        print("[Osaurus] Stopping NIO server...")
+        print("[Intelligence] Stopping NIO server...")
 
         RelayTunnelManager.shared.disconnectAll()
         BonjourAdvertiser.shared.stopAdvertising()
@@ -275,14 +275,14 @@ final class ServerController: ObservableObject {
         localNetworkAddress = "127.0.0.1"
 
         if !isRestarting { serverHealth = .stopped }
-        print("[Osaurus] Server stopped successfully")
+        print("[Intelligence] Server stopped successfully")
     }
 
     /// Ensures the server is properly shut down before app termination
     func ensureShutdown() async {
         guard serverActor != nil else { return }
 
-        print("[Osaurus] Ensuring NIO server shutdown before app termination")
+        print("[Intelligence] Ensuring NIO server shutdown before app termination")
         RelayTunnelManager.shared.disconnectAll()
         // Stop mDNS on the quit path too — `stopServer` does this, but
         // `ensureShutdown` is the only teardown the AppDelegate calls, so
@@ -303,7 +303,7 @@ final class ServerController: ObservableObject {
 
         localNetworkAddress = "127.0.0.1"
 
-        print("[Osaurus] Server shutdown completed")
+        print("[Intelligence] Server shutdown completed")
     }
 
     // Capture singleton pointer on init attach to UI
@@ -444,7 +444,7 @@ final class ServerController: ObservableObject {
             let (_, response) = try await URLSession.shared.data(from: url)
             return (response as? HTTPURLResponse)?.statusCode == 200
         } catch {
-            print("[Osaurus] Health check failed: \(error)")
+            print("[Intelligence] Health check failed: \(error)")
             return false
         }
     }
@@ -569,7 +569,7 @@ final class ServerController: ObservableObject {
 
     /// Handles server startup errors
     private func handleServerError(_ error: Error) {
-        print("[Osaurus] Failed to start server: \(error)")
+        print("[Intelligence] Failed to start server: \(error)")
         isRunning = false
         let desc = error.localizedDescription.lowercased()
         if desc.contains("address already in use") || desc.contains("eaddrinuse") {

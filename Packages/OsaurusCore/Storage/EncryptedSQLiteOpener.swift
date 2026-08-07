@@ -3,7 +3,7 @@
 //  osaurus
 //
 //  Centralizes the (vendored) SQLCipher open-and-key dance + the
-//  PRAGMAs every Osaurus database wants. All five `*Database` classes
+//  PRAGMAs every Intelligence database wants. All five `*Database` classes
 //  delegate to this so the encryption posture is consistent and
 //  auditable in one file.
 //

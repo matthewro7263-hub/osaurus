@@ -19,7 +19,7 @@ import Testing
 /// harness doesn't have — under plain `swift test` the boot fails with
 /// "Container networking failed". Run this lane as root
 /// (`sudo -E swift test …`) or drive the same three boots from a signed
-/// app build; also stop any running Osaurus instance first so the VMs
+/// app build; also stop any running Intelligence instance first so the VMs
 /// don't contend for network resources.
 private let isSandboxBenchmarkEnabled =
     ProcessInfo.processInfo.environment["OSAURUS_RUN_SANDBOX_BENCHMARK"] == "1"

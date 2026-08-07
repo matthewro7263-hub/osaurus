@@ -113,7 +113,7 @@ struct AcknowledgementsView: View {
                             )
                     }
 
-                    Text("Open source libraries used by Osaurus", bundle: .module)
+                    Text("Open source libraries used by Intelligence", bundle: .module)
                         .font(.system(size: 14))
                         .foregroundColor(theme.secondaryText)
                 }
@@ -168,7 +168,7 @@ struct AcknowledgementsView: View {
     private var introSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(
-                "Osaurus is built with the help of many excellent open source projects. We are grateful to the developers and maintainers of these libraries.",
+                "Intelligence is built with the help of many excellent open source projects. We are grateful to the developers and maintainers of these libraries.",
                 bundle: .module
             )
             .font(.system(size: 14))

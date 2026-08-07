@@ -1116,7 +1116,7 @@ struct ThemesView: View {
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundColor(theme.primaryText)
 
-                    Text("Discover and install more themes shared by the Osaurus community", bundle: .module)
+                    Text("Discover and install more themes shared by the Intelligence community", bundle: .module)
                         .font(.system(size: 12))
                         .foregroundColor(theme.secondaryText)
                         .lineLimit(2)
@@ -1302,10 +1302,10 @@ struct ThemesView: View {
         let themeName = theme.metadata.name
         let success = themeManager.deleteTheme(id: theme.metadata.id)
         if success {
-            print("[Osaurus] Successfully deleted theme: \(themeName)")
+            print("[Intelligence] Successfully deleted theme: \(themeName)")
             showToast(L("Deleted \"\(themeName)\""))
         } else {
-            print("[Osaurus] Failed to delete theme: \(themeName)")
+            print("[Intelligence] Failed to delete theme: \(themeName)")
         }
         themeToDelete = nil
     }
@@ -1376,7 +1376,7 @@ struct ThemesView: View {
 
     private func confirmDelete(_ theme: CustomTheme) {
         guard !theme.isBuiltIn else {
-            print("[Osaurus] Cannot delete built-in theme: \(theme.metadata.name)")
+            print("[Intelligence] Cannot delete built-in theme: \(theme.metadata.name)")
             return
         }
         themeToDelete = theme
@@ -1402,11 +1402,11 @@ struct ThemesView: View {
                 themeManager.refreshInstalledThemes()
                 showToast(L("Imported \"\(imported.metadata.name)\""))
             } catch {
-                print("[Osaurus] Failed to import theme: \(error)")
+                print("[Intelligence] Failed to import theme: \(error)")
                 showToast(L("Import failed: \(error.localizedDescription)"), type: .error)
             }
         case .failure(let error):
-            print("[Osaurus] Import failed: \(error)")
+            print("[Intelligence] Import failed: \(error)")
             showToast(L("Import failed: \(error.localizedDescription)"), type: .error)
         }
     }
@@ -1419,7 +1419,7 @@ struct ThemesView: View {
             }
             themeToExport = nil
         case .failure(let error):
-            print("[Osaurus] Export failed: \(error)")
+            print("[Intelligence] Export failed: \(error)")
         }
     }
 }

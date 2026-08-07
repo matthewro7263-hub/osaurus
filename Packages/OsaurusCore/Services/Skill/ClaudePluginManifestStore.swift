@@ -39,7 +39,7 @@ public struct ClaudePluginManifestSnapshot: Codable, Sendable, Hashable {
     public let declaresHooks: Bool
     public let declaresUnsupportedComponents: [String]
     /// Follow-up state captured from the install report. Optional so snapshots
-    /// written by older Osaurus builds still decode.
+    /// written by older Intelligence builds still decode.
     public let installOutcome: InstallOutcome?
 
     /// Declared artifact counts captured at install. Used to seed the card

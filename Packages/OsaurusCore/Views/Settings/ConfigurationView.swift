@@ -202,7 +202,7 @@ struct ConfigurationView: View {
                     // Start at Login
                     SettingsToggle(
                         title: L("Start at Login"),
-                        description: "Launch Osaurus when you sign in",
+                        description: "Launch Intelligence when you sign in",
                         anchorId: "settings.general.login",
                         isOn: $tempStartAtLogin
                     )
@@ -420,7 +420,7 @@ struct ConfigurationView: View {
                                 SettingsSection(title: "Legal", icon: "doc.text", anchorId: "settings.legal") {
                                     VStack(alignment: .leading, spacing: 12) {
                                         Text(
-                                            "Review the agreements that govern your use of Osaurus.",
+                                            "Review the agreements that govern your use of Intelligence.",
                                             bundle: .module
                                         )
                                         .font(.system(size: 12))
@@ -479,7 +479,7 @@ struct ConfigurationView: View {
 
                     VStack(spacing: 24) {
                         VStack(spacing: 8) {
-                            Text("Resetting Osaurus", bundle: .module)
+                            Text("Resetting Intelligence", bundle: .module)
                                 .font(.system(size: 18, weight: .bold))
                                 .foregroundColor(theme.primaryText)
 
@@ -763,7 +763,7 @@ struct ConfigurationView: View {
 
     private func showFactoryResetConfirmation() {
         let alert = NSAlert()
-        alert.messageText = L("Factory Reset Osaurus?")
+        alert.messageText = L("Factory Reset Intelligence?")
         alert.informativeText =
             L(
                 "This will permanently delete all your data, including chat history, agents, memory, and your identity keys. This action cannot be undone and the application will close."
@@ -1001,7 +1001,7 @@ extension ConfigurationView {
 
         // Candidate target directories. /opt/homebrew/bin is intentionally
         // NOT a candidate: it's a directory Homebrew owns and manages, and
-        // Osaurus isn't distributed via a Homebrew formula — its presence
+        // Intelligence isn't distributed via a Homebrew formula — its presence
         // on a user's machine for unrelated packages isn't a reason for
         // this app to write into it. See osaurus-ai/osaurus#2137.
         let usrLocalBin = URL(fileURLWithPath: "/usr/local/bin", isDirectory: true)
@@ -1288,7 +1288,7 @@ private struct FactoryResetStepRow: View {
         case .keychain: return L("Removing Keychain secrets")
         case .preferences: return L("Clearing preferences")
         case .data: return L("Deleting app data")
-        case .quit: return L("Quitting Osaurus")
+        case .quit: return L("Quitting Intelligence")
         }
     }
 

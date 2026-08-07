@@ -2,7 +2,7 @@
 //  StorageFileFormat.swift
 //  osaurus
 //
-//  Deterministic on-disk format detection for Osaurus SQLite databases.
+//  Deterministic on-disk format detection for Intelligence SQLite databases.
 //
 //  A plaintext SQLite 3 file always begins with the fixed 16-byte magic
 //  string "SQLite format 3\0". A SQLCipher-encrypted file encrypts page 1

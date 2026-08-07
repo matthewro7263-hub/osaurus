@@ -444,7 +444,7 @@ final class DiscordAPIClient: DiscordAPIClientProtocol, @unchecked Sendable {
         var request = URLRequest(url: url)
         request.setValue("Bot \(token)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue("Osaurus Discord Native Plugin", forHTTPHeaderField: "User-Agent")
+        request.setValue("Intelligence Discord Native Plugin", forHTTPHeaderField: "User-Agent")
         request.timeoutInterval = 30
         return request
     }

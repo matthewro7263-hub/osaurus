@@ -49,7 +49,7 @@ struct KnowledgeView: View {
                         icon: "books.vertical.fill",
                         title: L("Add Your First Knowledge Collection"),
                         subtitle: L(
-                            "Point Osaurus at a folder of guides, templates, and standards and grant it to agents so they can consult it on demand. Markdown, plain text, code, PDF, Word, Excel, PowerPoint, and CSV files are supported."
+                            "Point Intelligence at a folder of guides, templates, and standards and grant it to agents so they can consult it on demand. Markdown, plain text, code, PDF, Word, Excel, PowerPoint, and CSV files are supported."
                         ),
                         examples: [
                             .init(
@@ -904,7 +904,7 @@ private struct KnowledgeCollectionEditorSheet: View {
                         .textFieldStyle(.roundedBorder)
                         .font(.system(size: 12, design: .monospaced))
                     Text(
-                        "Clones into Osaurus-managed storage and keeps the git link for Sync. Uses your existing git credentials (credential helper or SSH agent). Leave empty to use the folder above.",
+                        "Clones into Intelligence-managed storage and keeps the git link for Sync. Uses your existing git credentials (credential helper or SSH agent). Leave empty to use the folder above.",
                         bundle: .module
                     )
                     .font(.system(size: 10))
@@ -1448,7 +1448,7 @@ private struct KnowledgeCollectionDetailSheet: View {
                 }
             } message: {
                 Text(
-                    "This removes the collection and its search index from Osaurus. The folder and its files on disk are not touched.",
+                    "This removes the collection and its search index from Intelligence. The folder and its files on disk are not touched.",
                     bundle: .module
                 )
             }

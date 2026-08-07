@@ -307,7 +307,7 @@
                 return "Couldn't launch stdio MCP subprocess: \(detail)"
             case .sandboxUnavailable:
                 return
-                    "This provider is configured to run in the Osaurus sandbox, but the sandbox runtime is not currently available."
+                    "This provider is configured to run in the Intelligence sandbox, but the sandbox runtime is not currently available."
             case .commandNotFound(let command, _):
                 return
                     "`\(command)` was \(Self.commandNotFoundMarker). Use a full path (e.g. /opt/homebrew/bin/npx) or switch to Sandbox."

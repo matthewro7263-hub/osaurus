@@ -94,7 +94,7 @@ public struct CodexReasoningLevel: Sendable, Equatable, Hashable {
 public struct CodexModelMetadata: Sendable, Equatable, Hashable {
     public let slug: String
     public let displayName: String?
-    /// Catalog default effort. Display-only: Osaurus shows it when the user
+    /// Catalog default effort. Display-only: Intelligence shows it when the user
     /// made no explicit choice but never injects it into requests.
     public let defaultReasoningLevel: String?
     /// Supported efforts in catalog order. Empty when the catalog exposes no

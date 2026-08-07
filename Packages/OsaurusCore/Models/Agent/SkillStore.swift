@@ -139,7 +139,7 @@ public enum SkillStore {
                 )
             }
         } catch {
-            print("[Osaurus] Failed to save skill \(skill.id): \(error)")
+            print("[Intelligence] Failed to save skill \(skill.id): \(error)")
         }
     }
 
@@ -352,7 +352,7 @@ public enum SkillStore {
                 pluginId: parsed.pluginId
             )
         } catch {
-            print("[Osaurus] Failed to load skill from \(directoryURL.lastPathComponent): \(error)")
+            print("[Intelligence] Failed to load skill from \(directoryURL.lastPathComponent): \(error)")
             return nil
         }
     }
@@ -454,9 +454,9 @@ public enum SkillStore {
                     encoding: .utf8
                 )
                 try FileManager.default.removeItem(at: file)
-                print("[Osaurus] Migrated skill: \(skill.name)")
+                print("[Intelligence] Migrated skill: \(skill.name)")
             } catch {
-                print("[Osaurus] Failed to migrate \(file.lastPathComponent): \(error)")
+                print("[Intelligence] Failed to migrate \(file.lastPathComponent): \(error)")
             }
         }
     }

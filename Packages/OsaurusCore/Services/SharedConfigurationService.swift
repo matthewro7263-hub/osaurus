@@ -32,7 +32,7 @@ final class SharedConfigurationService {
             try OsaurusPaths.ensureExists(instance)
             return true
         } catch {
-            print("[Osaurus] SharedConfigurationService: failed to create directories: \(error)")
+            print("[Intelligence] SharedConfigurationService: failed to create directories: \(error)")
             return false
         }
     }
@@ -92,7 +92,7 @@ final class SharedConfigurationService {
                     )
                 }
             } catch {
-                print("[Osaurus] SharedConfigurationService: failed to write configuration: \(error)")
+                print("[Intelligence] SharedConfigurationService: failed to write configuration: \(error)")
             }
         }
     }
@@ -107,7 +107,7 @@ final class SharedConfigurationService {
         let drained = DispatchSemaphore(value: 0)
         Self.ioQueue.async { drained.signal() }
         if drained.wait(timeout: .now() + 2) == .timedOut {
-            print("[Osaurus] SharedConfigurationService: flush timed out; abandoning pending I/O")
+            print("[Intelligence] SharedConfigurationService: flush timed out; abandoning pending I/O")
         }
     }
 
@@ -119,12 +119,12 @@ final class SharedConfigurationService {
                 if FileManager.default.fileExists(atPath: instance.path) {
                     try FileManager.default.removeItem(at: instance)
                     print(
-                        "[Osaurus] SharedConfigurationService: removed instance directory at \(instance.path)"
+                        "[Intelligence] SharedConfigurationService: removed instance directory at \(instance.path)"
                     )
                 }
             } catch {
                 print(
-                    "[Osaurus] SharedConfigurationService: failed to remove instance directory: \(error)")
+                    "[Intelligence] SharedConfigurationService: failed to remove instance directory: \(error)")
             }
         }
     }

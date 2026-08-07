@@ -58,7 +58,7 @@ final class ComputerUsePermissionDoctorTests: XCTestCase {
                 agents: [
                     ComputerUseAgentAvailabilityInput(
                         id: Agent.defaultId,
-                        displayName: "Osaurus",
+                        displayName: "Intelligence",
                         isBuiltIn: true,
                         computerUseEnabled: false,
                         hasEffectiveModel: true

@@ -613,7 +613,7 @@ struct RuntimePolicySourceTests {
             "../../App/osaurus.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
         )
 
-        // The synchronized revision keeps the consolidated vmlx-swift pin for Osaurus
+        // The synchronized revision keeps the consolidated vmlx-swift pin for Intelligence
         // with vendored Jinja/Hub/Tokenizers/Transformers exposed through
         // VMLX-prefixed products, plus the Qwen3.6 MXFP affine metadata,
         // MoE router-gate load hardening, native-MTP speedup proof gate,
@@ -633,7 +633,7 @@ struct RuntimePolicySourceTests {
         // the vMLX regression harness, plus the Nemotron Omni tool-template
         // fallback that keeps tool schemas rendered through the model-native
         // [AVAILABLE_TOOLS]/XML function-call contract instead of leaking
-        // role-token/DSML fragments in Osaurus tool turns, plus the Gemma4
+        // role-token/DSML fragments in Intelligence tool turns, plus the Gemma4
         // Zyphra XML tool-call parser used by live JANG_4M multiline tool
         // envelopes, plus Gemma4 unified 12B config dispatch, processor
         // tool-schema preservation, quoted native call:value parsing, the
@@ -647,7 +647,7 @@ struct RuntimePolicySourceTests {
         // metadata for strict tool choice, plus the Nemotron Ultra resident
         // perf harness load split and mmap growing-cache proof for
         // disk-backed hybrid SSM companion hits, plus the Nemotron Ultra
-        // mamba_projection role alias so Osaurus auto-settings consume the
+        // mamba_projection role alias so Intelligence auto-settings consume the
         // same 8-bit affine Mamba projection metadata as mamba_proj-stamped
         // bundles, plus the Nemotron-H JANGTQ mmap auto-BF16 load path that
         // keeps TQ tensors raw while promoting non-TQ tensors out of fp16
@@ -683,7 +683,7 @@ struct RuntimePolicySourceTests {
         // matching prefix-hit diagnostics that count disk-tier reuse.
         // That avoids Xcode PIF
         // duplicate-product collisions with the app graph while keeping yyjson
-        // as one shared C dependency. Osaurus must not carry SwiftPM
+        // as one shared C dependency. Intelligence must not carry SwiftPM
         // moduleAliases for that collision.
         // plus the quadratic-BPE merge fix (O(n^2) -> O(n log n) on long
         // whitespace-free pre-tokens) that collapses multi-second prefill on
@@ -769,11 +769,11 @@ struct RuntimePolicySourceTests {
         // integers across the Foundation bridge (instead of silently turning
         // `1` into `true`) and keeps nested Qwen XML argument marks lossless.
         // vmlx-swift#177 adds the awaited direct-generation cancellation/drain
-        // boundary required before Osaurus can admit the next solo request.
+        // boundary required before Intelligence can admit the next solo request.
         // vmlx-swift#179 adds schema-bound recovery for Qwen XML
         // array<string> arguments emitted as plain bracket lists and routes
         // Gemma's decoded thought-channel opener into the reasoning stream.
-        // The static-prefix cache-hint revision lets Osaurus seed an SSD
+        // The static-prefix cache-hint revision lets Intelligence seed an SSD
         // boundary from the byte-stable leading system prompt even when a
         // mutable DB/tool section later changes inside the same rendered
         // system message.
@@ -796,7 +796,7 @@ struct RuntimePolicySourceTests {
         #expect(manifestRevision == appRevision)
         #expect(
             manifestRevision == expectedRuntimeHardenedRevision,
-            "Osaurus must consume the proven vmlx-swift revision with schema-bound Qwen XML string-array recovery, Gemma reasoning routing, scalar text-only Gemma system prompts, static system-prefix SSD cache boundaries, Nanbeige 4.2 looped-transformer runtime support, and actor-consistent atomic BatchEngine capacity snapshots together with the existing runtime checkpoints. An internally-consistent older pin is still not wired"
+            "Intelligence must consume the proven vmlx-swift revision with schema-bound Qwen XML string-array recovery, Gemma reasoning routing, scalar text-only Gemma system prompts, static system-prefix SSD cache boundaries, Nanbeige 4.2 looped-transformer runtime support, and actor-consistent atomic BatchEngine capacity snapshots together with the existing runtime checkpoints. An internally-consistent older pin is still not wired"
         )
         #expect(manifest.contains("https://github.com/osaurus-ai/vmlx-swift"))
         #expect(!manifest.contains("https://github.com/osaurus-ai/vmlx-swift-lm"))
@@ -1029,7 +1029,7 @@ struct RuntimePolicySourceTests {
         }
     }
 
-    @Test("Osaurus source does not import unvendored tokenizer or template modules")
+    @Test("Intelligence source does not import unvendored tokenizer or template modules")
     func osaurusSourceUsesVMLXPrefixedTokenizerAndTemplateModules() throws {
         let disallowedImports = [
             "import Tokenizers",
@@ -1063,7 +1063,7 @@ struct RuntimePolicySourceTests {
         // Ownership moved from `ModelRuntime.buildCacheCoordinatorConfig`
         // (which now delegates to `VMLXServerRuntimeSettings.cacheCoordinatorConfig`)
         // to `ServerRuntimeSettingsStore.migratedFromLegacy`. The
-        // migrated default seeds `enableSSMReDerive: true` so Osaurus does
+        // migrated default seeds `enableSSMReDerive: true` so Intelligence does
         // not default hybrid models into KV-only cache reuse.
         let store = try Self.source("Models/Configuration/ServerRuntimeSettingsStore.swift")
 
@@ -1392,9 +1392,9 @@ struct RuntimePolicySourceTests {
     }
 
     /// With the default `maxBatchSize == 1`, vmlx can use its solo
-    /// TokenIterator-backed fast path. Osaurus must not let a second solo
+    /// TokenIterator-backed fast path. Intelligence must not let a second solo
     /// request run prompt tokenization / `MLXArray.asArray(...)` while that
-    /// decode is still active. Osaurus must release the solo lease only after
+    /// decode is still active. Intelligence must release the solo lease only after
     /// the upstream stream completes, never from one event's relative order;
     /// otherwise a second request can enter `prepareInput` while the first one
     /// is still draining GPU or cache work.
@@ -1452,7 +1452,7 @@ struct RuntimePolicySourceTests {
     /// `unclosedReasoning`. Dropping it is exactly how a reasoning-only MiniMax
     /// run can finish with a visible Thinking pane but no "thinking did not
     /// close" diagnostic. Cancellation must not be checked before preserving
-    /// `.info` / stats sentinels at any Osaurus stream boundary.
+    /// `.info` / stats sentinels at any Intelligence stream boundary.
     @Test("Generation stream wrappers preserve terminal info before honoring cancellation")
     func generationWrappersPreserveTerminalInfoBeforeCancellation() throws {
         let mapper = try Self.source("Services/ModelRuntime/GenerationEventMapper.swift")
@@ -3617,7 +3617,7 @@ struct RuntimePolicySourceTests {
         #expect(
             adapter.contains("engineDefaults.temperature")
                 && !adapter.contains("runtimeTemperature ?? 0.7"),
-            "Local chat sampler fallback must use vmlx GenerateParameters defaults, not Osaurus-specific invented temperature defaults."
+            "Local chat sampler fallback must use vmlx GenerateParameters defaults, not Intelligence-specific invented temperature defaults."
         )
         #expect(
             adapter.contains("engineDefaults.topP")
@@ -3626,7 +3626,7 @@ struct RuntimePolicySourceTests {
                 && !adapter.contains("runtimeTopP ?? 1.0")
                 && !adapter.contains("runtimeTopK ?? 0")
                 && !adapter.contains("runtimeMinP ?? 0"),
-            "Local chat sampler fallback must use vmlx GenerateParameters defaults for topP/topK/minP instead of hardcoded Osaurus literals."
+            "Local chat sampler fallback must use vmlx GenerateParameters defaults for topP/topK/minP instead of hardcoded Intelligence literals."
         )
         #expect(
             !adapter.contains("generation.samplingParametersAreImplicit {\n            return true"),
@@ -3652,7 +3652,7 @@ struct RuntimePolicySourceTests {
                 && !tokenizerLoader.contains(
                     "Self.requiresToolChoice(adjustedContext),\n            (env[\"VMLX_CHAT_TEMPLATE_FALLBACK_DISABLE\"] ?? \"0\") != \"1\"\n        {\n            return try fallback(\n                label: \"Gemma4"
                 ),
-            "Gemma4 required/named tool turns must not bypass the model-bundled native template with an Osaurus-forced Gemma4WithTools fallback."
+            "Gemma4 required/named tool turns must not bypass the model-bundled native template with an Intelligence-forced Gemma4WithTools fallback."
         )
         #expect(
             reasoningCapability.contains("runtime code must not synthesize")

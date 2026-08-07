@@ -280,7 +280,7 @@ private struct AddProviderFlow: View {
             L("This looks like an MCP server"),
             isPresented: $showMCPRedirectPrompt,
             message: L(
-                "This URL answers like an MCP server, not a chat completions API. Osaurus can add it as an MCP connection instead — the URL and token you entered will be carried over."
+                "This URL answers like an MCP server, not a chat completions API. Intelligence can add it as an MCP connection instead — the URL and token you entered will be carried over."
             ),
             buttons: [
                 .cancel(L("Cancel")),

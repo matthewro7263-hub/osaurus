@@ -12,7 +12,7 @@
 //  Chat-created watchers carry a plain folder path, not a security-scoped
 //  bookmark (there is no folder picker in chat). `WatcherManager` falls
 //  back to `watchPath` when no bookmark exists, so this works for folders
-//  Osaurus can already access; if macOS denies access, the tool directs
+//  Intelligence can already access; if macOS denies access, the tool directs
 //  the user to re-pick the folder in the Watchers tab.
 //
 

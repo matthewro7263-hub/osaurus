@@ -20,7 +20,7 @@ private let heroAvatarIconFontSize: CGFloat = 28
 // MARK: - Hero Agent Avatar
 
 /// Renders a hero-sized avatar for a given agent. Built-in and custom
-/// agents share the same `AgentAvatarView` path so the default Osaurus
+/// agents share the same `AgentAvatarView` path so the default Intelligence
 /// agent gets the same gradient-circle backing as every other agent —
 /// previously the built-in branch rendered the mascot PNG without that
 /// backing, leaving the dino floating against the chat background.
@@ -62,7 +62,7 @@ struct ChatEmptyState: View {
     /// setup runs (DeepSeek V4 Flash for first-run). Nil means Cloud still
     /// needs to connect.
     var temporaryCloudModelName: String? = nil
-    /// Automatic temporary Osaurus Cloud selection while the pinned local
+    /// Automatic temporary Intelligence Cloud selection while the pinned local
     /// download finishes. Async because the Router may need to connect on
     /// demand; false lets the setup card surface a retry.
     var onUseHostedWhilePending: (() async -> Bool)? = nil
@@ -358,7 +358,7 @@ struct ChatEmptyState: View {
         case .encrypted:
             return Text("End-to-end encrypted", bundle: .module)
         case .peerNeedsUpgrade:
-            return Text("Peer needs an Osaurus upgrade for encrypted chat", bundle: .module)
+            return Text("Peer needs an Intelligence upgrade for encrypted chat", bundle: .module)
         }
     }
 
@@ -366,15 +366,15 @@ struct ChatEmptyState: View {
         switch state {
         case .connecting:
             return L(
-                "Establishing the Osaurus Secure Channel — forward-secret, mutually authenticated end-to-end encryption. Not encrypted until connected."
+                "Establishing the Intelligence Secure Channel — forward-secret, mutually authenticated end-to-end encryption. Not encrypted until connected."
             )
         case .encrypted:
             return L(
-                "Agent traffic is protected by the Osaurus Secure Channel: forward-secret, mutually authenticated end-to-end encryption."
+                "Agent traffic is protected by the Intelligence Secure Channel: forward-secret, mutually authenticated end-to-end encryption."
             )
         case .peerNeedsUpgrade:
             return L(
-                "This peer runs an older Osaurus without the Secure Channel. Agent chat is refused until it upgrades — no plaintext fallback."
+                "This peer runs an older Intelligence without the Secure Channel. Agent chat is refused until it upgrades — no plaintext fallback."
             )
         }
     }
@@ -556,13 +556,13 @@ private struct EmptyStateSecondaryButton: View {
 
 /// Post-onboarding setup state for the local-first path. The pinned private
 /// model is still downloading (or paused / failed), so the included temporary
-/// Osaurus Cloud model is connected automatically. It keeps local progress and
+/// Intelligence Cloud model is connected automatically. It keeps local progress and
 /// Cloud readiness in one place until the downloaded model takes over.
 private struct ChatEmptyStateLocalSetup: View {
     let modelId: String
     let hasAppeared: Bool
     let temporaryCloudModelName: String?
-    /// Automatic temporary Osaurus Cloud selection while local setup runs.
+    /// Automatic temporary Intelligence Cloud selection while local setup runs.
     /// Returns false when the Router couldn't be reached; the card then shows
     /// a retry rather than silently choosing another provider. nil hides the
     /// connection status entirely.
@@ -755,7 +755,7 @@ private struct ChatEmptyStateLocalSetup: View {
                     Text("Ready to chat now", bundle: .module)
                         .font(theme.font(size: 12, weight: .semibold))
                         .foregroundColor(theme.primaryText)
-                    Text(L("\(cloudModel) on Osaurus Cloud · switches to local automatically"))
+                    Text(L("\(cloudModel) on Intelligence Cloud · switches to local automatically"))
                         .font(theme.font(size: 11))
                         .foregroundColor(theme.tertiaryText)
                         .fixedSize(horizontal: false, vertical: true)
@@ -767,7 +767,7 @@ private struct ChatEmptyStateLocalSetup: View {
             case .idle, .connecting:
                 HStack(spacing: 10) {
                     ProgressView().controlSize(.small)
-                    Text("Getting Osaurus Cloud ready…", bundle: .module)
+                    Text("Getting Intelligence Cloud ready…", bundle: .module)
                         .font(theme.font(size: 12, weight: .medium))
                         .foregroundColor(theme.secondaryText)
                     Spacer()
@@ -776,7 +776,7 @@ private struct ChatEmptyStateLocalSetup: View {
                 HStack(spacing: 10) {
                     statusIcon("exclamationmark", color: theme.warningColor)
                     VStack(alignment: .leading, spacing: 5) {
-                        Text("Couldn't reach Osaurus Cloud", bundle: .module)
+                        Text("Couldn't reach Intelligence Cloud", bundle: .module)
                             .font(theme.font(size: 12, weight: .semibold))
                             .foregroundColor(theme.primaryText)
                         EmptyStateSecondaryButton(
@@ -846,9 +846,9 @@ private struct ChatEmptyStateLocalSetup: View {
     private var subtitle: LocalizedStringKey {
         switch downloadState {
         case .failed, .paused:
-            return "You can keep chatting with Osaurus Cloud."
+            return "You can keep chatting with Intelligence Cloud."
         case .downloading, .completed, .notStarted:
-            return "Start chatting now while Osaurus finishes setting up local AI."
+            return "Start chatting now while Intelligence finishes setting up local AI."
         }
     }
 }
@@ -903,7 +903,7 @@ private struct ChatEmptyStateNoModels: View {
             failedDownloadState(failure)
         } else if !OnboardingService.shared.shouldShowOnboarding {
             // Onboarding finished but no model is reachable — most commonly
-            // the managed Osaurus connection failed (offline, server hiccup).
+            // the managed Intelligence connection failed (offline, server hiccup).
             // Recover in place: retry, go local, or connect a provider —
             // never send the user back through the whole wizard.
             connectionRecoveryState
@@ -927,7 +927,7 @@ private struct ChatEmptyStateNoModels: View {
                     .offset(y: hasAppeared ? 0 : 20)
                     .animation(theme.springAnimation().delay(0.1), value: hasAppeared)
 
-                Text("Osaurus needs an AI to work — either a cloud provider or a local model.", bundle: .module)
+                Text("Intelligence needs an AI to work — either a cloud provider or a local model.", bundle: .module)
                     .font(theme.font(size: CGFloat(theme.bodySize) + 2))
                     .foregroundColor(theme.secondaryText)
                     .multilineTextAlignment(.center)
@@ -949,7 +949,7 @@ private struct ChatEmptyStateNoModels: View {
     }
 
     /// Recoverable first-chat state for a completed onboarding whose brain
-    /// isn't reachable (e.g. the Osaurus connection failed while offline).
+    /// isn't reachable (e.g. the Intelligence connection failed while offline).
     private var connectionRecoveryState: some View {
         VStack(spacing: 14) {
             defaultWelcomeAvatar()
@@ -966,7 +966,7 @@ private struct ChatEmptyStateNoModels: View {
                     .animation(theme.springAnimation().delay(0.1), value: hasAppeared)
 
                 Text(
-                    "Osaurus couldn't connect to a model just now. Retry the connection, run a private model on this Mac, or use your own provider.",
+                    "Intelligence couldn't connect to a model just now. Retry the connection, run a private model on this Mac, or use your own provider.",
                     bundle: .module
                 )
                 .font(theme.font(size: CGFloat(theme.bodySize) + 2))

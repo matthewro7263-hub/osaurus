@@ -49,7 +49,7 @@ public enum ChatSessionImporter {
                 return L("The file is not valid JSON.")
             case .unrecognizedFormat:
                 return L(
-                    "Unrecognized export format. Supported: ChatGPT conversations.json, Claude export JSON, Grok account export, Gemini Takeout MyActivity.json, Open WebUI chat export, or Osaurus generic import JSON."
+                    "Unrecognized export format. Supported: ChatGPT conversations.json, Claude export JSON, Grok account export, Gemini Takeout MyActivity.json, Open WebUI chat export, or Intelligence generic import JSON."
                 )
             case .noConversations:
                 return L("No importable conversations were found in the file.")
@@ -551,7 +551,7 @@ public enum ChatSessionImporter {
         return nil
     }
 
-    // MARK: - Generic Osaurus import schema
+    // MARK: - Generic Intelligence import schema
 
     /// Minimal documented schema any tool (or an agent scraping a WebUI)
     /// can target:
@@ -650,7 +650,7 @@ public enum ChatSessionImporter {
             createdAt: created,
             updatedAt: updated,
             // Leave the model unset: the export's model id won't match a
-            // configured Osaurus model, and nil falls back to the agent's
+            // configured Intelligence model, and nil falls back to the agent's
             // default on load.
             selectedModel: nil,
             turns: turns,

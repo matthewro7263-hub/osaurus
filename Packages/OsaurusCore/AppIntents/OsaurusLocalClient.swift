@@ -22,15 +22,15 @@ public enum OsaurusLocalClientError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .serverUnreachable:
-            return "Osaurus isn't reachable. Open Osaurus and make sure its local server is running."
+            return "Intelligence isn't reachable. Open Intelligence and make sure its local server is running."
         case .badResponse(let status, let body):
             let trimmed = body.trimmingCharacters(in: .whitespacesAndNewlines)
             if trimmed.isEmpty {
-                return "Osaurus returned an unexpected response (HTTP \(status))."
+                return "Intelligence returned an unexpected response (HTTP \(status))."
             }
-            return "Osaurus returned an error (HTTP \(status)): \(trimmed)"
+            return "Intelligence returned an error (HTTP \(status)): \(trimmed)"
         case .emptyReply:
-            return "Osaurus didn't return a response."
+            return "Intelligence didn't return a response."
         }
     }
 }
@@ -47,10 +47,10 @@ public final class OsaurusLocalClient: Sendable {
 
     // MARK: - Agent resolution
 
-    /// The currently active agent's id. "Ask Osaurus" targets whatever agent
+    /// The currently active agent's id. "Ask Intelligence" targets whatever agent
     /// the user has selected in the app (`AgentManager.activeAgentId`), which is
     /// restored from persistence on launch. This may resolve to the built-in
-    /// "Osaurus" agent when that is the active one — which is why the run/dispatch
+    /// "Intelligence" agent when that is the active one — which is why the run/dispatch
     /// endpoints relax their built-in guard for loopback callers.
     public func activeAgentID() async -> String {
         await MainActor.run { AgentManager.shared.activeAgentId.uuidString }

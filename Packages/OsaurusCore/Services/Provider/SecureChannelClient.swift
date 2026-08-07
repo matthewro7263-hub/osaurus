@@ -2,8 +2,8 @@
 //  SecureChannelClient.swift
 //  osaurus
 //
-//  Client side of the Osaurus Secure Channel. Owns one established session
-//  per remote Osaurus provider (keyed by provider id + pinned agent address),
+//  Client side of the Intelligence Secure Channel. Owns one established session
+//  per remote Intelligence provider (keyed by provider id + pinned agent address),
 //  performs the `/secure/session` handshake on demand, verifies the server's
 //  transcript signature against the address pinned at pairing time, and
 //  re-handshakes when a session expires or the server forgets it (restart).
@@ -35,7 +35,7 @@ public enum SecureChannelClientError: Error, LocalizedError, Equatable {
         switch self {
         case .peerUnsupported:
             return
-                "This peer's Osaurus version does not support end-to-end encryption. Ask them to upgrade Osaurus."
+                "This peer's Intelligence version does not support end-to-end encryption. Ask them to upgrade Intelligence."
         case .missingAgentAddress:
             return "This provider has no pinned agent identity. Re-pair with the remote agent."
         case .identityMismatch:

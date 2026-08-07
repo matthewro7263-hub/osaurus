@@ -43,7 +43,7 @@ struct HTTPHandlerEndpointTests {
             from: URL(string: "http://\(server.host):\(server.port)/")!
         )
         #expect((resp as? HTTPURLResponse)?.statusCode == 200)
-        #expect(String(decoding: data, as: UTF8.self).contains("Osaurus Server is running"))
+        #expect(String(decoding: data, as: UTF8.self).contains("Intelligence Server is running"))
     }
 
     @Test func models_endpoint_returns_list() async throws {

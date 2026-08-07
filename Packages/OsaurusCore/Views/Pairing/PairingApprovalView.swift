@@ -178,7 +178,7 @@ struct PairingApprovalView: View {
     // MARK: - Encryption Assurance
 
     /// Reassures the user at the moment of approval: everything this device
-    /// exchanges with the agent runs through the Osaurus Secure Channel.
+    /// exchanges with the agent runs through the Intelligence Secure Channel.
     private var encryptionAssurance: some View {
         HStack(alignment: .top, spacing: 8) {
             Image(systemName: "lock.fill")

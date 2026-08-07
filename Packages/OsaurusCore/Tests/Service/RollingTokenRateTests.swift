@@ -1,4 +1,4 @@
-// Copyright © 2026 Osaurus AI. All rights reserved.
+// Copyright © 2026 Intelligence AI. All rights reserved.
 //
 // Tests for `RollingTokenRate` — the steady-state tok/s estimator that
 // replaced the chat UI's "single-final-average" display.

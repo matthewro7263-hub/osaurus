@@ -9,31 +9,31 @@
 	<key>SentryDSN</key>
 	<string>$(SENTRY_DSN)</string>
 	<key>SUEnableAutomaticChecks</key>
-	<true/>
+	<false/>
 	<key>SUFeedURL</key>
 	<string>https://osaurus-ai.github.io/osaurus/appcast.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>HBRBQ8QQOhmvMKnSxQxqb3upTjyirdx0xkHSSRqn7aI=</string>
 	<key>NSAppleEventsUsageDescription</key>
-	<string>Osaurus uses automation to control other applications on your behalf — including agents that write and run AppleScript to automate tasks on this Mac, and plugins that use automation.</string>
+	<string>Intelligence uses automation to control other applications on your behalf — including agents that write and run AppleScript to automate tasks on this Mac, and plugins that use automation.</string>
 	<key>NSCalendarsUsageDescription</key>
-	<string>Osaurus plugins may access your calendar to read and create events.</string>
+	<string>Intelligence plugins may access your calendar to read and create events.</string>
 	<key>NSCalendarsFullAccessUsageDescription</key>
-	<string>Osaurus plugins may access your calendar to read and create events.</string>
+	<string>Intelligence plugins may access your calendar to read and create events.</string>
 	<key>NSContactsUsageDescription</key>
-	<string>Osaurus plugins may access your contacts to search and read contact information.</string>
+	<string>Intelligence plugins may access your contacts to search and read contact information.</string>
 	<key>NSRemindersUsageDescription</key>
-	<string>Osaurus plugins may access your reminders to read and create tasks.</string>
+	<string>Intelligence plugins may access your reminders to read and create tasks.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Osaurus plugins may access your location to provide location-based services.</string>
+	<string>Intelligence plugins may access your location to provide location-based services.</string>
 	<key>NSLocationUsageDescription</key>
-	<string>Osaurus plugins may access your location to provide location-based services.</string>
+	<string>Intelligence plugins may access your location to provide location-based services.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Osaurus uses the microphone for on-device voice transcription with FluidAudio.</string>
+	<string>Intelligence uses the microphone for on-device voice transcription with FluidAudio.</string>
 	<key>NSScreenCaptureUsageDescription</key>
-	<string>Osaurus can capture screenshots and system audio only when you grant Screen Recording access.</string>
+	<string>Intelligence can capture screenshots and system audio only when you grant Screen Recording access.</string>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>Osaurus uses the local network to discover and connect to agents running on other devices.</string>
+	<string>Intelligence uses the local network to discover and connect to agents running on other devices.</string>
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_osaurus._tcp</string>

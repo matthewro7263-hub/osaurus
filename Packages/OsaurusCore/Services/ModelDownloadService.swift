@@ -175,7 +175,7 @@ final class ModelDownloadService: ObservableObject {
 
     /// How a download's file URLs are obtained. `.direct` is the plain
     /// anonymous `huggingface.co/resolve` URL. `.onboardingProxy` resolves
-    /// presigned CDN URLs through the Osaurus model download proxy — used only for the
+    /// presigned CDN URLs through the Intelligence model download proxy — used only for the
     /// onboarding flow, where the user hasn't had a chance to add their own
     /// HF token yet and anonymous throttling drives drop-off.
     enum DownloadRoute {

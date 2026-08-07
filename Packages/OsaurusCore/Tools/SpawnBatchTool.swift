@@ -25,7 +25,7 @@ public final class SpawnBatchTool: OsaurusTool, @unchecked Sendable {
     public let description =
         "Run several independent bounded subtasks using the agents and models the user allowed. "
         + "Each job must name a caller-stable id, one target_type (`agent` or `model`), the exact "
-        + "target name/id, and its input. Osaurus validates every job before changing local model "
+        + "target name/id, and its input. Intelligence validates every job before changing local model "
         + "residency, runs remote jobs concurrently, batches jobs for the same local model without "
         + "reloading it between jobs, serializes different local models, and returns results in the "
         + "same order as the input jobs. Use this only for independent work that can safely fan out."

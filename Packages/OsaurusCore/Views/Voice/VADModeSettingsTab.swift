@@ -169,7 +169,7 @@ struct VADModeSettingsTab: View {
                 }
 
                 infoBox(
-                    "When enabled, Osaurus will continuously listen for agent names. Say a agent's name to automatically open a chat with that agent."
+                    "When enabled, Intelligence will continuously listen for agent names. Say a agent's name to automatically open a chat with that agent."
                 )
             }
         }
@@ -303,7 +303,7 @@ struct VADModeSettingsTab: View {
                 StyledSettingsTextField(
                     label: "Custom Wake Phrase (Optional)",
                     text: $customWakePhrase,
-                    placeholder: "e.g., Hey Osaurus",
+                    placeholder: "e.g., Hey Intelligence",
                     help: "Leave empty to only use agent names as wake words"
                 )
                 .onChange(of: customWakePhrase) { _, _ in

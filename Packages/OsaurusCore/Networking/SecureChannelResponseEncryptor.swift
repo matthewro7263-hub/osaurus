@@ -80,7 +80,7 @@ final class SecureChannelResponseEncryptor: ChannelOutboundHandler, @unchecked S
 
         case .body(let ioData):
             guard case .byteBuffer(var buffer) = ioData else {
-                // File regions are never produced by Osaurus routes; pass
+                // File regions are never produced by Intelligence routes; pass
                 // through rather than crash if that ever changes.
                 context.write(data, promise: promise)
                 return

@@ -90,7 +90,7 @@ actor MediaGenerationCoordinator {
             return try await VeniceMediaClient(provider: provider).generateImage(request)
         case .osaurusCloud:
             guard cloudSupported else {
-                throw MediaGenerationError.unsupported("Osaurus Cloud media is not available.")
+                throw MediaGenerationError.unsupported("Intelligence Cloud media is not available.")
             }
             return try await cloud.generateImage(request)
         }
@@ -109,7 +109,7 @@ actor MediaGenerationCoordinator {
             return try await VeniceMediaClient(provider: provider).quoteVideo(request)
         case .osaurusCloud:
             guard cloudSupported else {
-                throw MediaGenerationError.unsupported("Osaurus Cloud media is not available.")
+                throw MediaGenerationError.unsupported("Intelligence Cloud media is not available.")
             }
             let quote = try await cloud.quoteVideo(request)
             guard let micro = Decimal(string: quote.quoteMicroUSD) else {
@@ -239,7 +239,7 @@ actor MediaGenerationCoordinator {
             return job
         case .osaurusCloud:
             guard cloudSupported else {
-                throw MediaGenerationError.unsupported("Osaurus Cloud media is not available.")
+                throw MediaGenerationError.unsupported("Intelligence Cloud media is not available.")
             }
             let quote = try await cloud.quoteVideo(request)
             guard let micro = Decimal(string: quote.quoteMicroUSD) else {

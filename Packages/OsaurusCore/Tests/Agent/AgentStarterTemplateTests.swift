@@ -12,7 +12,7 @@ import Testing
 
 @Suite("Agent starter templates")
 struct AgentStarterTemplateTests {
-    @Test("Osaurus Guide starter has been retired")
+    @Test("Intelligence Guide starter has been retired")
     func osaurusGuideStarterIsRemoved() {
         let raw = AgentStarterTemplate.allCases.map(\.rawValue)
         #expect(!raw.contains("osaurusGuide"))

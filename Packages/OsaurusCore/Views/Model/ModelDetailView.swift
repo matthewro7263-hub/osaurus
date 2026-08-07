@@ -1047,7 +1047,7 @@ struct ModelDetailView: View, Identifiable {
     // MARK: - Files Section
 
     /// Lists every file in the repo with its size, marking the ones
-    /// Osaurus actually downloads. Falls back to a loading state while the
+    /// Intelligence actually downloads. Falls back to a loading state while the
     /// tree request is in flight.
     private var filesSection: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -1297,7 +1297,7 @@ struct ModelDetailView: View, Identifiable {
         HStack(spacing: 12) {
             if isExternalModel {
                 // Externally-discovered models (Hugging Face cache, LM Studio)
-                // aren't owned by Osaurus, so in-app delete can't remove their
+                // aren't owned by Intelligence, so in-app delete can't remove their
                 // files — it only forgets them until the next rescan re-adds
                 // them. Offer "Reveal in Finder" instead so users can delete
                 // these unrecognized models manually.
@@ -1378,8 +1378,8 @@ struct ModelDetailView: View, Identifiable {
         }
     }
 
-    /// True for models discovered outside Osaurus (Hugging Face cache, LM
-    /// Studio). Their files live in another app's directory, so Osaurus
+    /// True for models discovered outside Intelligence (Hugging Face cache, LM
+    /// Studio). Their files live in another app's directory, so Intelligence
     /// offers "Reveal in Finder" rather than an in-app delete.
     private var isExternalModel: Bool {
         model.externalSource != nil || model.bundleDirectory != nil
@@ -1696,7 +1696,7 @@ private struct RepositoryLinkRow: View {
 }
 
 /// One row in the repo file listing: relative path, byte size, and a
-/// subtle marker when the file is part of what Osaurus downloads.
+/// subtle marker when the file is part of what Intelligence downloads.
 private struct FileRow: View {
     @Environment(\.theme) private var theme
     let file: HuggingFaceService.MatchedFile

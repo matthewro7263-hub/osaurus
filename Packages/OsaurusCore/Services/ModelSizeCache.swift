@@ -3,7 +3,7 @@
 //  osaurus
 //
 //  On-disk cache for model download sizes (the exact byte total of the
-//  files Osaurus downloads for a repo). Replaces the hand-coded
+//  files Intelligence downloads for a repo). Replaces the hand-coded
 //  `downloadSizeBytes` literals that used to live in the curated catalog.
 //
 //  Why a cache:
@@ -26,7 +26,7 @@ import Foundation
 enum ModelSizeCache {
     /// One cached size measurement for a repo.
     struct Entry: Codable {
-        /// Total bytes of the files Osaurus downloads for this repo.
+        /// Total bytes of the files Intelligence downloads for this repo.
         let bytes: Int64
         /// HF `lastModified` revision string the measurement was taken
         /// against, when known. `nil` for entries fetched on-demand

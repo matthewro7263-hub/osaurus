@@ -252,7 +252,7 @@ public final class MCPProviderManager: ObservableObject {
 
             // Create MCP client
             let client = MCP.Client(
-                name: "Osaurus",
+                name: "Intelligence",
                 version: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
             )
             attemptClient = client
@@ -290,7 +290,7 @@ public final class MCPProviderManager: ObservableObject {
                 updatedState.lastFailureWasTransient = false
                 providerStates[providerId] = updatedState
                 print(
-                    "[Osaurus] MCP Provider '\(provider.name)': Connected with \(updatedState.discoveredToolCount) tools"
+                    "[Intelligence] MCP Provider '\(provider.name)': Connected with \(updatedState.discoveredToolCount) tools"
                 )
             }
             notifyStatusChanged()
@@ -370,7 +370,7 @@ public final class MCPProviderManager: ObservableObject {
             // though the MCP handshake failed — make sure we don't leak them.
             stopStdioRunners(for: providerId)
 
-            print("[Osaurus] MCP Provider '\(provider.name)': Connection failed - \(error)")
+            print("[Intelligence] MCP Provider '\(provider.name)': Connection failed - \(error)")
             notifyStatusChanged()
             throw error
         }
@@ -411,7 +411,7 @@ public final class MCPProviderManager: ObservableObject {
         }
 
         if let provider = configuration.provider(id: providerId) {
-            print("[Osaurus] MCP Provider '\(provider.name)': Disconnected")
+            print("[Intelligence] MCP Provider '\(provider.name)': Disconnected")
         }
 
         notifyStatusChanged()
@@ -485,7 +485,7 @@ public final class MCPProviderManager: ObservableObject {
                     Self.isTransientConnectError(error)
                     && providerStates[providerId]?.requiresAuth != true
                 guard transient, attempt < attempts else {
-                    print("[Osaurus] Failed to auto-connect to '\(providerName)': \(error)")
+                    print("[Intelligence] Failed to auto-connect to '\(providerName)': \(error)")
                     return
                 }
                 let delay = Self.connectRetryBaseDelay * pow(2.0, Double(attempt - 1))
@@ -834,7 +834,7 @@ public final class MCPProviderManager: ObservableObject {
             throw error
         }
 
-        let client = MCP.Client(name: "Osaurus", version: "1.0.0")
+        let client = MCP.Client(name: "Intelligence", version: "1.0.0")
 
         do {
             try await withTimeout(seconds: 10) {
@@ -884,7 +884,7 @@ public final class MCPProviderManager: ObservableObject {
         )
 
         let client = MCP.Client(
-            name: "Osaurus",
+            name: "Intelligence",
             version: "1.0.0"
         )
 
@@ -1038,7 +1038,7 @@ public final class MCPProviderManager: ObservableObject {
                         try await SandboxManager.shared.startContainer()
                     } catch {
                         throw MCPStdioTransportError.processSpawnFailed(
-                            "Could not start the Osaurus sandbox: "
+                            "Could not start the Intelligence sandbox: "
                                 + error.localizedDescription
                         )
                     }

@@ -55,7 +55,7 @@ public enum OpenRouterOAuthService {
 
     // MARK: - Attribution
 
-    /// Single source of truth for Osaurus's identity to OpenRouter. The same
+    /// Single source of truth for Intelligence's identity to OpenRouter. The same
     /// values are used both when minting the OAuth app row (in
     /// `exchangeCodeForKey`) and on every downstream chat-completion request
     /// (auto-injected in `RemoteProvider.resolvedHeaders()`), so the OAuth
@@ -63,7 +63,7 @@ public enum OpenRouterOAuthService {
     public enum Attribution {
         public static let host = "openrouter.ai"
         public static let referrerURL = "https://osaurus.ai"
-        public static let appTitle = "Osaurus"
+        public static let appTitle = "Intelligence"
         public static let refererHeader = "HTTP-Referer"
         public static let titleHeader = "X-OpenRouter-Title"
     }
@@ -163,7 +163,7 @@ public enum OpenRouterOAuthService {
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         // Per OpenRouter Discord support: the "referrer URL" should match the
         // app identity. Sending it here keeps the OAuth app row pinned to the
-        // same Osaurus identity that future chat-completion requests present.
+        // same Intelligence identity that future chat-completion requests present.
         request.setValue(Attribution.referrerURL, forHTTPHeaderField: Attribution.refererHeader)
         request.setValue(Attribution.appTitle, forHTTPHeaderField: Attribution.titleHeader)
 

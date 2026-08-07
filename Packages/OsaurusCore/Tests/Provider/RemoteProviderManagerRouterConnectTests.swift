@@ -2,7 +2,7 @@
 //  RemoteProviderManagerRouterConnectTests.swift
 //  osaurusTests
 //
-//  Covers the launch-time reliability of the managed Osaurus Router:
+//  Covers the launch-time reliability of the managed Intelligence Router:
 //  bounded connect retry on transient failures, the transient-vs-terminal
 //  error classifier, and the identity-change / app-reactivation recovery
 //  hooks that (re)connect the router without a user-driven refresh.

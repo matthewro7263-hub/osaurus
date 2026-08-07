@@ -2,7 +2,7 @@
 //  OsaurusKeychainServices.swift
 //  osaurus
 //
-//  Central registry of every Keychain service Osaurus writes to.
+//  Central registry of every Keychain service Intelligence writes to.
 //
 
 import Foundation

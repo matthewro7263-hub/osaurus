@@ -148,7 +148,7 @@ public struct SandboxConfigurationStore {
     /// helper plus `SandboxManager` also call `load()` from several other
     /// code paths. Without a cache each of those is a synchronous JSON
     /// disk read on the main thread. Save() writes through so any in-app
-    /// mutation stays coherent. Osaurus never modifies sandbox.json from
+    /// mutation stays coherent. Intelligence never modifies sandbox.json from
     /// outside its own process, so we don't need invalidate-on-mtime.
     private static let cacheLock = NSLock()
     private nonisolated(unsafe) static var cachedValue: SandboxConfiguration?

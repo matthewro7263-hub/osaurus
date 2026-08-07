@@ -79,7 +79,7 @@ enum RequestSource: String, Sendable, CaseIterable {
     case chatUI = "Chat UI"
     case httpAPI = "HTTP API"
     case plugin = "Plugin"
-    /// Inbound traffic from another Osaurus peer over the Secure Channel
+    /// Inbound traffic from another Intelligence peer over the Secure Channel
     /// (remote chat completions and remote agent runs).
     case p2p = "P2P"
     /// Autonomous, headless runs that nobody is waiting on: cron schedules,
@@ -129,7 +129,7 @@ enum RequestMode: String, Sendable {
 enum RequestTransport: String, Sendable {
     /// Never left the device.
     case local
-    /// Osaurus Secure Channel (forward-secret, mutually authenticated E2E).
+    /// Intelligence Secure Channel (forward-secret, mutually authenticated E2E).
     case secureChannel
     /// Direct request (TLS to a third-party provider, or plaintext LAN).
     case direct
@@ -197,7 +197,7 @@ struct RequestLog: Identifiable, Sendable {
     /// open this exact entry. Nil for HTTP/plugin requests.
     let turnId: UUID?
 
-    /// Request-level correlation for router-backed chat calls. For Osaurus
+    /// Request-level correlation for router-backed chat calls. For Intelligence
     /// Router this is the signed idempotency key / request_id used by billing,
     /// so account usage rows can focus the exact Insights log for an iteration.
     let requestId: String?

@@ -242,7 +242,7 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         /// against the configured access keys. Set by the global auth gate
         /// (non-loopback) or by the opportunistic loopback validation, and
         /// carried into request tasks via `HTTPCallerContext` so credit-spend
-        /// gates (Osaurus Router) can tell keyed callers from key-less
+        /// gates (Intelligence Router) can tell keyed callers from key-less
         /// loopback-trusted ones.
         var callerHasVerifiedAccessKey: Bool = false
         /// Set when the request arrived as an encrypted `/secure/call`
@@ -299,7 +299,7 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         // mid-stream after disconnecting). Cancel in-flight work and close so
         // the socket can't be pinned indefinitely.
         if let idle = event as? IdleStateHandler.IdleStateEvent {
-            NSLog("[Osaurus] Closing idle connection (state=%@)", String(describing: idle))
+            NSLog("[Intelligence] Closing idle connection (state=%@)", String(describing: idle))
             _isChannelActive.value = false
             requestTasks.cancelAll()
             context.close(promise: nil)
@@ -316,7 +316,7 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         let requestTasks = requestTasks
         let operationBox = RequestTaskOperation(operation)
         // Snapshot the caller's auth proof (event-loop-only state) into a
-        // task-local so downstream gates — ChatEngine's Osaurus Router
+        // task-local so downstream gates — ChatEngine's Intelligence Router
         // credit-spend gate in particular — can tell keyed HTTP callers from
         // key-less loopback-trusted ones without threading a flag through
         // every request struct.
@@ -512,7 +512,7 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
 
                 let message: String
                 if !apiKeyValidator.hasKeys {
-                    message = "No access keys configured. Create one in Osaurus settings."
+                    message = "No access keys configured. Create one in Intelligence settings."
                 } else {
                     let result = apiKeyValidator.validate(rawKey: token)
                     switch result {
@@ -569,7 +569,7 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
             }
 
             // Loopback callers skip the auth gate entirely, but some
-            // downstream gates (Osaurus Router credit spend) require proof of
+            // downstream gates (Intelligence Router credit spend) require proof of
             // a valid access key. Validate a volunteered Bearer token
             // opportunistically — never rejecting the request, and never
             // setting `authedAudience` (loopback trust must not suddenly gain
@@ -615,7 +615,7 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
             else if head.method == .GET, path == "/" {
                 var headers = [("Content-Type", "text/plain; charset=utf-8")]
                 headers.append(contentsOf: stateRef.value.corsHeaders)
-                let rootBody = "Osaurus Server is running! 🦕"
+                let rootBody = "Intelligence Server is running! 🦕"
                 sendResponse(
                     context: context,
                     version: head.version,
@@ -1194,7 +1194,7 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
                 "status": "ok",
                 "timestamp": Date().ISO8601Format(),
                 "source":
-                    "last effective settings resolved by Osaurus; stage indicates whether they are pending preload or submitted to vmlx BatchEngine",
+                    "last effective settings resolved by Intelligence; stage indicates whether they are pending preload or submitted to vmlx BatchEngine",
                 "models": lastEffectiveGenerationSettings.keys.sorted(),
                 "generation_defaults_by_model": defaultsByModel,
                 "last_effective_generation_by_model": effectiveByModel,
@@ -1434,7 +1434,7 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
                 previous.generation != next.generation
                 || previous.concurrency != next.concurrency
             // Compiled decode is a process-startup lever (see above): a change
-            // to it only takes effect after restarting Osaurus, so report that
+            // to it only takes effect after restarting Intelligence, so report that
             // explicitly rather than letting the toggle look live.
             let compiledDecodeRestartRequired =
                 previous.effectivePerformance.compiledDecode
@@ -2823,7 +2823,7 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
 
     func errorCaught(context: ChannelHandlerContext, error: Error) {
         // Log and close the connection to avoid NIO debug preconditions crashing the app
-        print("[Osaurus][NIO] errorCaught: \(error)")
+        print("[Intelligence][NIO] errorCaught: \(error)")
         requestTasks.cancelAll()
         context.close(promise: nil)
     }
@@ -3060,7 +3060,7 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
             Set(ToolRegistry.shared.listTools().map(\.name))
         }
         // `/agents/{id}/run` may accept caller-defined function schemas, but a
-        // client schema must never revive or impersonate a registered Osaurus
+        // client schema must never revive or impersonate a registered Intelligence
         // tool that the authoritative agent composer withheld. Registered
         // tools come only from `agentTools`; unregistered caller functions
         // remain available for the API's external function-calling contract.
@@ -3773,7 +3773,7 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         var headers = [("Content-Type", "application/json; charset=utf-8")]
         headers.append(contentsOf: stateRef.value.corsHeaders)
         let body =
-            #"{"error":{"code":"secure_channel_required","message":"This peer requires end-to-end encryption for agent requests. Upgrade Osaurus to a version that supports the secure channel.","type":"upgrade_required"}}"#
+            #"{"error":{"code":"secure_channel_required","message":"This peer requires end-to-end encryption for agent requests. Upgrade Intelligence to a version that supports the secure channel.","type":"upgrade_required"}}"#
         sendResponse(
             context: context,
             version: head.version,
@@ -3925,7 +3925,7 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
                 let recovered = try? recoverAddress(
                     payload: signedPayload,
                     signature: sigBytes,
-                    domainPrefix: "Osaurus Signed Pairing"
+                    domainPrefix: "Intelligence Signed Pairing"
                 ),
                 recovered == req.connectorAddress
             else {
@@ -4747,7 +4747,7 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         // for built-ins are unreachable from remote HTTP.
         //
         // Loopback callers are trusted (same machine, no auth) and are allowed
-        // to reach the built-in agent so the App Intents "Ask Osaurus" surface
+        // to reach the built-in agent so the App Intents "Ask Intelligence" surface
         // can drive the in-app default agent. This exposes the built-in agent's
         // persona/memory/tools to any localhost process, which is acceptable
         // under the existing no-auth-loopback model.
@@ -5723,7 +5723,7 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         let agentIdentifier = String(components[1])
 
         // Loopback callers (same machine, no auth) are allowed to dispatch to
-        // the built-in agent so App Intents "Run Osaurus Agent" / "Ask Osaurus"
+        // the built-in agent so App Intents "Run Intelligence Agent" / "Ask Intelligence"
         // can drive it as a detached background task. Remote callers remain
         // blocked from the built-in agent.
         let isLoopback = isLoopbackConnection(context)
@@ -6332,7 +6332,7 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
 
     /// Decode an image that will leave the machine for a remote media
     /// provider. Unlike the local-engine helper, this intentionally rejects
-    /// `file://` references so an API caller cannot turn Osaurus into a local
+    /// `file://` references so an API caller cannot turn Intelligence into a local
     /// file exfiltration proxy.
     static func decodeImageInputWithMIME(_ value: String) -> (data: Data, mimeType: String)? {
         if value.hasPrefix("data:") {
@@ -7847,7 +7847,7 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
 
     /// Resolve the billing idempotency key for an HTTP-origin inference
     /// request. Honors a client-supplied `Idempotency-Key` header so
-    /// CLI/script retries of the same logical request dedupe Osaurus Router
+    /// CLI/script retries of the same logical request dedupe Intelligence Router
     /// billing on a re-POST; otherwise synthesizes a per-request key so the
     /// provider service's idempotent connect-phase retries still dedupe.
     /// The key rides only the Router wire (in the signed body — see
@@ -10430,7 +10430,7 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         // Refuse before any schema validation or gating.
         if ToolRegistry.externallyDeniedToolNames.contains(req.name) {
             let message =
-                "'\(req.name)' is not available to external callers. App-only tools can only run from the Osaurus app."
+                "'\(req.name)' is not available to external callers. App-only tools can only run from the Intelligence app."
             let bodyJSON = #"{"error":"tool_not_exposable","message":"\#(message)"}"#
             sendResponse(
                 context: context,
@@ -10517,7 +10517,7 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
                     ToolRegistry.shared.isGlobalEnabled(toolName)
                 }
                 if !isEnabled {
-                    let message = "Tool '\(toolName)' is disabled in Osaurus settings."
+                    let message = "Tool '\(toolName)' is disabled in Intelligence settings."
                     let payload: [String: Any] = [
                         "content": [["type": "text", "text": message]],
                         "isError": true,

@@ -80,7 +80,7 @@ public final class RemoteProviderManager: ObservableObject {
     /// Provider IDs created from Bonjour discovery — not persisted to disk
     private var ephemeralProviderIds: Set<UUID> = []
 
-    /// Per-model metadata for the managed Osaurus Router, keyed by unprefixed
+    /// Per-model metadata for the managed Intelligence Router, keyed by unprefixed
     /// model id (e.g. "<upstream>/model-b"). Captured from `/models` on
     /// connect/refetch so the picker can show provider, pricing, and context
     /// without a second request. Empty until the router connects.
@@ -130,7 +130,7 @@ public final class RemoteProviderManager: ObservableObject {
     private static func makeManagedOsaurusRouterProvider() -> RemoteProvider {
         RemoteProvider(
             id: osaurusRouterProviderId,
-            name: "Osaurus",
+            name: "Intelligence",
             host: OsaurusRouter.defaultBaseURL.host ?? "router.osaurus.ai",
             providerProtocol: OsaurusRouter.defaultBaseURL.scheme == "http" ? .http : .https,
             port: OsaurusRouter.defaultBaseURL.port,
@@ -146,7 +146,7 @@ public final class RemoteProviderManager: ObservableObject {
     private func ensureManagedOsaurusRouterProviderIfNeeded() {
         // A disabled router behaves exactly like a missing identity: drop the
         // managed provider, its state, and any live service. This is what
-        // removes Osaurus from the model picker and makes every
+        // removes Intelligence from the model picker and makes every
         // `connectOsaurusRouter*` path no-op while the user has it off.
         guard isOsaurusRouterEnabled, identityExists() else {
             configuration.providers.removeAll(where: Self.isManagedOsaurusRouterProvider)
@@ -464,7 +464,7 @@ public final class RemoteProviderManager: ObservableObject {
             state.requiresAuth = false
             providerStates[providerId] = state
 
-            print("[Osaurus] Remote Provider '\(provider.name)': Connected with \(models.count) models")
+            print("[Intelligence] Remote Provider '\(provider.name)': Connected with \(models.count) models")
 
             notifyStatusChanged()
             notifyModelsChanged()
@@ -475,7 +475,7 @@ public final class RemoteProviderManager: ObservableObject {
             if Self.isPermanentOAuthFailure(error) {
                 handlePermanentOAuthFailure(providerId: providerId)
                 print(
-                    "[Osaurus] Remote Provider '\(provider.name)': OAuth refresh failed permanently — sign-in required"
+                    "[Intelligence] Remote Provider '\(provider.name)': OAuth refresh failed permanently — sign-in required"
                 )
                 throw error
             }
@@ -495,7 +495,7 @@ public final class RemoteProviderManager: ObservableObject {
                 Task { await service.invalidateSession() }
             }
 
-            print("[Osaurus] Remote Provider '\(provider.name)': Connection failed - \(errorMessage)")
+            print("[Intelligence] Remote Provider '\(provider.name)': Connection failed - \(errorMessage)")
 
             notifyStatusChanged()
             // `state.discoveredModels` was cleared above. Notify the shared
@@ -527,7 +527,7 @@ public final class RemoteProviderManager: ObservableObject {
             if provider.providerType == .osaurusRouter {
                 osaurusRouterModelCatalog = [:]
             }
-            print("[Osaurus] Remote Provider '\(provider.name)': Disconnected")
+            print("[Intelligence] Remote Provider '\(provider.name)': Disconnected")
         }
 
         notifyStatusChanged()
@@ -547,7 +547,7 @@ public final class RemoteProviderManager: ObservableObject {
         // user left enabled AND auto-connect connect at launch. A provider
         // that is enabled but has auto-connect off stays dormant until the
         // user (or the model picker) connects it explicitly. The managed
-        // Osaurus Router keeps `autoConnect: true`, so it's still included.
+        // Intelligence Router keeps `autoConnect: true`, so it's still included.
         //
         // Connects run in parallel: model discovery is network-bound and
         // `connect`'s awaits suspend off the main actor, so N providers reach
@@ -557,9 +557,9 @@ public final class RemoteProviderManager: ObservableObject {
         // `connect` itself.
         await withTaskGroup(of: Void.self) { group in
             for provider in configuration.autoConnectProviders {
-                // The managed Osaurus Router gets bounded retry so a transient
+                // The managed Intelligence Router gets bounded retry so a transient
                 // launch failure (offline, server 5xx, cold start) doesn't leave
-                // the model picker without Osaurus options until a manual refresh.
+                // the model picker without Intelligence options until a manual refresh.
                 if provider.id == Self.osaurusRouterProviderId {
                     group.addTask { await self.connectOsaurusRouterWithRetry() }
                     continue
@@ -592,7 +592,7 @@ public final class RemoteProviderManager: ObservableObject {
                 return
             } catch {
                 guard Self.isTransientConnectError(error), attempt < attempts else {
-                    print("[Osaurus] Failed to auto-connect to '\(providerName)': \(error)")
+                    print("[Intelligence] Failed to auto-connect to '\(providerName)': \(error)")
                     return
                 }
                 await routerRetryBackoff(forAttempt: attempt, after: error)
@@ -608,7 +608,7 @@ public final class RemoteProviderManager: ObservableObject {
         try? await connect(providerId: Self.osaurusRouterProviderId)
     }
 
-    /// User-facing master switch for the managed Osaurus Router. Disabling drops
+    /// User-facing master switch for the managed Intelligence Router. Disabling drops
     /// the managed provider (see `ensureManagedOsaurusRouterProviderIfNeeded`)
     /// and clears credits state; enabling re-injects it and reconnects with the
     /// usual bounded retry. Idempotent.
@@ -636,13 +636,13 @@ public final class RemoteProviderManager: ObservableObject {
         }
 
         // Rebuild the picker and refresh status UI. Open chats observe
-        // `.remoteProviderModelsChanged` and fall back off an Osaurus model when
+        // `.remoteProviderModelsChanged` and fall back off an Intelligence model when
         // it disappears.
         notifyModelsChanged()
         notifyStatusChanged()
     }
 
-    // MARK: - Osaurus Router connect retry & recovery
+    // MARK: - Intelligence Router connect retry & recovery
 
     /// Total attempts (including the first) for the launch-time router connect.
     public static let osaurusRouterConnectMaxAttempts = 3
@@ -666,7 +666,7 @@ public final class RemoteProviderManager: ObservableObject {
         return state?.isConnected != true && state?.isConnecting != true
     }
 
-    /// Connect the managed Osaurus Router with bounded retry on *transient*
+    /// Connect the managed Intelligence Router with bounded retry on *transient*
     /// failures (offline at launch, server 5xx, timeouts). Terminal failures
     /// (no identity, auth, other 4xx, bad config) stop immediately because a
     /// retry cannot fix them. This is the launch entry point; the single-shot
@@ -879,7 +879,7 @@ public final class RemoteProviderManager: ObservableObject {
     /// Identity was created or wiped. When present, inject + connect the managed
     /// router; when gone, `ensureManagedOsaurusRouterProviderIfNeeded` drops it
     /// and we post `.remoteProviderModelsChanged` so the picker rebuilds without
-    /// the now-invalid Osaurus options.
+    /// the now-invalid Intelligence options.
     func handleIdentityChanged() async {
         ensureManagedOsaurusRouterProviderIfNeeded()
         if identityExists() {
@@ -1386,7 +1386,7 @@ public final class RemoteProviderManager: ObservableObject {
         id.split(separator: "/").last?.lowercased() == firstRunOsaurusModelSlug
     }
 
-    /// Metadata for an Osaurus Router model by its unprefixed id (the id as it
+    /// Metadata for an Intelligence Router model by its unprefixed id (the id as it
     /// appears in `discoveredModels`, e.g. "<upstream>/model-b"). Returns nil for
     /// non-router models or before the router has connected.
     ///
@@ -1517,11 +1517,11 @@ public final class RemoteProviderManager: ObservableObject {
 
         // OpenAI-compatible and Gemini providers use /models endpoint
         guard let url = tempProvider.url(for: "/models") else {
-            print("[Osaurus] Test Connection: Invalid URL")
+            print("[Intelligence] Test Connection: Invalid URL")
             throw RemoteProviderError.invalidURL
         }
 
-        print("[Osaurus] Test Connection: Requesting \(url.absoluteString)")
+        print("[Intelligence] Test Connection: Requesting \(url.absoluteString)")
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -1535,7 +1535,7 @@ public final class RemoteProviderManager: ObservableObject {
                 value: value,
                 configuredSecretHeaderKeys: tempProvider.secretHeaderKeys
             )
-            print("[Osaurus] Test Connection: Adding header \(key)=\(logValue)")
+            print("[Intelligence] Test Connection: Adding header \(key)=\(logValue)")
             request.setValue(value, forHTTPHeaderField: key)
         }
 
@@ -1561,7 +1561,7 @@ public final class RemoteProviderManager: ObservableObject {
             }
 
             guard let httpResponse = response as? HTTPURLResponse else {
-                print("[Osaurus] Test Connection: Invalid response type")
+                print("[Intelligence] Test Connection: Invalid response type")
                 let diagnostics = ProviderReplayDiagnosticBundle(
                     phase: "test_model_discovery",
                     request: request,
@@ -1570,7 +1570,7 @@ public final class RemoteProviderManager: ObservableObject {
                 throw RemoteProviderServiceError.invalidResponse.attachingReplayDiagnostics(diagnostics)
             }
 
-            print("[Osaurus] Test Connection: HTTP \(httpResponse.statusCode)")
+            print("[Intelligence] Test Connection: HTTP \(httpResponse.statusCode)")
             let diagnostics = ProviderReplayDiagnosticBundle(
                 phase: "test_model_discovery",
                 request: request,
@@ -1583,7 +1583,7 @@ public final class RemoteProviderManager: ObservableObject {
             if providerType == .gemini {
                 if httpResponse.statusCode >= 400 {
                     let errorMessage = extractErrorMessage(from: data, statusCode: httpResponse.statusCode)
-                    print("[Osaurus] Test Connection: Error response: \(errorMessage)")
+                    print("[Intelligence] Test Connection: Error response: \(errorMessage)")
                     throw RemoteProviderServiceError.requestFailedWithDiagnostics(
                         ProviderDiagnosticRedactor.safe(errorMessage, maxLength: 500),
                         diagnostics
@@ -1597,7 +1597,7 @@ public final class RemoteProviderManager: ObservableObject {
                         return methods.contains("generateContent")
                     }
                     .map { $0.modelId }
-                print("[Osaurus] Test Connection (Gemini): Success - found \(models.count) models")
+                print("[Intelligence] Test Connection (Gemini): Success - found \(models.count) models")
                 return models
             } else {
                 let models: [String]
@@ -1637,13 +1637,13 @@ public final class RemoteProviderManager: ObservableObject {
                             discovered: models,
                             catalog: catalog
                         )
-                        print("[Osaurus] Test Connection: Success - found \(merged.count) models")
+                        print("[Intelligence] Test Connection: Success - found \(merged.count) models")
                         return merged
                     } catch {
-                        print("[Osaurus] Test Connection: Fireworks catalog unavailable, using /models only")
+                        print("[Intelligence] Test Connection: Fireworks catalog unavailable, using /models only")
                     }
                 }
-                print("[Osaurus] Test Connection: Success - found \(models.count) models")
+                print("[Intelligence] Test Connection: Success - found \(models.count) models")
                 return models
             }
         } catch let error as RemoteProviderServiceError {
@@ -1651,7 +1651,7 @@ public final class RemoteProviderManager: ObservableObject {
         } catch let error as RemoteProviderError {
             throw error
         } catch {
-            print("[Osaurus] Test Connection: Network error: \(error)")
+            print("[Intelligence] Test Connection: Network error: \(error)")
             throw RemoteProviderError.connectionFailed(error.localizedDescription)
         }
     }
@@ -1696,21 +1696,21 @@ public final class RemoteProviderManager: ObservableObject {
         testHeaders: [String: String]
     ) async throws -> [String] {
         guard let baseURL = tempProvider.url(for: "/models") else {
-            print("[Osaurus] Test Connection (Anthropic): Invalid URL")
+            print("[Intelligence] Test Connection (Anthropic): Invalid URL")
             throw RemoteProviderError.invalidURL
         }
 
-        print("[Osaurus] Test Connection (Anthropic): Requesting \(baseURL.absoluteString)")
+        print("[Intelligence] Test Connection (Anthropic): Requesting \(baseURL.absoluteString)")
 
         do {
             let models = try await RemoteProviderService.fetchAnthropicModels(
                 baseURL: baseURL,
                 headers: testHeaders
             )
-            print("[Osaurus] Test Connection (Anthropic): Success - found \(models.count) models")
+            print("[Intelligence] Test Connection (Anthropic): Success - found \(models.count) models")
             return models
         } catch {
-            print("[Osaurus] Test Connection (Anthropic): Error: \(error)")
+            print("[Intelligence] Test Connection (Anthropic): Error: \(error)")
             throw RemoteProviderError.connectionFailed(error.localizedDescription)
         }
     }

@@ -2,7 +2,7 @@
 //  ModelResidencySection.swift
 //  osaurus
 //
-//  Osaurus-owned model memory policy (eviction + idle residency) for
+//  Intelligence-owned model memory policy (eviction + idle residency) for
 //  the Server → Settings tab. Persisted to `server.json`.
 //
 

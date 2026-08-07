@@ -134,7 +134,7 @@ actor IMessageWatchTransportRuntime: AgentChannelReceiveTransportRuntime {
                 status: .degraded,
                 severity: .warning,
                 summary: "iMessage receive is waiting for Full Disk Access.",
-                detail: "Grant Full Disk Access to Osaurus in System Settings > Privacy & Security.",
+                detail: "Grant Full Disk Access to Intelligence in System Settings > Privacy & Security.",
                 isRunning: worker != nil,
                 receiveEnabled: false,
                 lastFailureAt: now,
@@ -190,7 +190,7 @@ actor IMessageWatchTransportRuntime: AgentChannelReceiveTransportRuntime {
                 summary: reason.isEmpty
                     ? "The iMessage receive stream was interrupted; reconnecting."
                     : reason,
-                detail: "Osaurus restarts the helper and resumes from the saved cursor automatically (attempt \(consecutiveFailures)).",
+                detail: "Intelligence restarts the helper and resumes from the saved cursor automatically (attempt \(consecutiveFailures)).",
                 isRunning: worker != nil,
                 receiveEnabled: true,
                 lastFailureAt: failedAt,

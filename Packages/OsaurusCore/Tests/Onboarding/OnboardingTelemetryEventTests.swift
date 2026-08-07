@@ -123,7 +123,7 @@ struct OnboardingTelemetryEventTests {
         #expect(event.props["download_started"] as? Bool == true)
     }
 
-    /// The managed Osaurus default reports the documented `hosted` token and,
+    /// The managed Intelligence default reports the documented `hosted` token and,
     /// like local, never a provider property.
     @Test func brainSourceSelected_osaurus_carries_hosted_source_only() {
         let (service, rec, cleanup) = makeRecordingService()

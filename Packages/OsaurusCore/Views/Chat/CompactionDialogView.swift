@@ -91,7 +91,7 @@ struct CompactionDialogView: View {
     private var modelSelectionContent: some View {
         VStack(alignment: .leading, spacing: 14) {
             Text(
-                "This conversation is close to the model's context limit. Osaurus can summarize the older messages with a model of your choice, so the chat can continue with full awareness of what happened — your visible transcript is never changed.",
+                "This conversation is close to the model's context limit. Intelligence can summarize the older messages with a model of your choice, so the chat can continue with full awareness of what happened — your visible transcript is never changed.",
                 bundle: .module
             )
             .font(.system(size: 12))

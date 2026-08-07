@@ -99,7 +99,7 @@ struct ToolCatalogPresentationTests {
     @Test
     func shippedSourcesFoldIntoBuiltIn() {
         // Runtime-managed execution tools and native helpers ship with
-        // Osaurus; the internal "runtime" category must not leak into the
+        // Intelligence; the internal "runtime" category must not leak into the
         // default UI as its own group.
         for source in [ToolExposureSource.builtIn, .native, .runtime, .unknown] {
             #expect(ToolCatalogPresentation.section(for: source) == .builtIn)

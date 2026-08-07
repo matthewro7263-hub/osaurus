@@ -43,7 +43,7 @@ enum SecretSaveOutcome: Equatable, Sendable {
                     "The \(label) could not be stored because the Keychain is locked or unavailable right now (OSStatus \(status)). Unlock the login keychain and try again."
             case .accessDenied(let status):
                 return
-                    "The \(label) could not be stored because macOS denied Osaurus access to its existing Keychain entry (OSStatus \(status)). In Keychain Access, delete the old Osaurus item for this credential and try again."
+                    "The \(label) could not be stored because macOS denied Intelligence access to its existing Keychain entry (OSStatus \(status)). In Keychain Access, delete the old Intelligence item for this credential and try again."
             case .failure(let status):
                 return "The \(label) could not be stored, Keychain error OSStatus \(status)."
             case .disabled:

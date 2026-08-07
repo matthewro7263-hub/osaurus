@@ -2,7 +2,7 @@
 //  OsaurusGuide.swift
 //  osaurus
 //
-//  Loader for the bundled Osaurus user guide — the curated, user-facing
+//  Loader for the bundled Intelligence user guide — the curated, user-facing
 //  topic corpus under `Resources/Guide/guide-*.md` that backs the
 //  `osaurus_help` read tool. Each topic file carries a small front-matter
 //  block (`title`, `summary`, `order`) followed by the markdown body.

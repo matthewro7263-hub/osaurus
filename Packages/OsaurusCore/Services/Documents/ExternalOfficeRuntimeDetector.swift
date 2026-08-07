@@ -135,7 +135,7 @@ public struct ExternalOfficeRuntimeDetector: Sendable {
     }
 
     /// Preferred environment knobs for a user or integration test that wants
-    /// to point Osaurus at a specific office runtime.
+    /// to point Intelligence at a specific office runtime.
     public static let environmentExecutableKeys = [
         "OSAURUS_OFFICE_RUNTIME_URL",
         "OSAURUS_OFFICE_RUNTIME_PATH",

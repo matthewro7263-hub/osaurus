@@ -205,7 +205,7 @@ struct CORSHandlerTests {
     /// auto-trust short-circuit. With an empty allowlist the server must
     /// not advertise CORS, so cross-origin browser callers get blocked.
     /// Locks down the explicit-allowlist contract for users who run
-    /// Osaurus under reverse proxies / strict environments.
+    /// Intelligence under reverse proxies / strict environments.
     @Test func nonLoopback_emptyAllowlist_returnsNoCORSHeaders() async throws {
         var config = ServerConfiguration.default
         config.allowedOrigins = []
@@ -229,7 +229,7 @@ struct CORSHandlerTests {
     }
 
     /// Non-loopback wildcard is the explicit "I want CORS open to anyone"
-    /// opt-in (e.g. for LAN-shared Osaurus instances). Must still emit `*`.
+    /// opt-in (e.g. for LAN-shared Intelligence instances). Must still emit `*`.
     @Test func nonLoopback_wildcardAllowlist_returnsAllowOriginStar() async throws {
         var config = ServerConfiguration.default
         config.allowedOrigins = ["*"]

@@ -63,7 +63,7 @@ struct ConfigureAIStateDownloadTests {
         }
     }
 
-    // MARK: - Default (managed Osaurus) home screen
+    // MARK: - Default (managed Intelligence) home screen
 
     /// A fresh state lands on the home screen — the featured local model
     /// card — with no brain committed and no download started yet.
@@ -81,7 +81,7 @@ struct ConfigureAIStateDownloadTests {
         #expect(state.screen == .home)
     }
 
-    /// "Skip download" commits the managed Osaurus brain and advances in one
+    /// "Skip download" commits the managed Intelligence brain and advances in one
     /// click — no model, key, or download involved.
     @Test func chooseOsaurusCommitsAndAdvancesImmediately() {
         let state = ConfigureAIState()

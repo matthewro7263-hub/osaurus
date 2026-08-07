@@ -52,7 +52,7 @@ struct ConcurrencySection: View {
             SettingsToggle(
                 title: L("Continuous Batching"),
                 description:
-                    "When off, Osaurus pins each local model to one active job even if Concurrent Sessions is higher. Remote jobs can still overlap, and jobs targeting different local models remain serialized by model residency.",
+                    "When off, Intelligence pins each local model to one active job even if Concurrent Sessions is higher. Remote jobs can still overlap, and jobs targeting different local models remain serialized by model residency.",
                 isOn: $draft.concurrency.continuousBatching
             )
 

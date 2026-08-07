@@ -481,11 +481,11 @@ extension InsightsService {
     /// same "no third-party secrets at rest" bar as the provider diagnostics.
     private nonisolated static let upstreamRedactors: [(regex: NSRegularExpression, template: String)] = {
         let specs: [(String, String)] = [
-            // Any Bearer token (not just Osaurus `osk-`): OpenAI/Anthropic/etc.
+            // Any Bearer token (not just Intelligence `osk-`): OpenAI/Anthropic/etc.
             (#"(?i)(bearer\s+)[A-Za-z0-9._~+/=-]{8,}"#, "$1<redacted>"),
             // `sk-…` / `sk-ant-…` style keys (JSON value, header, prose). The
             // lookbehind keeps this from matching *inside* other token shapes
-            // — notably the `sk-` tail of Osaurus `osk-v1.…` keys, whose bare
+            // — notably the `sk-` tail of Intelligence `osk-v1.…` keys, whose bare
             // prose form is deliberately left alone (see redactor contract).
             (#"(?<![A-Za-z0-9])sk-[A-Za-z0-9._-]{8,}"#, "<redacted>"),
             // JSON-Web-Token shaped values (id/access tokens).
@@ -671,7 +671,7 @@ extension InsightsService {
 
     /// Resolve the Insights source category for an HTTP-logged request.
     /// In-app chat (`method == "CHAT"`) stays `.chatUI`. Anything that arrived
-    /// over the Secure Channel is another Osaurus peer (remote chat completions
+    /// over the Secure Channel is another Intelligence peer (remote chat completions
     /// or a remote agent run) and is surfaced under `.p2p`; all other
     /// local/LAN HTTP traffic remains `.httpAPI`.
     nonisolated static func inboundSource(

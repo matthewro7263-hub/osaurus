@@ -84,11 +84,11 @@ enum LaunchGuard {
         if defaults.bool(forKey: startupInProgressKey) {
             let count = defaults.integer(forKey: crashCountKey) + 1
             defaults.set(count, forKey: crashCountKey)
-            NSLog("[Osaurus] Previous launch did not complete (consecutive crashes: %d)", count)
+            NSLog("[Intelligence] Previous launch did not complete (consecutive crashes: %d)", count)
             disabledFeatures = features(forCrashCount: count)
             if !disabledFeatures.isEmpty {
                 NSLog(
-                    "[Osaurus] Safe mode active — disabled features bitmask: %d",
+                    "[Intelligence] Safe mode active — disabled features bitmask: %d",
                     disabledFeatures.rawValue
                 )
             }
@@ -120,7 +120,7 @@ enum LaunchGuard {
         let recovered = disabledFeatures
         disabledFeatures = []
         NSLog(
-            "[Osaurus] Clean /health observed — clearing safe mode (was bitmask %d) and requesting subsystem recovery",
+            "[Intelligence] Clean /health observed — clearing safe mode (was bitmask %d) and requesting subsystem recovery",
             recovered.rawValue
         )
         NotificationCenter.default.post(

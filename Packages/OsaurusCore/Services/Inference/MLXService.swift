@@ -347,7 +347,7 @@ actor MLXService: ToolCapableService {
         }
         if isKnownTextOnlyJANGRuntimeFamily(modelId: modelId) {
             // MiMo/N2 JANG and JANGTQ tool parsing/template selection is owned
-            // by the pinned vMLX runtime. Keep Osaurus request preflight from
+            // by the pinned vMLX runtime. Keep Intelligence request preflight from
             // synchronously walking large or symlinked model bundles before
             // vMLX can load and validate the actual runtime contract.
             return true
@@ -526,7 +526,7 @@ actor MLXService: ToolCapableService {
         }
         if ModelFamilyNames.isStepFamily(modelId) {
             // Step 3.7 currently runs through vMLX's Step text runtime in
-            // Osaurus. Some source bundles carry vision metadata, but the
+            // Intelligence. Some source bundles carry vision metadata, but the
             // Step VLM path is not wired or proven here; keep request gating
             // text-only and avoid blocking runtime preflight on large
             // external-bundle metadata reads.

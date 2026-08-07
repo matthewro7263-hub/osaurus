@@ -659,7 +659,7 @@ struct GitHubImportSheet: View {
                         icon: "terminal.fill",
                         title: L("Stdio MCP servers need env vars"),
                         message: L(
-                            "These stdio MCP servers were imported into the Osaurus sandbox but ship with `${VAR}` placeholders for sensitive env vars. Tap one to open its editor:"
+                            "These stdio MCP servers were imported into the Intelligence sandbox but ship with `${VAR}` placeholders for sensitive env vars. Tap one to open its editor:"
                         ),
                         items: report.allStdioProvidersNeedingConfiguration,
                         onSelect: { openMCPProvider(id: $0) }
@@ -671,7 +671,7 @@ struct GitHubImportSheet: View {
                         icon: "shippingbox.fill",
                         title: L("Sandbox unavailable — stdio MCP skipped"),
                         message: L(
-                            "Imported stdio MCP servers run inside the Osaurus sandbox, which isn't available on this machine. These weren't installed:"
+                            "Imported stdio MCP servers run inside the Intelligence sandbox, which isn't available on this machine. These weren't installed:"
                         ),
                         items: report.allStdioProvidersBlockedNoSandbox
                     )

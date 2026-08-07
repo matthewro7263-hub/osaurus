@@ -2,7 +2,7 @@
 //  ImageGenerationTypes.swift
 //  osaurus
 //
-//  Osaurus-native request / event / catalog types for on-device image
+//  Intelligence-native request / event / catalog types for on-device image
 //  generation. These deliberately do NOT expose any vMLXFlux symbols so the
 //  HTTP layer and the chat UI can consume them without importing the engine
 //  (only `ImageGenerationService` links vMLXFlux). The service translates

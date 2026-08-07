@@ -166,7 +166,7 @@ struct ToolOutputCompressorTests {
     // MARK: - Token-level savings on representative production payloads
 
     // A jq/REST/MCP-style pretty JSON response — the surface 2C actually
-    // targets in production (Osaurus's own envelopes already serialize compact).
+    // targets in production (Intelligence's own envelopes already serialize compact).
     private static let apiResponsePretty = """
         {
           "status": "ok",

@@ -366,7 +366,7 @@ private extension TelegramUser {
         TelegramUser(
             id: 42,
             isBot: true,
-            firstName: "Osaurus",
+            firstName: "Intelligence",
             lastName: nil,
             username: "osaurus_test_bot"
         )

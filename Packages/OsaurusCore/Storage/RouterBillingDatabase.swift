@@ -2,7 +2,7 @@
 //  RouterBillingDatabase.swift
 //  osaurus
 //
-//  Encrypted, on-device ledger of Osaurus Router billing events. Metadata
+//  Encrypted, on-device ledger of Intelligence Router billing events. Metadata
 //  only — cost, token counts, status, and the rendered outcome, correlated to
 //  a chat session + assistant turn. NEVER stores prompt or response text, is
 //  never uploaded, and survives chat deletion (no FK to the chat-history DB) so

@@ -23,12 +23,12 @@ enum OsaurusRouter {
         return productionBaseURL
     }
 
-    /// UserDefaults key backing the user's master on/off switch for the Osaurus
+    /// UserDefaults key backing the user's master on/off switch for the Intelligence
     /// Router. Absent = enabled, so the router is on by default for everyone and
     /// only an explicit opt-out turns it off.
     static let enabledDefaultsKey = "ai.osaurus.router.enabled"
 
-    /// Whether the Osaurus Router is enabled for this user. Defaults to `true`
+    /// Whether the Intelligence Router is enabled for this user. Defaults to `true`
     /// when the key was never written, so existing installs (and tests) stay on.
     /// When `false`, the managed router provider is dropped from the model
     /// picker and every router/credits server request is suppressed.
@@ -36,18 +36,18 @@ enum OsaurusRouter {
         UserDefaults.standard.object(forKey: enabledDefaultsKey) as? Bool ?? true
     }
 
-    /// Persist the user's master on/off choice for the Osaurus Router.
+    /// Persist the user's master on/off choice for the Intelligence Router.
     static func setEnabled(_ enabled: Bool) {
         UserDefaults.standard.set(enabled, forKey: enabledDefaultsKey)
     }
 
     /// UserDefaults key backing the opt-in that lets *key-less* loopback API
-    /// callers route requests through the Osaurus Router.
+    /// callers route requests through the Intelligence Router.
     static let allowUnkeyedLoopbackSpendDefaultsKey =
         "ai.osaurus.router.allowUnkeyedLoopbackSpend"
 
     /// Whether local (loopback) HTTP callers that did not present a valid
-    /// access key may route requests to the Osaurus Router. Router requests
+    /// access key may route requests to the Intelligence Router. Router requests
     /// are signed with the user's master key and spend real credits, so this
     /// defaults to `false`: without the opt-in, any local process could spend
     /// the user's balance through the unauthenticated loopback API. Keyed
@@ -139,7 +139,7 @@ enum OsaurusRouterAPIError: LocalizedError, Sendable {
     var errorDescription: String? {
         switch self {
         case .noIdentity:
-            return "Set up your Osaurus Identity before using the router."
+            return "Set up your Intelligence Identity before using the router."
         case .firstActionPending:
             return "Finish choosing your welcome credit before using the router."
         case .invalidURL:
@@ -155,7 +155,7 @@ enum OsaurusRouterAPIError: LocalizedError, Sendable {
         case .insufficientFunds:
             return "Insufficient credits. Add balance to continue."
         case .accountFrozen:
-            return "Your Osaurus billing account is on hold."
+            return "Your Intelligence billing account is on hold."
         case .unauthorized:
             return "Router authentication failed. Check your clock and identity."
         case .rateLimited:
@@ -384,7 +384,7 @@ struct OsaurusRouterSummaryEvent: Decodable, Equatable, Sendable {
     let osaurus: Summary
 }
 
-/// Local, persistable snapshot of a single Osaurus Router billing event.
+/// Local, persistable snapshot of a single Intelligence Router billing event.
 ///
 /// `OsaurusRouterSummaryEvent.Summary` is the wire shape (`Decodable`-only); this
 /// is the decoupled value the app actually carries around — encoded onto the chat

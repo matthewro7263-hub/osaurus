@@ -318,7 +318,7 @@ struct ComputerUseSettingsView: View {
         SettingsSection(title: "Screen context", icon: "rectangle.on.rectangle.angled") {
             VStack(alignment: .leading, spacing: 14) {
                 bodyText(
-                    "Give the assistant ambient awareness of what you're working on. When on, Osaurus freezes a quick snapshot of your open windows and the field you're focused on at the start of each chat, and shares it as background context. It's built from on-screen text only — no screenshots — and is scrubbed by the Privacy Filter before it reaches a cloud model."
+                    "Give the assistant ambient awareness of what you're working on. When on, Intelligence freezes a quick snapshot of your open windows and the field you're focused on at the start of each chat, and shares it as background context. It's built from on-screen text only — no screenshots — and is scrubbed by the Privacy Filter before it reaches a cloud model."
                 )
 
                 screenContextPerAgentNote

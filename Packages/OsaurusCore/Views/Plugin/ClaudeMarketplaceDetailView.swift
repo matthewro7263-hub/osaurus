@@ -440,13 +440,13 @@ struct ClaudeMarketplaceDetailView: View {
     }
 
     /// Shown when the catalog classified the plugin as importing nothing
-    /// Osaurus supports. These are normally hidden from the grid, so this is a
+    /// Intelligence supports. These are normally hidden from the grid, so this is a
     /// safety net rather than a common state.
     private var notImportablePanel: some View {
         infoPanel(
-            title: "Nothing to import into Osaurus",
+            title: "Nothing to import into Intelligence",
             message:
-                "Osaurus imports skills, agents, commands, and MCP servers. This plugin ships none of those."
+                "Intelligence imports skills, agents, commands, and MCP servers. This plugin ships none of those."
         )
     }
 

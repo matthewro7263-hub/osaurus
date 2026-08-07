@@ -4,7 +4,7 @@
 //
 //  Storage-location standards audit for issue #1422.
 //
-//  Osaurus currently keeps its app data in `~/.osaurus/` (see
+//  Intelligence currently keeps its app data in `~/.osaurus/` (see
 //  `OsaurusPaths`), which follows neither Apple's file-system guidance
 //  (`~/Library/Application Support/...`) nor the XDG base-directory spec
 //  (`~/.local/share/...`). Relocating the root is a data-safety decision —
@@ -185,7 +185,7 @@ public enum StorageLocationStandards {
 
     /// Proposed Apple-spec folder name under Application Support. Reported
     /// as a candidate only; nothing is created or moved.
-    public static let appleSpecCandidateFolderName = "Osaurus"
+    public static let appleSpecCandidateFolderName = "Intelligence"
 
     /// Gather live inputs. Read-only: performs `fileExists` probes plus the
     /// same root resolution `OsaurusPaths.root()` already performed for the

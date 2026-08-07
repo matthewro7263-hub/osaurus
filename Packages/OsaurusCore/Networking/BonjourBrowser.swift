@@ -2,7 +2,7 @@
 //  BonjourBrowser.swift
 //  osaurus
 //
-//  Discovers remote Osaurus agents advertised as Bonjour services on the local
+//  Discovers remote Intelligence agents advertised as Bonjour services on the local
 //  network, enabling the agent selector to list peers from other devices.
 //
 
@@ -12,10 +12,10 @@ import os
 
 // MARK: - PairedRelayAgent
 
-/// A remote Osaurus agent that is persistently paired and reachable via the relay tunnel,
+/// A remote Intelligence agent that is persistently paired and reachable via the relay tunnel,
 /// but is not currently discoverable on the local network via Bonjour.
 public struct PairedRelayAgent: Identifiable, Equatable, Sendable {
-    /// The UUID of the agent on the remote Osaurus server.
+    /// The UUID of the agent on the remote Intelligence server.
     public let id: UUID
     /// Display name of the remote agent.
     public let name: String
@@ -46,7 +46,7 @@ public struct PairedRelayAgent: Identifiable, Equatable, Sendable {
 
 // MARK: - DiscoveredAgent
 
-/// A remote Osaurus agent discovered via Bonjour on the local network.
+/// A remote Intelligence agent discovered via Bonjour on the local network.
 public struct DiscoveredAgent: Identifiable, Equatable, Sendable {
     public let id: UUID
     public let name: String
@@ -88,7 +88,7 @@ public struct DiscoveredAgent: Identifiable, Equatable, Sendable {
     }
 
     /// True when the peer claims Secure Channel support (`osc=1`) but
-    /// advertised no crypto address to pin. A genuine Osaurus peer always
+    /// advertised no crypto address to pin. A genuine Intelligence peer always
     /// advertises its address alongside `osc=1`; the inconsistent combination
     /// is the signature of a spoofed advertisement (or a buggy peer), so the
     /// pairing flow refuses it rather than silently skipping the server

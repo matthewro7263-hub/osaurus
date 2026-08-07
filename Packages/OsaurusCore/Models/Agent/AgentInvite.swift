@@ -24,7 +24,7 @@ public enum AgentInviteError: Error, LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .identityMissing:
-            return "No Osaurus identity is configured on this device."
+            return "No Intelligence identity is configured on this device."
         case .agentMissingIdentity:
             return "This agent has no derived crypto identity yet."
         case .relayBaseURLMissing:
@@ -54,7 +54,7 @@ public enum AgentInviteError: Error, LocalizedError {
 /// {
 ///   "v": 1,
 ///   "addr": "0xABCD...",
-///   "name": "Osaurus",
+///   "name": "Intelligence",
 ///   "desc": "optional brief",
 ///   "url":  "https://0xabcd....agent.osaurus.ai",
 ///   "nonce": "<base64url, 32 bytes>",
@@ -79,11 +79,11 @@ public struct AgentInvite: Codable, Sendable, Equatable {
     /// Unix-seconds expiry (UTC). Server enforces; receiver clock skew is irrelevant.
     public let exp: Int64
     /// 65-byte recoverable secp256k1 signature (hex), produced via the
-    /// `Osaurus Signed Invite` domain prefix over the canonical signing string.
+    /// `Intelligence Signed Invite` domain prefix over the canonical signing string.
     public let sig: String
 
     public static let currentVersion: Int = 1
-    public static let signingDomain: String = "Osaurus Signed Invite"
+    public static let signingDomain: String = "Intelligence Signed Invite"
 
     public init(
         v: Int = AgentInvite.currentVersion,

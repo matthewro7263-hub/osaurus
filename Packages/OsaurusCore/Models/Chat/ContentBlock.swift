@@ -73,7 +73,7 @@ enum ContentBlockKind: Equatable {
     /// image), so Read-aloud and the overflow "…" Inspect — which have nothing to
     /// act on — are hidden. `timestamp` backs the overflow menu's "arrived at" header.
     case assistantActions(turnId: UUID, imageOnly: Bool, timestamp: Date)
-    /// Shown when the Osaurus Router billed a turn that produced no visible
+    /// Shown when the Intelligence Router billed a turn that produced no visible
     /// text (and no reasoning/tools). Surfaces the charge honestly with a Retry
     /// affordance instead of silently dropping the turn. `costMicro` is the raw
     /// micro-USD string; `status` is the router's terminal status.

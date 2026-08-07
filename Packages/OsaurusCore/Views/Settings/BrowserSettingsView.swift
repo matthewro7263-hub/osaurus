@@ -260,7 +260,7 @@ struct BrowserSettingsView: View {
         SettingsSection(title: "Sessions", icon: "rectangle.stack.person.crop") {
             VStack(alignment: .leading, spacing: 12) {
                 bodyText(
-                    "One browser profile per agent. Open a session to see it live (or restore it at its last page). Sign-in badges reflect what Osaurus has actually observed — never guessed from cookies."
+                    "One browser profile per agent. Open a session to see it live (or restore it at its last page). Sign-in badges reflect what Intelligence has actually observed — never guessed from cookies."
                 )
 
                 if records.isEmpty {
@@ -451,7 +451,7 @@ struct BrowserSettingsView: View {
     // MARK: - Row copy helpers
 
     private func agentDisplayName(for agentId: UUID) -> String {
-        if agentId == Agent.defaultId { return "Osaurus" }
+        if agentId == Agent.defaultId { return "Intelligence" }
         if let agent = agentManager.agent(for: agentId) { return agent.name }
         return L("Deleted agent")
     }

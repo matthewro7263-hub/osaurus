@@ -134,7 +134,7 @@ public final class RouterBillingLedger: @unchecked Sendable {
         public let generatedAt: Date
         public let appVersion: String?
         public let osVersion: String
-        /// Public Osaurus ID (wallet address) the router bills, for server-side
+        /// Public Intelligence ID (wallet address) the router bills, for server-side
         /// correlation. Nil when no non-prompting source is available.
         public let walletAddress: String?
         /// Explains why `walletAddress` is present or absent. Support exports

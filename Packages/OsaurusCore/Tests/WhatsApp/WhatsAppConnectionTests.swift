@@ -95,7 +95,7 @@ struct WhatsAppRPCFramingTests {
         #expect(WhatsAppLinkStatus.parse(statusJSON: Data("{}".utf8)) == nil)
     }
 
-    /// Every RPC method name Osaurus dispatches must exist in the helper's
+    /// Every RPC method name Intelligence dispatches must exist in the helper's
     /// advertised surface (`rpcMethods` in helpers/osaurus-wa/main.go); a
     /// rename must fail this lock instead of degrading to "method not found".
     @Test func dispatchedMethodNamesMatchHelperSurface() {

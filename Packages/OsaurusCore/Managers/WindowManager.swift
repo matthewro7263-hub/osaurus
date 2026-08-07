@@ -179,9 +179,9 @@ public final class WindowManager: NSObject, ObservableObject {
         window.level = .screenSaver  // Higher than modalPanel
 
         // Activate app and yank focus. Force activation (`ignoringOtherApps`)
-        // when Osaurus is backgrounded rather than relying on the cooperative
+        // when Intelligence is backgrounded rather than relying on the cooperative
         // `NSApp.activate()`: as an `LSUIElement` accessory app whose main
-        // surface is a transient status-bar popover, Osaurus is usually not the
+        // surface is a transient status-bar popover, Intelligence is usually not the
         // active app when a window is opened from the popover. Sequoia's
         // stricter cooperative-activation rules then make `NSApp.activate()` a
         // no-op, so the window is created but never comes to the front (the

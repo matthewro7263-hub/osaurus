@@ -9,14 +9,14 @@
 import AppIntents
 import OsaurusCore
 
-/// Ask the currently active Osaurus agent and return its reply.
+/// Ask the currently active Intelligence agent and return its reply.
 ///
 /// This awaits the streaming `/agents/{id}/run` result. A short ask completes
 /// well within the intent time budget; an ask that triggers heavy tool use can
 /// exceed it (the run is connection-bound and would be cancelled).
 struct AskOsaurusIntent: AppIntent {
-    static let title: LocalizedStringResource = "Ask Osaurus"
-    static let description = IntentDescription("Ask the active Osaurus agent.")
+    static let title: LocalizedStringResource = "Ask Intelligence"
+    static let description = IntentDescription("Ask the active Intelligence agent.")
 
     @Parameter(title: "Prompt") var prompt: String
 
@@ -27,14 +27,14 @@ struct AskOsaurusIntent: AppIntent {
     }
 }
 
-/// Start a custom Osaurus agent in the background (fire-and-confirm).
+/// Start a custom Intelligence agent in the background (fire-and-confirm).
 ///
 /// Uses the detached `/agents/{id}/dispatch` path so the run survives this
 /// intent returning; progress and results surface through the app's Work Mode
 /// and toasts.
 struct RunAgentIntent: AppIntent {
-    static let title: LocalizedStringResource = "Run Osaurus Agent"
-    static let description = IntentDescription("Start an Osaurus agent in the background.")
+    static let title: LocalizedStringResource = "Run Intelligence Agent"
+    static let description = IntentDescription("Start an Intelligence agent in the background.")
 
     @Parameter(title: "Agent") var agent: AgentEntity
     @Parameter(title: "Input") var input: String?

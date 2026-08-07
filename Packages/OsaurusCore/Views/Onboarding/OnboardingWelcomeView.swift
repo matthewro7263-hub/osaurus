@@ -95,7 +95,7 @@ struct WelcomeUsageOptIn: View {
                 Image(systemName: state.shareUsageData ? "checkmark.square.fill" : "square")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(state.shareUsageData ? theme.accentColor : theme.tertiaryText)
-                Text("Share anonymous usage data to help improve Osaurus", bundle: .module)
+                Text("Share anonymous usage data to help improve Intelligence", bundle: .module)
                     .font(theme.font(size: 12))
                     .foregroundColor(theme.secondaryText)
             }
@@ -126,7 +126,7 @@ struct WelcomeUsageOptIn: View {
     private var infoPopover: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(
-                "We collect anonymous, aggregated usage data to learn which features are used so we can improve Osaurus. It's completely anonymous and never includes your chats, prompts, files, or keys. You can turn this off anytime in Settings.",
+                "We collect anonymous, aggregated usage data to learn which features are used so we can improve Intelligence. It's completely anonymous and never includes your chats, prompts, files, or keys. You can turn this off anytime in Settings.",
                 bundle: .module
             )
             .font(theme.font(size: 12))

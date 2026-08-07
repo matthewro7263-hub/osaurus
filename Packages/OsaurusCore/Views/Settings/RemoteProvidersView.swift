@@ -707,7 +707,7 @@ private struct ProviderCardView: View {
                         }
 
                         if provider.providerType == .osaurus {
-                            // Osaurus peers talk through the Secure Channel —
+                            // Intelligence peers talk through the Secure Channel —
                             // agent traffic is end-to-end encrypted or refused.
                             HStack(spacing: 3) {
                                 Image(systemName: "lock.fill")
@@ -721,7 +721,7 @@ private struct ProviderCardView: View {
                             .background(Capsule().fill(theme.successColor.opacity(0.12)))
                             .help(
                                 L(
-                                    "Agent traffic is protected by the Osaurus Secure Channel: forward-secret, mutually authenticated end-to-end encryption."
+                                    "Agent traffic is protected by the Intelligence Secure Channel: forward-secret, mutually authenticated end-to-end encryption."
                                 )
                             )
                         }

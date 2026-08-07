@@ -83,7 +83,7 @@ public struct MockAppleScriptWorld: Sendable, Equatable {
         fallback: AppleScriptExecutionResult
     ) -> AppleScriptExecutionResult {
         // Simple `set name to "literal"` bindings, so idiomatic scripts that
-        // hoist their values (`set folderName to "Osaurus Drops"` … `{name:
+        // hoist their values (`set folderName to "Intelligence Drops"` … `{name:
         // folderName}`) resolve to the same literal a direct form would.
         let bindings = Self.parseStringBindings(script)
 
@@ -314,7 +314,7 @@ public struct MockAppleScriptWorld: Sendable, Equatable {
     // MARK: - Identifier bindings
 
     /// Collect `set <identifier> to "literal"` bindings so parsers can resolve
-    /// an idiomatic hoisted value (`set folderName to "Osaurus Drops"`).
+    /// an idiomatic hoisted value (`set folderName to "Intelligence Drops"`).
     /// Only DIRECT string-literal assignments bind; anything computed stays
     /// unresolved (→ fallback), never guessed.
     static func parseStringBindings(_ script: String) -> [String: String] {

@@ -2,12 +2,12 @@
 //  FrontmostAppTracker.swift
 //  OsaurusCore — Computer Use
 //
-//  Records the most-recently-active application that is NOT Osaurus itself.
+//  Records the most-recently-active application that is NOT Intelligence itself.
 //
 //  Why this exists: the screen-context snapshot freezes on the first send of
-//  a chat session, at which point Osaurus is usually the frontmost app (the
+//  a chat session, at which point Intelligence is usually the frontmost app (the
 //  user just clicked into the chat input). The interesting "what were you
-//  doing" signal is the app that was frontmost *before* Osaurus took focus —
+//  doing" signal is the app that was frontmost *before* Intelligence took focus —
 //  which macOS does not expose after the fact. So we observe activations from
 //  app launch and remember the last non-self app, giving the distiller a
 //  reliable working-app hint to fall back to.
@@ -21,7 +21,7 @@ import Foundation
 public final class FrontmostAppTracker: ObservableObject {
     public static let shared = FrontmostAppTracker()
 
-    /// pid of the most-recently-active non-Osaurus app, or nil if none has
+    /// pid of the most-recently-active non-Intelligence app, or nil if none has
     /// been observed since the tracker started.
     public private(set) var lastNonSelfPid: Int32?
 

@@ -121,7 +121,7 @@ public enum WhatsNewContent {
                 title: "Knowledge Base",
                 titlePrefix: "Introducing",
                 description:
-                    "Point Osaurus at folders of reference material like team guides, standards, specs, and spreadsheets, and your agents can search and read them on demand. Markdown, plain text, code, PDF, Word, Excel, PowerPoint, and CSV files are all indexed, entirely on your Mac.",
+                    "Point Intelligence at folders of reference material like team guides, standards, specs, and spreadsheets, and your agents can search and read them on demand. Markdown, plain text, code, PDF, Word, Excel, PowerPoint, and CSV files are all indexed, entirely on your Mac.",
                 systemImage: "books.vertical.fill"
             ),
             WhatsNewPage(

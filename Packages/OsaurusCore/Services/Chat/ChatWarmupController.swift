@@ -82,7 +82,7 @@ final class ChatWarmupController: ObservableObject {
     static let scheduleDebounce: Duration = .milliseconds(500)
 
     /// Projected RAM feasibility for a candidate warm-up load (test seam;
-    /// production queries the shared runtime). Warm-up is Osaurus-initiated
+    /// production queries the shared runtime). Warm-up is Intelligence-initiated
     /// background work, so a projection past the hard RAM ceiling skips it
     /// entirely — proactively loading a model that can't fit is how a
     /// window-open warm-up turns into a fatal Metal OOM

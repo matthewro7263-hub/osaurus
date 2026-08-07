@@ -47,7 +47,7 @@ public struct ChatTurnData: Codable, Identifiable, Sendable {
     /// An abandoned reasoning/protocol attempt can remain visible in the
     /// transcript without being replayed to the model. False for legacy turns.
     public var modelContextExcluded: Bool
-    /// Osaurus Router billing snapshot (cost, token counts, status) for this
+    /// Intelligence Router billing snapshot (cost, token counts, status) for this
     /// assistant turn. Metadata only - no prompt/response text. Nil for local
     /// models and non-router providers.
     public var routerBilling: RouterBillingSummary?

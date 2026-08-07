@@ -6,7 +6,7 @@
 //  allows servers to paginate `tools/list`; a single call only returns the
 //  first page, so callers that treat it as the full tool set silently drop
 //  every tool past page one (osaurus-ai/osaurus#1999 — Baserow returns a
-//  paginated list and Osaurus discovered zero tools).
+//  paginated list and Intelligence discovered zero tools).
 //
 
 import Foundation

@@ -4,7 +4,7 @@
 //
 //  RFC 7591 Dynamic Client Registration for the MCP authorization spec.
 //
-//  We register Osaurus as a **public** native client (no client secret) using
+//  We register Intelligence as a **public** native client (no client secret) using
 //  loopback redirect URIs per RFC 8252. The resulting `client_id` is cached
 //  in the provider's `MCPOAuthConfig` so we don't re-register on every
 //  sign-in / refresh.

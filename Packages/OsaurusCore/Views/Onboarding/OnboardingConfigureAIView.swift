@@ -3,11 +3,11 @@
 //  osaurus
 //
 //  Onboarding step 3 — "Give your dino a brain". One path, no fork: the home
-//  screen features the local model Osaurus picked for this Mac (name, use
+//  screen features the local model Intelligence picked for this Mac (name, use
 //  case, download size) with a single "Download model" CTA. Pressing it starts
 //  the background download and advances immediately; the dedicated chat setup
 //  state owns progress feedback later. Quiet supporting text explains that
-//  Osaurus Cloud is included automatically with the free welcome credit, so
+//  Intelligence Cloud is included automatically with the free welcome credit, so
 //  they can chat immediately while the model lands. The footer keeps the two
 //  outcomes together: download the recommended model, or skip it and use Cloud.
 //  Bring-your-own-provider stays available as a tertiary path, and "Change
@@ -506,7 +506,7 @@ final class ConfigureAIState: ObservableObject {
         isChoosingModel = false
     }
 
-    /// "Skip download": start on Osaurus Cloud (with the free welcome credit)
+    /// "Skip download": start on Intelligence Cloud (with the free welcome credit)
     /// instead of downloading anything. There is nothing to download or
     /// connect here — identity + router connect are prepared in the
     /// background by `OnboardingView` and finalized at finish.
@@ -545,7 +545,7 @@ final class ConfigureAIState: ObservableObject {
         // alert can't re-present later in the Models tab. A repeat refusal
         // sets a new alert.
         clearDownloadAlertForSelectedModel()
-        // Route through the onboarding-only Osaurus model download proxy: the user
+        // Route through the onboarding-only Intelligence model download proxy: the user
         // has no HF token yet, and anonymous throttling here is a measured
         // onboarding drop-off driver. Any proxy failure silently falls back
         // to the plain anonymous HF path.
@@ -1001,7 +1001,7 @@ struct ConfigureAIBody: View {
                     )
                 }
                 Text(
-                    "Your free $2.50 credit lets you start immediately. Osaurus switches to your private model automatically when it's ready.",
+                    "Your free $2.50 credit lets you start immediately. Intelligence switches to your private model automatically when it's ready.",
                     bundle: .module
                 )
                 .font(theme.font(size: 11))
@@ -1188,7 +1188,7 @@ struct ConfigureAIBody: View {
 
     /// Replaces the API key field for presets that authenticate locally (no
     /// key required — Ollama, etc.). Shows the resolved endpoint so the user
-    /// can confirm where Osaurus will look.
+    /// can confirm where Intelligence will look.
     private func noAuthEndpointBanner(for preset: ProviderPreset) -> some View {
         let cfg = preset.configuration
         var url = cfg.providerProtocol.rawValue + "://" + cfg.host
@@ -1372,7 +1372,7 @@ struct ConfigureAIBody: View {
 
 // MARK: - Featured local model card
 
-/// The home screen's hero: the local model Osaurus picked for this Mac, with
+/// The home screen's hero: the local model Intelligence picked for this Mac, with
 /// its use case, download size, and memory requirement. If the user navigates
 /// back after starting the download, this card also reflects live progress and
 /// recovery state. Isolated so only the card re-renders on `ModelManager`'s
@@ -1946,7 +1946,7 @@ struct ConfigureAICTA: View {
                     state.chooseOsaurusAndContinue(onComplete: onComplete)
                 }
                 .localizedHelp(
-                    "Start on free Osaurus Cloud credits — you can download a model anytime later."
+                    "Start on free Intelligence Cloud credits — you can download a model anytime later."
                 )
             }
         }

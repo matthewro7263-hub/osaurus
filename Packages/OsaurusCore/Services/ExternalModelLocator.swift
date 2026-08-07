@@ -3,7 +3,7 @@
 //  osaurus
 //
 //  Read-only discovery of MLX/safetensors model bundles that live outside
-//  Osaurus's own models directory — the Hugging Face Hub cache, LM
+//  Intelligence's own models directory — the Hugging Face Hub cache, LM
 //  Studio, and user-selected model folders. Discovered bundles are surfaced in the catalog and made
 //  runnable in place via an id -> absolute-path registry the runtime path
 //  resolvers consult; nothing is ever copied, symlinked, or mutated in the
@@ -251,7 +251,7 @@ enum ExternalModelLocator {
                 // local and loadable but loses `model_type` in the picker.
                 // Chat-family routing and structural agent contracts would
                 // then silently differ from the same bundle installed under
-                // Osaurus's managed model directory.
+                // Intelligence's managed model directory.
                 modelType: VLMDetection.readModelType(at: bundleDirectory),
                 bundleDirectory: bundleDirectory,
                 externalSource: entry.source

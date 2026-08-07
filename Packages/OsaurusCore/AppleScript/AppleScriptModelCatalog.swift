@@ -91,7 +91,7 @@ enum AppleScriptModelCatalog {
     static let models: [MLXModel] = [
         MLXModel(
             id: model16BId,
-            name: "Osaurus AppleScript 16B",
+            name: "Intelligence AppleScript 16B",
             description:
                 "On-device mixture-of-experts model fine-tuned to write executable AppleScript for "
                 + "macOS automation. Built for reliable scripts on harder automation tasks.",
@@ -103,7 +103,7 @@ enum AppleScriptModelCatalog {
         ),
         MLXModel(
             id: model8BId,
-            name: "Osaurus AppleScript 8B",
+            name: "Intelligence AppleScript 8B",
             description:
                 "Lighter on-device model fine-tuned to write executable AppleScript for macOS "
                 + "automation. A smaller download that fits Macs with less memory.",
@@ -126,7 +126,7 @@ enum AppleScriptModelCatalog {
     }
 
     /// Whether a catalog/ad-hoc AppleScript bundle is available either in the
-    /// Osaurus models directory or through the user's external-model registry.
+    /// Intelligence models directory or through the user's external-model registry.
     /// Runtime loading already resolves external bundles in place; the
     /// availability gate must use the same source of truth or a valid model in
     /// a Settings-selected folder is shown as installed but rejected at call

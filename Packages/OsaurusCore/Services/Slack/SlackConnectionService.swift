@@ -52,7 +52,7 @@ struct SlackConnectionDiagnostics: Equatable, Sendable {
     /// Machine reason inbound dispatch cannot run (nil when dispatch is
     /// disabled or fully configured).
     let inboundDispatchIssue: String?
-    /// Actionable environment warnings, e.g. multiple running Osaurus
+    /// Actionable environment warnings, e.g. multiple running Intelligence
     /// instances competing for Socket Mode envelopes.
     let warnings: [String]
 
@@ -302,7 +302,7 @@ enum SlackConnectionServiceError: LocalizedError, Equatable, Sendable {
         case .writeDisabled:
             return "Slack write access is disabled in settings."
         case .sendConfirmationRequired:
-            return "`confirm_send` must be true before Osaurus posts to Slack."
+            return "`confirm_send` must be true before Intelligence posts to Slack."
         case .messageTooLong:
             return "Slack messages must be 40000 characters or fewer."
         case .emptyMessage:

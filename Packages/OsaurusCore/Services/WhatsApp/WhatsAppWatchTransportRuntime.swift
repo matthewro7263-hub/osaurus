@@ -169,7 +169,7 @@ actor WhatsAppWatchTransportRuntime: AgentChannelReceiveTransportRuntime {
                 summary: reason.isEmpty
                     ? "The WhatsApp receive stream was interrupted; reconnecting."
                     : reason,
-                detail: "Osaurus restarts the helper and resubscribes automatically (attempt \(consecutiveFailures)). If the account was unlinked, re-scan the QR code in WhatsApp settings.",
+                detail: "Intelligence restarts the helper and resubscribes automatically (attempt \(consecutiveFailures)). If the account was unlinked, re-scan the QR code in WhatsApp settings.",
                 isRunning: worker != nil,
                 receiveEnabled: true,
                 lastFailureAt: failedAt,

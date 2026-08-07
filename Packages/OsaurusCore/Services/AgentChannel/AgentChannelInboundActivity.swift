@@ -145,9 +145,9 @@ enum AgentChannelInboundActivityPresentation {
         case "team_not_allowlisted", "space_not_allowlisted":
             return L("The workspace is not allowlisted. Select it in the channel settings and save.")
         case "bot_identity_unknown":
-            return L("Osaurus has not confirmed the bot identity yet. Run Test Connection once.")
+            return L("Intelligence has not confirmed the bot identity yet. Run Test Connection once.")
         case "own_message", "self_message":
-            return L("Osaurus ignores the bot's own messages.")
+            return L("Intelligence ignores the bot's own messages.")
         case "duplicate_event", "duplicate_event_acknowledge_without_dispatch",
              "duplicate_message_acknowledge_without_dispatch":
             return L("This event was already processed; the provider redelivered it.")
@@ -166,9 +166,9 @@ enum AgentChannelInboundActivityPresentation {
         case "inbound_sender_missing":
             return L("Telegram did not include a sender for this message, so it cannot be authorized.")
         case "undecodable_envelope":
-            return L("The provider sent an envelope Osaurus could not decode.")
+            return L("The provider sent an envelope Intelligence could not decode.")
         case "mention_required":
-            return L("Mentions are required to start a conversation. Mention the bot user (not the Osaurus agent name) in your message.")
+            return L("Mentions are required to start a conversation. Mention the bot user (not the Intelligence agent name) in your message.")
         case "inbound_dispatch_disabled", "inbound_dispatch_not_configured":
             return L("Dispatch to an agent is turned off. Enable it and pick an agent in the channel settings.")
         case "inbound_agent_unavailable":

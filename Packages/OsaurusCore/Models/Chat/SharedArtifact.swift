@@ -390,7 +390,7 @@ extension SharedArtifact {
         return .success(ProcessingResult(artifact: artifact, enrichedToolResult: enriched))
     }
 
-    /// Process a host file that Osaurus itself produced, such as a native image
+    /// Process a host file that Intelligence itself produced, such as a native image
     /// generation output. This deliberately bypasses the model-controlled
     /// `path` resolver used by `share_artifact`; callers must only pass paths
     /// returned by trusted local services.

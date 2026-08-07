@@ -11,7 +11,7 @@
 //
 //  Everything here is version- and digest-pinned, and every spawn re-verifies
 //  the installed copy — fail-closed on both sides, so a mirror/registry
-//  compromise cannot swap the bytes Osaurus executes without failing
+//  compromise cannot swap the bytes Intelligence executes without failing
 //  verification on the host. The pins are locked to
 //  `scripts/build/imsg-helper-manifest.json` by a unit test.
 //
@@ -34,7 +34,7 @@ import Security
         public static let license = "MIT"
 
         /// Nested Mach-O + resource file names inside `Contents/Helpers`.
-        /// `executableName` is the JSON-RPC entrypoint Osaurus spawns; the
+        /// `executableName` is the JSON-RPC entrypoint Intelligence spawns; the
         /// bridge dylib is only used by `imsg`'s private-API mode (advanced
         /// actions) and must be signed as a nested Mach-O before the app seal.
         public static let executableName = "imsg"
@@ -238,7 +238,7 @@ import Security
         /// 1. Digest pin: the file is byte-identical to the pinned upstream
         ///    release (dev `make app` staging, which does not re-sign).
         /// 2. Same-team signature: the release pipeline re-signs the helper
-        ///    with Osaurus's Developer ID (changing its digest), so a helper
+        ///    with Intelligence's Developer ID (changing its digest), so a helper
         ///    whose signature is valid AND whose TeamIdentifier matches the
         ///    host app's is the pinned binary as sealed by our own release.
         ///    This path exists only for the sealed bundled copy: a

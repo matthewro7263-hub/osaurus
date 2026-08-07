@@ -18,7 +18,7 @@ public enum SystemPromptTemplates {
     /// running so a custom persona doesn't accidentally erase that context.
     /// Names no tools (see `defaultPersona` for why).
     public static let platformIdentity =
-        "You are an Osaurus chat agent running locally on the user's Mac."
+        "You are an Intelligence chat agent running locally on the user's Mac."
 
     /// Default persona used when the user has not configured a custom one.
     /// Frames the agent as tool-driven so models don't reflexively say
@@ -750,7 +750,7 @@ public enum SystemPromptTemplates {
     /// enumeration. The manifest lists a plugin's skill alongside its tools;
     /// this rule tells the model to load the skill first because a
     /// name+description manifest can't convey the skill-first ordering a
-    /// tool-group skill (e.g. `Osaurus Browser`) teaches.
+    /// tool-group skill (e.g. `Intelligence Browser`) teaches.
     public static func skillsGovernToolGroups(
         names: CapabilityToolNames = .gateway
     ) -> String {
@@ -1193,7 +1193,7 @@ public enum SystemPromptTemplates {
             """
     }
 
-    /// Old Osaurus-generated SOUL seeds named a private backend adapter. Fix
+    /// Old Intelligence-generated SOUL seeds named a private backend adapter. Fix
     /// only those known seed sentences while rendering; arbitrary user notes
     /// remain byte-for-byte untouched on disk and in the prompt.
     private static func normalizeLegacySoulToolVocabulary(_ content: String) -> String {

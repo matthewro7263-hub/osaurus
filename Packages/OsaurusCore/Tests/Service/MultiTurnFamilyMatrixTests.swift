@@ -8,7 +8,7 @@
 //
 // Why split: the engine doesn't know "this user has a flat-layout
 // `MiniMax-M2.7-Small-JANGTQ` directory and tried to drop an image on
-// it" — the engine just gets a chat message with parts. Osaurus is the
+// it" — the engine just gets a chat message with parts. Intelligence is the
 // layer that gates which parts even get to be in the message in the
 // first place. A regression here means the engine never sees the
 // image (UI silently rejects it) or sees an image the engine can't

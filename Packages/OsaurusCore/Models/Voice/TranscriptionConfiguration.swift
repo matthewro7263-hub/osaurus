@@ -60,7 +60,7 @@ public enum TranscriptionConfigurationStore {
         do {
             return try JSONDecoder().decode(TranscriptionConfiguration.self, from: Data(contentsOf: url))
         } catch {
-            print("[Osaurus] Failed to load TranscriptionConfiguration: \(error)")
+            print("[Intelligence] Failed to load TranscriptionConfiguration: \(error)")
             return TranscriptionConfiguration.default
         }
     }
@@ -76,7 +76,7 @@ public enum TranscriptionConfigurationStore {
                 NotificationCenter.default.post(name: .transcriptionConfigurationChanged, object: nil)
             }
         } catch {
-            print("[Osaurus] Failed to save TranscriptionConfiguration: \(error)")
+            print("[Intelligence] Failed to save TranscriptionConfiguration: \(error)")
         }
     }
 

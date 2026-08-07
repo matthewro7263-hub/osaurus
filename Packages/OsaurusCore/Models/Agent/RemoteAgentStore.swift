@@ -28,7 +28,7 @@ public enum RemoteAgentStore {
                 let agent = try decoder.decode(RemoteAgent.self, from: data)
                 result.append(agent)
             } catch {
-                print("[Osaurus] Failed to load remote agent from \(file.lastPathComponent): \(error)")
+                print("[Intelligence] Failed to load remote agent from \(file.lastPathComponent): \(error)")
             }
         }
         return result.sorted { $0.pairedAt > $1.pairedAt }
@@ -43,7 +43,7 @@ public enum RemoteAgentStore {
             encoder.dateEncodingStrategy = .iso8601
             try encoder.encode(agent).write(to: url, options: [.atomic])
         } catch {
-            print("[Osaurus] Failed to save remote agent \(agent.id): \(error)")
+            print("[Intelligence] Failed to save remote agent \(agent.id): \(error)")
         }
     }
 
@@ -53,7 +53,7 @@ public enum RemoteAgentStore {
             try FileManager.default.removeItem(at: fileURL(for: id))
             return true
         } catch {
-            print("[Osaurus] Failed to delete remote agent \(id): \(error)")
+            print("[Intelligence] Failed to delete remote agent \(id): \(error)")
             return false
         }
     }

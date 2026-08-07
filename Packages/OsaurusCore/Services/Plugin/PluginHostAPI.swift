@@ -2694,7 +2694,7 @@ final class PluginHostContext: @unchecked Sendable {
         }
 
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
-        let suffix = "Osaurus/\(appVersion) Plugin/\(pluginId)"
+        let suffix = "Intelligence/\(appVersion) Plugin/\(pluginId)"
         let existing = request.value(forHTTPHeaderField: "User-Agent")
         request.setValue(existing.map { "\($0) \(suffix)" } ?? suffix, forHTTPHeaderField: "User-Agent")
 

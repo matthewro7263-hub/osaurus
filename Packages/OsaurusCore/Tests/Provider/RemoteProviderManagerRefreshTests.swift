@@ -194,7 +194,7 @@ struct RemoteProviderManagerRefreshTests {
     @Test func refreshConnectedProviders_throttlesRepeatedCalls() async throws {
         await RemoteProviderTestLock.shared.run {
             let manager = RemoteProviderManager.shared
-            // Keep the managed Osaurus Router out of `enabledProviders` so the
+            // Keep the managed Intelligence Router out of `enabledProviders` so the
             // counter reflects only the installed user provider, independent of
             // whether this machine has a real identity (which would otherwise
             // let `refreshConnectedProviders` connect the router via the seam).

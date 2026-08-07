@@ -123,13 +123,13 @@ struct AppleScriptModelsView: View {
 
     /// AppleScript talks to other apps via Apple Events, which macOS gates with
     /// the per-app Automation permission. The first time an agent controls a new
-    /// app the OS prompts (attributed to Osaurus); this primes the System Events
+    /// app the OS prompts (attributed to Intelligence); this primes the System Events
     /// grant up front so the first real run isn't interrupted.
     private var permissionSection: some View {
         SettingsSection(title: "Automation permission", icon: "lock.shield") {
             VStack(alignment: .leading, spacing: 12) {
                 Text(
-                    "Running AppleScript that controls another app needs macOS Automation permission. The first time an agent controls an app, macOS asks you to allow it for Osaurus. You can prime the System Events grant now.",
+                    "Running AppleScript that controls another app needs macOS Automation permission. The first time an agent controls an app, macOS asks you to allow it for Intelligence. You can prime the System Events grant now.",
                     bundle: .module
                 )
                 .font(.system(size: 12))

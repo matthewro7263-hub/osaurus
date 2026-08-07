@@ -37,7 +37,7 @@ public struct ServerConfiguration: Codable, Equatable, Sendable {
     /// Expose the server to the local network (0.0.0.0) or keep it on localhost (127.0.0.1)
     public var exposeToNetwork: Bool
 
-    /// Start Osaurus automatically at login
+    /// Start Intelligence automatically at login
     public var startAtLogin: Bool
 
     /// Hide the dock icon (run as accessory app)

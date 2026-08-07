@@ -733,7 +733,7 @@ func cachedAvailability(
 // MARK: - Custom Tools Tab
 
 /// The Custom tab: tools the user creates or imports as JSON recipes. They
-/// run inside Osaurus's sandbox, isolated from the rest of the Mac — the
+/// run inside Intelligence's sandbox, isolated from the rest of the Mac — the
 /// sandbox is the safety mechanism, not the organizing concept.
 private struct CustomToolsTabContent: View {
     @Environment(\.theme) private var theme
@@ -755,7 +755,7 @@ private struct CustomToolsTabContent: View {
                 SectionHeader(
                     title: L("Custom Tools"),
                     description:
-                        "Tools you create or import as JSON recipes. They run inside Osaurus's sandbox, isolated from the rest of your Mac."
+                        "Tools you create or import as JSON recipes. They run inside Intelligence's sandbox, isolated from the rest of your Mac."
                 )
 
                 HStack {

@@ -152,13 +152,13 @@ private extension osaurusApp {
         CommandGroup(replacing: .appInfo) {
             Button {
                 NSApp.orderFrontStandardAboutPanel(options: [
-                    .applicationName: "Osaurus",
+                    .applicationName: "Intelligence",
                     .applicationVersion: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
                         ?? "1.0",
                     .version: Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1",
                 ])
             } label: {
-                Text(verbatim: L("About Osaurus"))
+                Text(verbatim: L("About Intelligence"))
             }
         }
     }
@@ -308,7 +308,7 @@ private extension osaurusApp {
             Button {
                 openURL("https://docs.osaurus.ai/")
             } label: {
-                Text(verbatim: L("Osaurus Help"))
+                Text(verbatim: L("Intelligence Help"))
             }
             .keyboardShortcut("?", modifiers: .command)
 

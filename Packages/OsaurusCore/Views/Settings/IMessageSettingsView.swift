@@ -10,7 +10,7 @@
 //  permissions (Full Disk Access, Messages Automation, Messages sign-in)
 //  instead of credentials. Advanced private-API actions carry an explicit
 //  security warning: they require SIP and Library Validation to be disabled
-//  by the operator, and Osaurus never changes either protection itself.
+//  by the operator, and Intelligence never changes either protection itself.
 //
 
 import SwiftUI
@@ -248,7 +248,7 @@ struct IMessageSettingsView: View {
     private var connectSectionContent: some View {
         VStack(alignment: .leading, spacing: 20) {
             Text(
-                "iMessage runs entirely on this Mac: Osaurus reads the Messages database and sends through Messages.app using a pinned, integrity-verified helper. No account token or server is involved.",
+                "iMessage runs entirely on this Mac: Intelligence reads the Messages database and sends through Messages.app using a pinned, integrity-verified helper. No account token or server is involved.",
                 bundle: .module
             )
             .font(.system(size: 12))
@@ -339,7 +339,7 @@ struct IMessageSettingsView: View {
             detail = L("Open Messages.app and sign in with your Apple Account.")
         default:
             detail = L(
-                "Osaurus can't verify this automatically — make sure Messages.app is signed in with your Apple Account on this Mac."
+                "Intelligence can't verify this automatically — make sure Messages.app is signed in with your Apple Account on this Mac."
             )
         }
         return HStack(alignment: .top, spacing: 10) {
@@ -456,7 +456,7 @@ struct IMessageSettingsView: View {
             )
             permissionRow(
                 .automationMessages,
-                detail: L("Required only for sending — Osaurus asks Messages.app to deliver each message.")
+                detail: L("Required only for sending — Intelligence asks Messages.app to deliver each message.")
             )
         }
     }
@@ -506,7 +506,7 @@ struct IMessageSettingsView: View {
             SettingsToggle(
                 title: L("Receive Messages"),
                 description: L(
-                    "Osaurus checks the Messages database for new messages in readable chats while the app runs."
+                    "Intelligence checks the Messages database for new messages in readable chats while the app runs."
                 ),
                 isOn: $receivePollingEnabled.animation(.easeOut(duration: 0.2))
             )
@@ -531,7 +531,7 @@ struct IMessageSettingsView: View {
 
             if receivePollingEnabled {
                 Text(
-                    "Keep receiving enabled in only one copy of Osaurus on this Mac. A second running instance (for example a development build next to the installed app) watches the same Messages database and would reply independently, causing duplicate answers.",
+                    "Keep receiving enabled in only one copy of Intelligence on this Mac. A second running instance (for example a development build next to the installed app) watches the same Messages database and would reply independently, causing duplicate answers.",
                     bundle: .module
                 )
                 .font(.system(size: 10))
@@ -811,7 +811,7 @@ struct IMessageSettingsView: View {
                     label: L("Poll Interval Seconds"),
                     text: $pollIntervalSeconds,
                     placeholder: "3",
-                    help: L("How often Osaurus checks for new messages. Clamped to 1-60 seconds.")
+                    help: L("How often Intelligence checks for new messages. Clamped to 1-60 seconds.")
                 )
                 SettingsToggle(
                     title: L("Ingest Attachments"),
@@ -903,7 +903,7 @@ struct IMessageSettingsView: View {
             VStack(alignment: .leading, spacing: 12) {
                 Label {
                     Text(
-                        "Editing, unsending, tapbacks, typing indicators, and attachment sends use Apple's private iMessage APIs. They only work after you disable System Integrity Protection and Library Validation on this Mac — a significant, system-wide security reduction. Osaurus never changes those protections; it only detects whether the bridge is active. Do this only on a dedicated machine.",
+                        "Editing, unsending, tapbacks, typing indicators, and attachment sends use Apple's private iMessage APIs. They only work after you disable System Integrity Protection and Library Validation on this Mac — a significant, system-wide security reduction. Intelligence never changes those protections; it only detects whether the bridge is active. Do this only on a dedicated machine.",
                         bundle: .module
                     )
                     .font(.system(size: 11))

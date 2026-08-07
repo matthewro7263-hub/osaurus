@@ -226,7 +226,7 @@ struct TelegramSettingsView: View {
     private var connectSectionContent: some View {
         VStack(alignment: .leading, spacing: 20) {
             Text(
-                "Osaurus polls Telegram for new messages — no webhook or public URL is needed.",
+                "Intelligence polls Telegram for new messages — no webhook or public URL is needed.",
                 bundle: .module
             )
             .font(.system(size: 12))
@@ -536,7 +536,7 @@ struct TelegramSettingsView: View {
             SettingsToggle(
                 title: L("Receive Messages"),
                 description: L(
-                    "Osaurus continuously asks Telegram for new messages while the app runs (long polling). Turn this off only if another program polls the same bot."
+                    "Intelligence continuously asks Telegram for new messages while the app runs (long polling). Turn this off only if another program polls the same bot."
                 ),
                 isOn: $longPollingEnabled.animation(.easeOut(duration: 0.2))
             )

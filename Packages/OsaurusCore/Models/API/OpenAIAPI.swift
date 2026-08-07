@@ -80,7 +80,7 @@ struct OpenAIModel: Codable, Sendable {
         modified_at = try container.decodeIfPresent(String.self, forKey: .modified_at)
         // Some OpenAI-compatible servers expose provider-local metadata in
         // `size` as a fractional value. That field is informational for
-        // Osaurus model discovery, so preserve the model row instead of
+        // Intelligence model discovery, so preserve the model row instead of
         // rejecting the whole `/models` response.
         size = try? container.decodeIfPresent(Int.self, forKey: .size)
         digest = try container.decodeIfPresent(String.self, forKey: .digest)
@@ -756,11 +756,11 @@ struct ChatCompletionRequest: Codable, Sendable {
     var isAgentRequest: Bool = false
     /// Stable per-logical-step idempotency token. Set by the chat surface and
     /// reused across connect-phase and transient agent-loop retries so the
-    /// Osaurus Router can dedupe billing on a re-POST. Not decoded from inbound
+    /// Intelligence Router can dedupe billing on a re-POST. Not decoded from inbound
     /// OpenAI JSON; forwarded ONLY to the router (in the signed request body).
     var idempotencyKey: String? = nil
     /// Local-only marker set by a chat session that targets a paired/discovered
-    /// remote Osaurus *agent* (Mode 2). When true the request is routed to the
+    /// remote Intelligence *agent* (Mode 2). When true the request is routed to the
     /// remote `/agents/{address}/run` endpoint so the agent runs fully
     /// server-side (its own model + context + tools) and only text deltas
     /// stream back. When false an `.osaurus` provider is used as a plain
@@ -1114,7 +1114,7 @@ struct DeltaContent: Codable, Sendable {
 struct StreamChoice: Codable, Sendable {
     let index: Int
     /// Optional on decode: OpenAI-compatible providers (DeepSeek among them)
-    /// omit `delta` on the final finish/usage chunk. Osaurus's own stream
+    /// omit `delta` on the final finish/usage chunk. Intelligence's own stream
     /// writers always populate it.
     let delta: DeltaContent?
     let finish_reason: String?
@@ -1139,7 +1139,7 @@ struct ChatCompletionChunk: Codable, Sendable {
     /// Final usage chunk (OpenAI `stream_options.include_usage`). Populated
     /// only on the dedicated penultimate SSE chunk; nil on every other.
     var usage: Usage? = nil
-    /// Osaurus extension chunk for determinate local prefill progress. Emitted
+    /// Intelligence extension chunk for determinate local prefill progress. Emitted
     /// with empty choices before the first token when the runtime reports it.
     var osaurus_prefill: PrefillProgressState? = nil
 }

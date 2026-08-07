@@ -32,7 +32,7 @@ public enum BuiltInAgentGuardError: Error, Equatable, Sendable {
         switch self {
         case .builtInAgentNotExposable(let agentId, let source):
             return "Built-in agent \(agentId.uuidString) is not reachable from \(source). "
-                + "Built-in agents (including the Default agent) are only available inside the Osaurus app."
+                + "Built-in agents (including the Default agent) are only available inside the Intelligence app."
         }
     }
 }

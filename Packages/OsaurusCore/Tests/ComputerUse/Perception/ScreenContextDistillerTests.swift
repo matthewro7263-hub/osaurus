@@ -4,7 +4,7 @@
 //
 //  Pure-data coverage for the screen-context smart sampler. Drives the
 //  distiller through `MockMacDriver` so working-app selection, the
-//  Osaurus-exclusion fallback, focused-field extraction, the window list, and
+//  Intelligence-exclusion fallback, focused-field extraction, the window list, and
 //  the rendered block are all asserted without touching real Accessibility.
 //
 
@@ -169,8 +169,8 @@ final class ScreenContextDistillerTests: XCTestCase {
             apps: [
                 CUAppListing(pid: 100, bundleId: "com.apple.Safari", name: "Safari", active: false, hidden: false)
             ],
-            // Osaurus itself is frontmost (its pid == selfPid).
-            active: CUActiveWindow(pid: selfPid, app: "Osaurus", title: "Chat", x: 0, y: 0, w: 600, h: 800),
+            // Intelligence itself is frontmost (its pid == selfPid).
+            active: CUActiveWindow(pid: selfPid, app: "Intelligence", title: "Chat", x: 0, y: 0, w: 600, h: 800),
             windowsByPid: [
                 100: [
                     CUWindowInfo(
@@ -196,7 +196,7 @@ final class ScreenContextDistillerTests: XCTestCase {
         )
 
         XCTAssertEqual(snap.workingApp, "Safari")
-        // No window is frontmost because the genuine frontmost app (Osaurus) is excluded.
+        // No window is frontmost because the genuine frontmost app (Intelligence) is excluded.
         XCTAssertFalse(snap.windows.contains { $0.frontmost })
     }
 
@@ -206,7 +206,7 @@ final class ScreenContextDistillerTests: XCTestCase {
                 CUAppListing(pid: 200, bundleId: "com.apple.mail", name: "Mail", active: false, hidden: false),
                 CUAppListing(pid: 100, bundleId: "com.apple.Safari", name: "Safari", active: false, hidden: false),
             ],
-            active: CUActiveWindow(pid: selfPid, app: "Osaurus", title: "Chat", x: 0, y: 0, w: 600, h: 800),
+            active: CUActiveWindow(pid: selfPid, app: "Intelligence", title: "Chat", x: 0, y: 0, w: 600, h: 800),
             windowsByPid: [
                 200: [
                     CUWindowInfo(
@@ -237,8 +237,8 @@ final class ScreenContextDistillerTests: XCTestCase {
         let driver = makeDriver(
             apps: [
                 CUAppListing(pid: 100, bundleId: "com.apple.Safari", name: "Safari", active: true, hidden: false),
-                // Osaurus shows up in the app list (dock-icon / .regular mode).
-                CUAppListing(pid: selfPid, bundleId: selfBundleId, name: "Osaurus", active: false, hidden: false),
+                // Intelligence shows up in the app list (dock-icon / .regular mode).
+                CUAppListing(pid: selfPid, bundleId: selfBundleId, name: "Intelligence", active: false, hidden: false),
             ],
             active: CUActiveWindow(pid: 100, app: "Safari", title: "Weather — Safari", x: 0, y: 0, w: 1200, h: 800),
             windowsByPid: [
@@ -257,7 +257,7 @@ final class ScreenContextDistillerTests: XCTestCase {
                 selfPid: [
                     CUWindowInfo(
                         windowId: 2,
-                        title: "Osaurus Chat",
+                        title: "Intelligence Chat",
                         focused: false,
                         minimized: false,
                         x: 0,
@@ -277,7 +277,7 @@ final class ScreenContextDistillerTests: XCTestCase {
             preferredPid: nil
         )
 
-        XCTAssertTrue(snap.windows.allSatisfy { $0.app != "Osaurus" })
+        XCTAssertTrue(snap.windows.allSatisfy { $0.app != "Intelligence" })
     }
 
     func testWindowListIsCapped() async {
@@ -781,7 +781,7 @@ final class ScreenContextDistillerTests: XCTestCase {
                 CUElement(
                     id: "p1",
                     role: "statictext",
-                    value: "The accessibility tree exposes every on-screen element so Osaurus can read it.",
+                    value: "The accessibility tree exposes every on-screen element so Intelligence can read it.",
                     windowId: 1,
                     x: 250,
                     y: 150,
@@ -919,7 +919,7 @@ final class ScreenContextDistillerTests: XCTestCase {
         let driver = editorDriver(
             app: "Slack",
             bundleId: "com.tinyspeck.slackmacgap",
-            title: "#engineering — Osaurus",
+            title: "#engineering — Intelligence",
             windowW: 1400,
             windowH: 900,
             elements: [
@@ -947,7 +947,7 @@ final class ScreenContextDistillerTests: XCTestCase {
         let driver = editorDriver(
             app: "Slack",
             bundleId: "com.tinyspeck.slackmacgap",
-            title: "105-osaurus (Channel) - Osaurus - Slack",
+            title: "105-osaurus (Channel) - Intelligence - Slack",
             windowW: 1400,
             windowH: 900,
             elements: [

@@ -42,7 +42,7 @@ public enum MigrationGenerator {
             try downSQL.write(to: downURL, atomically: true, encoding: .utf8)
             return (index, upURL, downURL)
         } catch {
-            print("[Osaurus] MigrationGenerator: write failed: \(error)")
+            print("[Intelligence] MigrationGenerator: write failed: \(error)")
             return nil
         }
     }

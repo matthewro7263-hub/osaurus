@@ -8,7 +8,7 @@
 //  providers empty state all render from this catalog instead of hand-rolling
 //  their own lists, cards, and per-provider auth branches.
 //
-//  Adding a new provider (for example a future hosted "Osaurus API") is a
+//  Adding a new provider (for example a future hosted "Intelligence API") is a
 //  single `ProviderCatalogEntry` here — no view edits required. See the
 //  `Adding a provider` note on `ProviderCatalog` below.
 //
@@ -143,7 +143,7 @@ struct ProviderCatalogEntry: Identifiable {
 ///
 /// ## Adding a provider
 /// Append one `ProviderCatalogEntry` to `entries`. For example, a future hosted
-/// Osaurus API provider is a single line here once it has a `ProviderPreset`
+/// Intelligence API provider is a single line here once it has a `ProviderPreset`
 /// case whose `configuration.providerType` is `RemoteProviderType.osaurus`
 /// (already defined) and, if it uses browser sign-in, a new
 /// `ProviderOAuthKind.osaurus` carrying its CTA/subtitle copy:

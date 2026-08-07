@@ -154,7 +154,7 @@ final class BrowserWindowController: NSObject, NSWindowDelegate {
         )
         switch purpose {
         case .login:
-            win.title = L("Sign in — Osaurus Browser") + " (\(profileId.uuidString.prefix(8)))"
+            win.title = L("Sign in — Intelligence Browser") + " (\(profileId.uuidString.prefix(8)))"
         case .session:
             let agentName = AgentManager.shared.agents.first(where: { $0.id == agentId })?.name
             win.title = L("Browser Session") + " — " + (agentName ?? L("Agent"))

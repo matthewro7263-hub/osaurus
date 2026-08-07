@@ -40,7 +40,7 @@ enum RelayConfigurationStore {
         do {
             return try JSONDecoder().decode(RelayConfiguration.self, from: Data(contentsOf: url))
         } catch {
-            print("[Osaurus] Failed to load RelayConfiguration: \(error)")
+            print("[Intelligence] Failed to load RelayConfiguration: \(error)")
             return .default
         }
     }
@@ -53,7 +53,7 @@ enum RelayConfigurationStore {
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
             try encoder.encode(configuration).write(to: url, options: [.atomic])
         } catch {
-            print("[Osaurus] Failed to save RelayConfiguration: \(error)")
+            print("[Intelligence] Failed to save RelayConfiguration: \(error)")
         }
     }
 }

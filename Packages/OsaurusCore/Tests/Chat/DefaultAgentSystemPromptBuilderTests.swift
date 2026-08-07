@@ -173,8 +173,8 @@ struct DefaultAgentSystemPromptBuilderTests {
         // model-download ("I cannot download models or perform web tasks")
         // because downloading touches the web, even though `osaurus_model
         // action download` is the agent's own configure surface. The compact
-        // prompt must scope the exclusion to doing non-Osaurus WORK and say
-        // managing/explaining Osaurus itself stays in scope even when the
+        // prompt must scope the exclusion to doing non-Intelligence WORK and say
+        // managing/explaining Intelligence itself stays in scope even when the
         // request mentions web or downloads. (Was "IS config" before the
         // configure+explain revamp widened the agent's job.)
         let compact = DefaultAgentSystemPromptBuilder._renderForTests(
@@ -188,7 +188,7 @@ struct DefaultAgentSystemPromptBuilderTests {
     @Test
     func render_compactOutOfScopeOffersAgentHandoffExplicitly() {
         // The out-of-scope rubric (and the product contract) is a two-part
-        // reply: say the agent only configures Osaurus AND offer the
+        // reply: say the agent only configures Intelligence AND offer the
         // create/switch handoff. The compact variant's old "Offer
         // `osaurus_agent` (`create` or `activate`)" tool-jargon lost the
         // second part on small models — pin the action words instead.
@@ -215,9 +215,9 @@ struct DefaultAgentSystemPromptBuilderTests {
     @Test
     func render_teachesHelpToolForOsaurusQuestionsInBothVariants() {
         // Configure+explain revamp: both variants must (a) name
-        // `osaurus_help` as the way to answer questions about Osaurus,
+        // `osaurus_help` as the way to answer questions about Intelligence,
         // (b) tell the model to ground answers in the topic text instead
-        // of guessing from memory, and (c) never deflect Osaurus questions
+        // of guessing from memory, and (c) never deflect Intelligence questions
         // as out-of-scope.
         for compact in [false, true] {
             let rendered = DefaultAgentSystemPromptBuilder._renderForTests(

@@ -316,7 +316,7 @@ public final class CrashReportingService {
                 // disables itself. Flag it loudly rather than failing quietly.
                 if !plist.contains("://") {
                     NSLog(
-                        "[Osaurus] SENTRY_DSN looks truncated (\"%@\"). An xcconfig treats "
+                        "[Intelligence] SENTRY_DSN looks truncated (\"%@\"). An xcconfig treats "
                             + "// as a comment — escape the scheme slashes in Secrets.xcconfig "
                             + "(e.g. SLASH = / then https:$(SLASH)$(SLASH)…).",
                         plist

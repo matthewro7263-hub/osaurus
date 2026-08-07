@@ -167,7 +167,7 @@ public enum BrowserSessionCatalog {
             cached = map
             return map
         } catch {
-            print("[Osaurus] Failed to load BrowserSessionCatalog: \(error)")
+            print("[Intelligence] Failed to load BrowserSessionCatalog: \(error)")
             cached = [:]
             return [:]
         }
@@ -189,7 +189,7 @@ public enum BrowserSessionCatalog {
                 encoder.dateEncodingStrategy = .iso8601
                 try encoder.encode(records).write(to: url, options: [.atomic])
             } catch {
-                print("[Osaurus] Failed to save BrowserSessionCatalog: \(error)")
+                print("[Intelligence] Failed to save BrowserSessionCatalog: \(error)")
             }
         }
     }

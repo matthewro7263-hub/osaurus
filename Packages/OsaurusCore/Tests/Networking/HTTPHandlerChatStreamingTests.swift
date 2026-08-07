@@ -1209,7 +1209,7 @@ struct HTTPHandlerChatStreamingTests {
     }
 
     /// Loopback callers (no auth, same machine) may reach the built-in Default
-    /// agent via `/agents/{id}/run` so the App Intents "Ask Osaurus" surface
+    /// agent via `/agents/{id}/run` so the App Intents "Ask Intelligence" surface
     /// can drive it. The request must pass the built-in guard rather than
     /// returning a `built_in_agent_not_exposable` envelope.
     @Test func builtInAgentRun_overLoopback_bypassesGuard() async throws {

@@ -817,7 +817,7 @@ public struct CustomTheme: Codable, Equatable, Sendable {
                 id: UUID(uuidString: "00000000-0000-0000-0000-000000000001")!,
                 name: "Dark",
                 version: "2.0",
-                author: "Osaurus"
+                author: "Intelligence"
             ),
             colors: ThemeColors(
                 primaryText: "#f5f5f7",
@@ -918,7 +918,7 @@ public struct CustomTheme: Codable, Equatable, Sendable {
                 id: UUID(uuidString: "00000000-0000-0000-0000-000000000002")!,
                 name: "Light",
                 version: "2.0",
-                author: "Osaurus"
+                author: "Intelligence"
             ),
             colors: ThemeColors(
                 primaryText: "#1d1d1f",
@@ -1012,15 +1012,15 @@ public struct CustomTheme: Codable, Equatable, Sendable {
         )
     }
 
-    /// Osaurus Dark — the previous default dark palette, retained as a
+    /// Intelligence Dark — the previous default dark palette, retained as a
     /// selectable built-in preset after the macOS-native defaults landed.
     public static var osaurusDarkPreset: CustomTheme {
         CustomTheme(
             metadata: ThemeMetadata(
                 id: UUID(uuidString: "00000000-0000-0000-0000-000000000007")!,
-                name: "Osaurus Dark",
+                name: "Intelligence Dark",
                 version: "1.1",
-                author: "Osaurus"
+                author: "Intelligence"
             ),
             colors: ThemeColors(
                 primaryText: "#ffffea",
@@ -1091,15 +1091,15 @@ public struct CustomTheme: Codable, Equatable, Sendable {
         )
     }
 
-    /// Osaurus Light — the previous default light palette, retained as a
+    /// Intelligence Light — the previous default light palette, retained as a
     /// selectable built-in preset after the macOS-native defaults landed.
     public static var osaurusLightPreset: CustomTheme {
         CustomTheme(
             metadata: ThemeMetadata(
                 id: UUID(uuidString: "00000000-0000-0000-0000-000000000008")!,
-                name: "Osaurus Light",
+                name: "Intelligence Light",
                 version: "1.1",
-                author: "Osaurus"
+                author: "Intelligence"
             ),
             colors: ThemeColors(
                 primaryText: "#181e38",
@@ -1176,7 +1176,7 @@ public struct CustomTheme: Codable, Equatable, Sendable {
             metadata: ThemeMetadata(
                 id: UUID(uuidString: "00000000-0000-0000-0000-000000000003")!,
                 name: "Neon",
-                author: "Osaurus"
+                author: "Intelligence"
             ),
             colors: ThemeColors(
                 primaryText: "#f0f0f0",  // ~18:1 contrast ✓
@@ -1258,7 +1258,7 @@ public struct CustomTheme: Codable, Equatable, Sendable {
             metadata: ThemeMetadata(
                 id: UUID(uuidString: "00000000-0000-0000-0000-000000000004")!,
                 name: "Nord",
-                author: "Osaurus"
+                author: "Intelligence"
             ),
             colors: ThemeColors(
                 primaryText: "#eceff4",  // ~10:1 contrast ✓
@@ -1329,7 +1329,7 @@ public struct CustomTheme: Codable, Equatable, Sendable {
             metadata: ThemeMetadata(
                 id: UUID(uuidString: "00000000-0000-0000-0000-000000000005")!,
                 name: "Paper",
-                author: "Osaurus"
+                author: "Intelligence"
             ),
             colors: ThemeColors(
                 primaryText: "#3d3d3d",  // ~9:1 contrast ✓
@@ -1420,7 +1420,7 @@ public struct CustomTheme: Codable, Equatable, Sendable {
             metadata: ThemeMetadata(
                 id: UUID(uuidString: "00000000-0000-0000-0000-000000000006")!,
                 name: "Terminal",
-                author: "Osaurus"
+                author: "Intelligence"
             ),
             colors: ThemeColors(
                 primaryText: "#00ff41",  // Classic phosphor green

@@ -144,7 +144,7 @@ struct InsightsDetailPane: View {
                         )
                         .help(
                             Text(
-                                "End-to-end encrypted via Osaurus Secure Channel",
+                                "End-to-end encrypted via Intelligence Secure Channel",
                                 bundle: .module
                             )
                         )
@@ -842,8 +842,8 @@ private struct ToolCard: View {
 /// "Wire Request" / "Wire Response" tabs into a sub-toggle so the
 /// page never has 6 tabs.
 enum InsightsBodySource: Hashable {
-    /// What Osaurus saw from the local caller (Chat UI -> Osaurus,
-    /// or HTTP API client -> Osaurus). Unscrubbed for chat sends.
+    /// What Intelligence saw from the local caller (Chat UI -> Intelligence,
+    /// or HTTP API client -> Intelligence). Unscrubbed for chat sends.
     case local
     /// What the cloud provider actually saw on the wire
     /// (post Privacy Filter, raw pre-unscrub stream on return).

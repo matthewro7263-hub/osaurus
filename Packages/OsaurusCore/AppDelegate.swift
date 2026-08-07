@@ -64,7 +64,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelega
         // process). The reason string is held for app lifetime; we never
         // re-enable, since the inference path is always potentially active.
         ProcessInfo.processInfo.disableAutomaticTermination(
-            "Osaurus local LLM HTTP server (long-running)"
+            "Intelligence local LLM HTTP server (long-running)"
         )
 
         // Tahoe only early launch hygiene. Sequoia reported launch
@@ -259,7 +259,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelega
         // remain honored by vmlx for diagnostics.
 
         // App has launched
-        NSLog("Osaurus server app launched")
+        NSLog("Intelligence server app launched")
 
         // Log per-launch adoption count for the Agent DB feature.
         // The total is across both built-in and custom agents
@@ -270,7 +270,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelega
         let allAgents = AgentManager.shared.agents
         let dbEnabledCount = allAgents.filter { $0.settings.dbEnabled }.count
         NSLog(
-            "[Osaurus] AgentDB adoption: %d/%d agents have dbEnabled=true",
+            "[Intelligence] AgentDB adoption: %d/%d agents have dbEnabled=true",
             dbEnabledCount,
             allAgents.count
         )
@@ -291,9 +291,9 @@ public final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelega
         // Set up observers for server state changes
         setupObservers()
 
-        // Start tracking the user's most-recently-active (non-Osaurus) app so
+        // Start tracking the user's most-recently-active (non-Intelligence) app so
         // the opt-in screen-context snapshot can recover "what they were doing"
-        // even when Osaurus is itself frontmost at send time. Cheap: a single
+        // even when Intelligence is itself frontmost at send time. Cheap: a single
         // NSWorkspace activation observer.
         FrontmostAppTracker.shared.start()
 
@@ -591,7 +591,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelega
         // Keychain/password prompt.
         Task { @MainActor in
             guard StorageKeyManager.shared.isStorageReadyForWrites else {
-                NSLog("[Osaurus] Scheduler disabled: storage key is not already unlocked")
+                NSLog("[Intelligence] Scheduler disabled: storage key is not already unlocked")
                 // Arm a one-shot start for when the key becomes resident,
                 // so slots persisted from a previous session still fire
                 // once the user unlocks encrypted storage.
@@ -656,7 +656,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelega
 
             if keychainDisabledTestMode && !keychainDisabledUIPresentationMode {
                 ProcessInfo.processInfo.disableAutomaticTermination(
-                    "Osaurus keychain-free headless live proof server"
+                    "Intelligence keychain-free headless live proof server"
                 )
             }
 
@@ -753,7 +753,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelega
     /// who already chose.
     ///
     /// Hosted in the user's landing app window (chat overlay, else management)
-    /// so it behaves like an app modal and recedes when Osaurus is deactivated,
+    /// so it behaves like an app modal and recedes when Intelligence is deactivated,
     /// falling back to the screen-level toast overlay only if no app window is
     /// up. Any dismissal (the "Not Now" button or a tap outside) records a
     /// decline: we treat "didn't say yes" as off.
@@ -770,7 +770,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelega
 
             // Host the prompt inside whatever app window the user landed on
             // (chat overlay, else management) so it behaves like an app modal —
-            // recedes when Osaurus is deactivated — rather than the toast
+            // recedes when Intelligence is deactivated — rather than the toast
             // overlay panel, which sits at status-bar level across all spaces
             // and would hover above other apps. The toast scope is only a
             // last-resort fallback if no app window is up.
@@ -787,9 +787,9 @@ public final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelega
             ThemedAlertCenter.shared.present(
                 ThemedAlertRequest(
                     id: requestId,
-                    title: "Help improve Osaurus",
+                    title: "Help improve Intelligence",
                     message: L(
-                        "Osaurus can send anonymous usage data to help us understand how it's used and improve it."
+                        "Intelligence can send anonymous usage data to help us understand how it's used and improve it."
                     ),
                     accessory: AnyView(TelemetryConsentDetails()),
                     buttons: [
@@ -1256,7 +1256,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelega
         // flushes in `applicationWillTerminate`) runs on the main actor — so a
         // single synchronous call that wedges the main thread disables all of
         // them at once and the app hangs forever (0.22.11 factory-reset
-        // report: journey stuck on "Quitting Osaurus" with MainThreadWatchdog
+        // report: journey stuck on "Quitting Intelligence" with MainThreadWatchdog
         // logging a blocked main thread for minutes). Once this method runs,
         // the quit is committed (`isTerminating` is never reset and the reply
         // is always `true`), and the normal path already ends in
@@ -1345,7 +1345,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelega
                 do {
                     try await SandboxManager.shared.stopContainer()
                 } catch {
-                    NSLog("[Osaurus] Sandbox stop failed: \(error)")
+                    NSLog("[Intelligence] Sandbox stop failed: \(error)")
                 }
             }
             // Belt-and-suspenders: if the sandbox was never provisioned,
@@ -1404,7 +1404,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelega
     }
 
     public func applicationWillTerminate(_ notification: Notification) {
-        NSLog("Osaurus server app terminating")
+        NSLog("Intelligence server app terminating")
         PluginRepositoryService.shared.stopBackgroundRefresh()
         ToastWindowController.shared.teardown()
         NotchWindowController.shared.teardown()
@@ -1476,9 +1476,9 @@ public final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelega
                 image.isTemplate = true
                 button.image = image
             } else {
-                button.title = "Osaurus"
+                button.title = "Intelligence"
             }
-            button.toolTip = L("Osaurus Server")
+            button.toolTip = L("Intelligence Server")
             button.target = self
             button.action = #selector(togglePopover(_:))
 
@@ -1649,17 +1649,17 @@ public final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelega
             switch serverController.serverHealth {
             case .stopped:
                 tooltip =
-                    serverController.isRestarting ? "Osaurus — Restarting…" : "Osaurus — Ready to start"
+                    serverController.isRestarting ? "Intelligence — Restarting…" : "Intelligence — Ready to start"
             case .starting:
-                tooltip = "Osaurus — Starting…"
+                tooltip = "Intelligence — Starting…"
             case .restarting:
-                tooltip = "Osaurus — Restarting…"
+                tooltip = "Intelligence — Restarting…"
             case .running:
-                tooltip = "Osaurus — Running on port \(serverController.port)"
+                tooltip = "Intelligence — Running on port \(serverController.port)"
             case .stopping:
-                tooltip = "Osaurus — Stopping…"
+                tooltip = "Intelligence — Stopping…"
             case .error(let message):
-                tooltip = "Osaurus — Error: \(message)"
+                tooltip = "Intelligence — Error: \(message)"
             }
             if serverController.activeRequestCount > 0 {
                 tooltip += " — Generating…"
@@ -1990,7 +1990,7 @@ extension AppDelegate {
         let cfg = ChatConfigurationStore.load()
         HotKeyManager.shared.register(hotkey: cfg.hotkey) { [weak self] in
             Task { @MainActor in
-                // if opening (about to be shown), and clipboard monitoring is enabled, trigger a selection grab before showing Osaurus
+                // if opening (about to be shown), and clipboard monitoring is enabled, trigger a selection grab before showing Intelligence
                 // to capture content from the currently active application.
                 if !ChatWindowManager.shared.hasVisibleWindows && cfg.enableClipboardMonitoring {
                     // start grabbing selection in the background before we take focus
@@ -2074,7 +2074,7 @@ extension AppDelegate {
                 let alert = NSAlert()
                 alert.messageText = L("Unsupported model")
                 alert.informativeText = L(
-                    "Osaurus supports MLX-compatible Hugging Face repositories, including MLX, MXFP, JANG, JANGTQ, and TurboQuant artifacts when required files are present."
+                    "Intelligence supports MLX-compatible Hugging Face repositories, including MLX, MXFP, JANG, JANGTQ, and TurboQuant artifacts when required files are present."
                 )
                 alert.alertStyle = .warning
                 alert.addButton(withTitle: "OK")
@@ -2586,7 +2586,7 @@ extension AppDelegate {
 
         // Host in the user's landing window (same routing as the telemetry
         // consent prompt) so the dialog behaves like an app modal and recedes
-        // when Osaurus deactivates; the screen-level toast overlay is only a
+        // when Intelligence deactivates; the screen-level toast overlay is only a
         // last-resort fallback when no app window is up.
         let scope: ThemedAlertScope
         if let chatId = ChatWindowManager.shared.lastFocusedWindowId,
@@ -2612,14 +2612,14 @@ extension AppDelegate {
                     """
                     Hey! After 10 months of building in public, today is our official launch on Product Hunt.
 
-                    Osaurus has been shaped by feedback from people like you. If it's been useful to you, come say hi and support the launch. It means a lot to us.
+                    Intelligence has been shaped by feedback from people like you. If it's been useful to you, come say hi and support the launch. It means a lot to us.
 
                     Thank you for being here early.
                     """
                 ),
                 headerImageNames: ["osaurus-thanks", "ph-cat"],
                 headerImageAccessibilityLabel: L(
-                    "Osaurus dinosaur and the Product Hunt kitty saying thank you"),
+                    "Intelligence dinosaur and the Product Hunt kitty saying thank you"),
                 buttons: [
                     // "Maybe later" carries the cancel role so Escape and an
                     // outside click follow the same permanent-dismiss path.

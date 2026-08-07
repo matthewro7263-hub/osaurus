@@ -1113,7 +1113,7 @@ final class NativeToolCallRowView: NSView {
                 )
             }
             searchSettingsButton.isHidden = !showSearchLink
-            // Search-source tag for completed search rows: premium (Osaurus
+            // Search-source tag for completed search rows: premium (Intelligence
             // hosted) tints accent, the user's own provider reads neutral,
             // and the built-in scrapers stay dimmed — the at-a-glance state
             // the Credits UI elaborates on.

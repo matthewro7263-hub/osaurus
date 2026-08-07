@@ -871,7 +871,7 @@ public struct SystemPromptComposer: Sendable {
                             "## Working directory\n**Path:** \(home)\n"
                             + "This run is isolated in the VM. Host folders are unavailable. "
                             + "Use paths relative to this directory. "
-                            + "Osaurus capability ids are separate from sandbox programs and libraries: "
+                            + "Intelligence capability ids are separate from sandbox programs and libraries: "
                             + "check programs/libraries with shell_run, and install exact missing package "
                             + "names with sandbox_install. "
                             + "Use the workspace tools to complete requested work now; "
@@ -2287,7 +2287,7 @@ public struct SystemPromptComposer: Sendable {
                 )
             case .vmnetOwnedByOtherProcess:
                 return (
-                    "The sandbox VM is currently owned by another Osaurus process. "
+                    "The sandbox VM is currently owned by another Intelligence process. "
                         + "Detail: \(reason.message)",
                     "Tell the user which process owns the sandbox and ask them to stop "
                         + "that app or eval run before retrying. Do not repeatedly retry "

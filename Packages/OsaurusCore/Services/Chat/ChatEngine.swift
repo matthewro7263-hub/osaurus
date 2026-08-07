@@ -71,7 +71,7 @@ actor ChatEngine: Sendable, ChatEngineProtocol {
             /// to model-string routing, which could silently retarget a
             /// different local provider. Maps to 503.
             case remoteAgentUnavailable
-            /// An HTTP-origin request routed to the Osaurus Router without
+            /// An HTTP-origin request routed to the Intelligence Router without
             /// spend authorization. Router requests are signed with the
             /// user's master key and spend real credits, so key-less
             /// loopback-trusted callers are refused unless the user opted in.
@@ -91,7 +91,7 @@ actor ChatEngine: Sendable, ChatEngineProtocol {
                 return "The selected remote agent isn't connected. Reconnect to the agent and try again."
             case .routerSpendNotAuthorized:
                 return
-                    "This model routes through the Osaurus Router and spends account credits. Include a valid Osaurus access key (Authorization: Bearer <key>), or enable 'Allow local API access without a key' for the Router in Osaurus Credits settings."
+                    "This model routes through the Intelligence Router and spends account credits. Include a valid Intelligence access key (Authorization: Bearer <key>), or enable 'Allow local API access without a key' for the Router in Intelligence Credits settings."
             }
         }
 
@@ -313,12 +313,12 @@ actor ChatEngine: Sendable, ChatEngineProtocol {
         return Dispatch(route: route, params: params, remoteServices: remoteServices)
     }
 
-    // MARK: - Osaurus Router spend gate
+    // MARK: - Intelligence Router spend gate
 
     /// Pure decision core for the Router credit-spend gate, split out so the
     /// policy is unit-testable without a live provider or HTTP channel.
     ///
-    /// Osaurus Router requests are signed with the user's master key and
+    /// Intelligence Router requests are signed with the user's master key and
     /// spend real credits, while the loopback HTTP API is deliberately
     /// unauthenticated. Without this gate any local process could silently
     /// drain the user's Router balance. Policy: HTTP-origin requests may
@@ -973,7 +973,7 @@ actor ChatEngine: Sendable, ChatEngineProtocol {
         // Mode 2 is the native server-side agent run; everything else routed to
         // a remote provider is plain inference (Mode 1).
         let mode: RequestMode = (isOsaurus && runAsRemoteAgent) ? .remoteAgentRun : .remoteInference
-        // Native Osaurus peers always ride the Secure Channel; third-party
+        // Native Intelligence peers always ride the Secure Channel; third-party
         // providers go direct (TLS) — see `_streamRemote`'s `secureProvider`.
         let transport: RequestTransport = isOsaurus ? .secureChannel : .direct
         let endpointURL: URL? =
@@ -1108,7 +1108,7 @@ actor ChatEngine: Sendable, ChatEngineProtocol {
             let shouldAccumulate = shouldLogToInsights
             var responseAccumulator = ""
 
-            print("[Osaurus][Stream] Starting stream wrapper for model: \(model)")
+            print("[Intelligence][Stream] Starting stream wrapper for model: \(model)")
 
             do {
                 for try await delta in inner {
@@ -1141,7 +1141,7 @@ actor ChatEngine: Sendable, ChatEngineProtocol {
 
                     // Check for task cancellation to allow early termination
                     if Task.isCancelled {
-                        print("[Osaurus][Stream] Task cancelled after \(deltaCount) deltas")
+                        print("[Intelligence][Stream] Task cancelled after \(deltaCount) deltas")
                         continuation.finish()
                         return
                     }
@@ -1192,7 +1192,7 @@ actor ChatEngine: Sendable, ChatEngineProtocol {
                     // Log every 50th delta or if there's a long gap (potential freeze indicator)
                     if deltaCount % 50 == 1 || timeSinceLastDelta > 2.0 {
                         print(
-                            "[Osaurus][Stream] Delta #\(deltaCount): +\(String(format: "%.2f", timeSinceStart))s total, gap=\(String(format: "%.3f", timeSinceLastDelta))s, len=\(delta.count)"
+                            "[Intelligence][Stream] Delta #\(deltaCount): +\(String(format: "%.2f", timeSinceStart))s total, gap=\(String(format: "%.3f", timeSinceLastDelta))s, len=\(delta.count)"
                         )
                     }
 
@@ -1231,7 +1231,7 @@ actor ChatEngine: Sendable, ChatEngineProtocol {
                     ? (sentinelCount > 0 ? "sentinel-only" : "empty")
                     : "non-empty"
                 print(
-                    "[Osaurus][Stream] Stream completed: \(deltaCount) content/reasoning deltas in \(String(format: "%.2f", totalTime))s classification=\(zeroDeltaClassification) reasoning=\(reasoningHintCount) stats=\(statsHintCount) toolHints=\(toolHintCount) billingHints=\(billingHintCount) prefillHints=\(prefillHintCount)"
+                    "[Intelligence][Stream] Stream completed: \(deltaCount) content/reasoning deltas in \(String(format: "%.2f", totalTime))s classification=\(zeroDeltaClassification) reasoning=\(reasoningHintCount) stats=\(statsHintCount) toolHints=\(toolHintCount) billingHints=\(billingHintCount) prefillHints=\(prefillHintCount)"
                 )
 
                 // A blank stream that coincides with a fresh MLX C++ error is
@@ -1239,7 +1239,7 @@ actor ChatEngine: Sendable, ChatEngineProtocol {
                 // would-be fatalError, so generation just produced nothing).
                 // Surface it as a failed stream rather than an empty success.
                 if deltaCount == 0, let mlxErr = MLXErrorRecovery.errorSince(mlxErrorEpoch) {
-                    print("[Osaurus][Stream] Empty stream after MLX error: \(mlxErr)")
+                    print("[Intelligence][Stream] Empty stream after MLX error: \(mlxErr)")
                     finishReason = .error
                     errorMsg = mlxErr
                     continuation.finish(throwing: MLXForwardPassError(message: mlxErr))
@@ -1247,7 +1247,7 @@ actor ChatEngine: Sendable, ChatEngineProtocol {
                     continuation.finish()
                 }
             } catch let invs as ServiceToolInvocations {
-                print("[Osaurus][Stream] Tool invocations (batch): count=\(invs.invocations.count)")
+                print("[Intelligence][Stream] Tool invocations (batch): count=\(invs.invocations.count)")
                 parsedToolNames = invs.invocations.map(\.toolName)
                 if let first = invs.invocations.first {
                     toolInvocation = (first.toolName, first.jsonArguments)
@@ -1255,7 +1255,7 @@ actor ChatEngine: Sendable, ChatEngineProtocol {
                 finishReason = .toolCalls
                 continuation.finish(throwing: invs)
             } catch let inv as ServiceToolInvocation {
-                print("[Osaurus][Stream] Tool invocation: \(inv.toolName)")
+                print("[Intelligence][Stream] Tool invocation: \(inv.toolName)")
                 parsedToolNames = [inv.toolName]
                 toolInvocation = (inv.toolName, inv.jsonArguments)
                 finishReason = .toolCalls
@@ -1263,11 +1263,11 @@ actor ChatEngine: Sendable, ChatEngineProtocol {
             } catch {
                 // Check if this is a CancellationError (expected when consumer stops)
                 if Task.isCancelled || error is CancellationError {
-                    print("[Osaurus][Stream] Stream cancelled after \(deltaCount) deltas")
+                    print("[Intelligence][Stream] Stream cancelled after \(deltaCount) deltas")
                     continuation.finish()
                     return
                 }
-                print("[Osaurus][Stream] Stream error after \(deltaCount) deltas: \(error.localizedDescription)")
+                print("[Intelligence][Stream] Stream error after \(deltaCount) deltas: \(error.localizedDescription)")
                 finishReason = .error
                 errorMsg = error.localizedDescription
                 continuation.finish(throwing: error)
@@ -1330,7 +1330,7 @@ actor ChatEngine: Sendable, ChatEngineProtocol {
         continuation.onTermination = { @Sendable termination in
             switch termination {
             case .cancelled:
-                print("[Osaurus][Stream] Consumer cancelled - stopping producer task")
+                print("[Intelligence][Stream] Consumer cancelled - stopping producer task")
                 producerTask.cancel()
             case .finished:
                 // Normal completion, producer should already be done

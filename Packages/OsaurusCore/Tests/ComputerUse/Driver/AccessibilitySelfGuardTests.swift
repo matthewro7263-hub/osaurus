@@ -2,7 +2,7 @@
 //  AccessibilitySelfGuardTests.swift
 //  OsaurusCoreTests — Computer Use
 //
-//  The native driver must never resolve Osaurus's OWN accessibility tree on the
+//  The native driver must never resolve Intelligence's OWN accessibility tree on the
 //  off-main driver queue: querying our own elements re-enters AppKit/SwiftUI
 //  accessibility in-process, evaluating SwiftUI `body` and tripping its
 //  main-thread assertion when it runs off the main thread (the production

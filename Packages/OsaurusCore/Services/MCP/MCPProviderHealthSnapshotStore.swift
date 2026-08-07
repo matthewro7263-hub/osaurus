@@ -88,7 +88,7 @@ public enum MCPProviderHealthSnapshotStore {
             let data = try encoder.encode(Envelope(snapshots: ordered))
             try data.write(to: url, options: [.atomic])
         } catch {
-            print("[Osaurus] Failed to save MCP health snapshots: \(error)")
+            print("[Intelligence] Failed to save MCP health snapshots: \(error)")
         }
     }
 

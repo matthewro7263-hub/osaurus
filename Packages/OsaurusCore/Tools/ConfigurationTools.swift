@@ -3,12 +3,12 @@
 //  osaurus
 //
 //  The four "always loaded" read tools the default agent uses to
-//  inspect Osaurus's current configuration and explain the app:
+//  inspect Intelligence's current configuration and explain the app:
 //
 //   - osaurus_status   — one-shot snapshot + suggestions
 //   - osaurus_list     — list items in a scope
 //   - osaurus_describe — full detail for one item
-//   - osaurus_help     — bundled user-guide topics about Osaurus itself
+//   - osaurus_help     — bundled user-guide topics about Intelligence itself
 //
 //  These tools intentionally don't emit secrets. Provider rows expose
 //  "has API key" booleans rather than the key itself, and `hasOAuth`
@@ -115,10 +115,10 @@ private enum PluginRepositoryDiagnosticProjection {
 public final class OsaurusStatusTool: OsaurusTool, @unchecked Sendable {
     public let name = "osaurus_status"
     public let description =
-        "One-shot snapshot of Osaurus configuration: default agent, server, models, providers, "
+        "One-shot snapshot of Intelligence configuration: default agent, server, models, providers, "
         + "plugins, schedules, watchers, skills, knowledge, channels, memory, sandbox. Returns "
         + "`suggestions` derived from the snapshot — call this first when the user says "
-        + "'help me set up Osaurus' or asks what's configured."
+        + "'help me set up Intelligence' or asks what's configured."
     public let parameters: JSONValue? = .object([
         "type": .string("object"),
         "additionalProperties": .bool(false),
@@ -642,7 +642,7 @@ public final class OsaurusListTool: OsaurusTool, @unchecked Sendable {
 public final class OsaurusHelpTool: OsaurusTool, @unchecked Sendable {
     public let name = "osaurus_help"
     public let description =
-        "Bundled Osaurus user guide — answers questions about what Osaurus is and how its features "
+        "Bundled Intelligence user guide — answers questions about what Intelligence is and how its features "
         + "work (models, providers, agents, skills, plugins, MCP, schedules, memory, server/API, "
         + "voice, themes, channels, automation). "
         + "`action`: topics (index of topic ids with summaries), read (needs `topic` id; returns the "

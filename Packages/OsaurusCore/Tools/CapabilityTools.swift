@@ -468,7 +468,7 @@ final class CapabilitiesDiscoverTool: OsaurusTool, @unchecked Sendable {
             }
             if !recovery.isEmpty {
                 text +=
-                    "\n\nThis search checks optional Osaurus capabilities only; it does not remove "
+                    "\n\nThis search checks optional Intelligence capabilities only; it does not remove "
                     + "functions already in your schema or programs/libraries in the working environment. "
                     + recovery.joined(separator: " ")
             }
@@ -1325,7 +1325,7 @@ final class CapabilitiesLoadTool: OsaurusTool, @unchecked Sendable {
                     kind: .rejected,
                     message:
                         "Skill loading is disabled for the configuration agent. "
-                        + "Use `osaurus_help` for questions about Osaurus, or `capabilities_discover` "
+                        + "Use `osaurus_help` for questions about Intelligence, or `capabilities_discover` "
                         + "to find a configuration tool (osaurus_*_<verb>) and load it directly."
                 )
             )

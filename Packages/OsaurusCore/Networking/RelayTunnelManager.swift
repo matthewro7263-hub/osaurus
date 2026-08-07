@@ -30,7 +30,7 @@ struct RelayPublicRouteCheckResult: Equatable, Sendable {
 }
 
 /// Performs the cheap public `/health` request that proves the relay hostname
-/// can actually proxy back to the local Osaurus server.
+/// can actually proxy back to the local Intelligence server.
 struct RelayPublicURLProbe: Sendable {
     typealias Transport = @Sendable (URLRequest) async throws -> (Data, URLResponse)
 
@@ -660,7 +660,7 @@ public final class RelayTunnelManager: ObservableObject {
         return uuid.uuidString
     }
 
-    /// Proxy a relay request frame to the local Osaurus server and send result frames
+    /// Proxy a relay request frame to the local Intelligence server and send result frames
     /// through the WebSocket. Detects streaming responses (SSE / NDJSON) and uses the
     /// relay streaming protocol (stream_start / stream_chunk / stream_end) so chunks
     /// are forwarded incrementally instead of buffered.

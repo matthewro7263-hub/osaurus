@@ -590,7 +590,7 @@ public final class ToolRegistry: ObservableObject {
         ToolEnvelope.failure(
             kind: .rejected,
             message:
-                "'\(tool)' is not available to external callers. This tool can only run from the Osaurus app.",
+                "'\(tool)' is not available to external callers. This tool can only run from the Intelligence app.",
             tool: tool
         )
     }
@@ -613,7 +613,7 @@ public final class ToolRegistry: ObservableObject {
                 code: 3,
                 userInfo: [
                     NSLocalizedDescriptionKey:
-                        "'\(name)' is not available to external callers. This tool can only run from the Osaurus app."
+                        "'\(name)' is not available to external callers. This tool can only run from the Intelligence app."
                 ]
             )
         }
@@ -754,7 +754,7 @@ public final class ToolRegistry: ObservableObject {
                     let message =
                         ChatExecutionContext.isExternalSurface
                             || ChatExecutionContext.denyUnapprovedToolPrompts
-                        ? "Tool '\(name)' requires interactive approval in the Osaurus app. Enable auto-approve or change the tool policy to auto before calling it from an external MCP client."
+                        ? "Tool '\(name)' requires interactive approval in the Intelligence app. Enable auto-approve or change the tool policy to auto before calling it from an external MCP client."
                         : "User denied execution for tool: \(name)"
                     throw NSError(
                         domain: "ToolRegistry",

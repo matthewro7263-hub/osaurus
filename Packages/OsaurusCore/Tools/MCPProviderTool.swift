@@ -74,7 +74,7 @@ final class MCPProviderTool: OsaurusTool, PermissionedTool, @unchecked Sendable 
             .filter { $0.isLetter || $0.isNumber || $0 == "_" }
     }
 
-    /// Build the Osaurus-exposed tool name for an MCP tool, disambiguating when
+    /// Build the Intelligence-exposed tool name for an MCP tool, disambiguating when
     /// two providers normalize to the same prefix (e.g. "My Server" / "my-server").
     static func exposedName(
         providerId: UUID,
@@ -129,7 +129,7 @@ final class MCPProviderTool: OsaurusTool, PermissionedTool, @unchecked Sendable 
 
     // MARK: - Schema Conversion
 
-    /// Convert MCP Value schema to Osaurus JSONValue
+    /// Convert MCP Value schema to Intelligence JSONValue
     private static func convertInputSchema(_ schema: MCP.Value?) -> JSONValue? {
         guard let schema = schema else {
             // Return a basic object schema if none provided

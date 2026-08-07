@@ -9,7 +9,7 @@ import Foundation
 
 /// Schedules idle unloads after a model's final generation lease drops.
 ///
-/// The actor owns only Osaurus policy state. `ModelRuntime` remains the
+/// The actor owns only Intelligence policy state. `ModelRuntime` remains the
 /// authority for loading/unloading containers, while `ModelLease` remains the
 /// crash-safety boundary that proves no stream is still using model buffers.
 public actor ModelResidencyManager {

@@ -320,13 +320,13 @@ final class AppleScriptKind: SubagentKind, @unchecked Sendable {
             for app in running where seen.insert(app.name.lowercased()).inserted {
                 unique.append(app)
             }
-            // The user necessarily brings Osaurus frontmost to submit a chat
-            // task, so NSWorkspace usually reports Osaurus here instead of the
+            // The user necessarily brings Intelligence frontmost to submit a chat
+            // task, so NSWorkspace usually reports Intelligence here instead of the
             // app they were working in. Computer Use already preserves that
             // handoff through FrontmostAppTracker; use the same source for
             // AppleScript so phrases such as "the file" or "the document"
             // can resolve against the real working app and receive its
-            // dictionary/recipes. A genuinely frontmost non-Osaurus app still
+            // dictionary/recipes. A genuinely frontmost non-Intelligence app still
             // wins, and no synthetic app is invented when the tracker is empty.
             let current = workspace.frontmostApplication
             let currentIsSelf =

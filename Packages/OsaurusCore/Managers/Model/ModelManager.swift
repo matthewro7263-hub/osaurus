@@ -1193,7 +1193,7 @@ extension ModelManager {
 
         // MARK: Large / specialist catalog
         //
-        // Never onboarding auto-defaults. Each is gated on real Osaurus load +
+        // Never onboarding auto-defaults. Each is gated on real Intelligence load +
         // decode + architecture-correct cache proof before any Top-Pick
         // promotion. `modelType` hints below are inferred from HF tags and are
         // confirmed/overridden by runtime auto-detection from each repo's
@@ -1513,7 +1513,7 @@ extension ModelManager {
     /// `ModelSizeCache` and only hitting the network when the cache is
     /// missing or its revision no longer matches `revision`.
     ///
-    /// "Download size" here is the sum of just the files Osaurus actually
+    /// "Download size" here is the sum of just the files Intelligence actually
     /// writes to disk (the `ModelDownloadService.downloadFilePatterns`
     /// set), not the whole-repo `usedStorage` HF reports — that over-counts
     /// READMEs, `.gitattributes`, alternate-format weights, etc.
@@ -1790,7 +1790,7 @@ extension ModelManager {
     /// curated entries (and any unrelated entries that may have been added).
     /// Internal so tests can drive the merge without hitting the network.
     /// `statsById` carries HF Hub `downloads` counts; `sizesById` carries
-    /// per-repo download-size byte counts (sum of the files Osaurus
+    /// per-repo download-size byte counts (sum of the files Intelligence
     /// downloads, resolved via `ModelSizeCache` + the tree API). Both flow
     /// into curated entries and auto-fetched entries at merge time.
     func applyOsaurusOrgFetch(

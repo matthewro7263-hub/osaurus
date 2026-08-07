@@ -2131,13 +2131,13 @@ struct SlackConnectionTests {
             let diagnostics = await service.diagnostics()
 
             #expect(diagnostics.warnings.contains {
-                $0.contains("Socket Mode") && $0.contains("2 Osaurus instances")
+                $0.contains("Socket Mode") && $0.contains("2 Intelligence instances")
             })
 
             // Readiness folds the environment warning into its notes so the
             // setup checklist can display it.
             let report = AgentChannelLiveProofReadiness.slack(diagnostics)
-            #expect(report.notes.contains { $0.contains("2 Osaurus instances") })
+            #expect(report.notes.contains { $0.contains("2 Intelligence instances") })
         }
     }
 

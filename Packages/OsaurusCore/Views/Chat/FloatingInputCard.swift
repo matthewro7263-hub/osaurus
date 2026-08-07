@@ -39,9 +39,9 @@ struct FloatingInputCard: View {
     let appliesAgentReasoningDefault: Bool
     /// Per-category breakdown of context token usage
     var contextBreakdown: ContextBreakdown = .zero
-    /// Total micro-USD spent on the Osaurus Router this session.
+    /// Total micro-USD spent on the Intelligence Router this session.
     var sessionSpendMicro: Int = 0
-    /// True when this session's spend is billed via the Osaurus Router (the
+    /// True when this session's spend is billed via the Intelligence Router (the
     /// managed cloud provider is the selected model). Drives the credits chip's
     /// low/empty escalation and the wallet panel's session-spend row; the chip
     /// itself is shown in every session where the router is usable.
@@ -244,7 +244,7 @@ struct FloatingInputCard: View {
     /// Drives the composer credits chip (balance + low-balance tinting) and the
     /// wallet panel's recent-activity list.
     @ObservedObject private var accountService = OsaurusRouterAccountService.shared
-    /// Master-switch mirror for the Osaurus Router; the credits chip shows in
+    /// Master-switch mirror for the Intelligence Router; the credits chip shows in
     /// every session while the router is usable (switch on + identity present).
     @ObservedObject private var remoteProviders = RemoteProviderManager.shared
     // Frontmost-app + Accessibility observation for the read-only
@@ -1017,7 +1017,7 @@ struct FloatingInputCard: View {
                 "Microphone access is off",
                 isPresented: $showMicPermissionAlert,
                 message:
-                    "Osaurus needs microphone access to transcribe speech. Enable it in System Settings → Privacy & Security → Microphone, then try again.",
+                    "Intelligence needs microphone access to transcribe speech. Enable it in System Settings → Privacy & Security → Microphone, then try again.",
                 primaryButton: .primary("Open System Settings") {
                     if let url = URL(
                         string:
@@ -1405,7 +1405,7 @@ extension FloatingInputCard {
                 sampleRate: sampleRate
             )
             print(
-                "[Osaurus][LiveVoice] preencode_status=\(result.status.rawValue) samples=\(result.sampleCount) sample_rate=\(result.sampleRate) encode_ms=\(result.encodeMs) message=\(result.message ?? "")"
+                "[Intelligence][LiveVoice] preencode_status=\(result.status.rawValue) samples=\(result.sampleCount) sample_rate=\(result.sampleRate) encode_ms=\(result.encodeMs) message=\(result.message ?? "")"
             )
         }
         liveVoicePreencodeTask = task
@@ -1597,7 +1597,7 @@ extension FloatingInputCard {
             let wavBytes = voiceAudioData?.count ?? 0
             let durationMs = Int((voiceSnapshot?.durationSeconds ?? 0) * 1000)
             print(
-                "[Osaurus][LiveVoice] snapshot_ms=\(snapshotMs) wav_encode_ms=\(wavEncodeMs) wav_bytes=\(wavBytes) sample_rate=\(voiceSnapshot?.sampleRate ?? 0) duration_ms=\(durationMs)"
+                "[Intelligence][LiveVoice] snapshot_ms=\(snapshotMs) wav_encode_ms=\(wavEncodeMs) wav_bytes=\(wavBytes) sample_rate=\(voiceSnapshot?.sampleRate ?? 0) duration_ms=\(durationMs)"
             )
         }
 
@@ -2474,7 +2474,7 @@ extension FloatingInputCard {
         }
     }
 
-    /// Passive status group for the right edge of the selector row: the Osaurus
+    /// Passive status group for the right edge of the selector row: the Intelligence
     /// Router balance and the context/token indicator, joined by a hairline only
     /// when both are present. Rendered as muted text (the balance chip adds its
     /// own pill only in the low/empty attention states) so it never competes
@@ -2984,15 +2984,15 @@ extension FloatingInputCard {
         agentId ?? Agent.defaultId
     }
 
-    /// The built-in Default ("Osaurus") agent is a configuration-only
-    /// surface: it configures Osaurus and never uses the sandbox or a
+    /// The built-in Default ("Intelligence") agent is a configuration-only
+    /// surface: it configures Intelligence and never uses the sandbox or a
     /// working folder, so we hide those chips and show a quiet
     /// "Configuration" indicator instead.
     private var isDefaultConfigAgent: Bool {
         effectiveAgentId == Agent.defaultId
     }
 
-    /// Default agent runs Osaurus configuration, which needs the configure
+    /// Default agent runs Intelligence configuration, which needs the configure
     /// tool schema. The same resolver the composer uses to strip tools
     /// (`.tiny` window) decides whether configuration can run at all — so
     /// when the selected model's window is too small (e.g. Foundation at
@@ -3622,9 +3622,9 @@ extension FloatingInputCard {
 
     // MARK: - Configuration Indicator Chip
 
-    /// Quiet, non-interactive pill shown for the Default ("Osaurus")
+    /// Quiet, non-interactive pill shown for the Default ("Intelligence")
     /// agent in place of the sandbox/folder chips. It signals that this
-    /// agent's job is to configure Osaurus — it doesn't execute code in a
+    /// agent's job is to configure Intelligence — it doesn't execute code in a
     /// sandbox or work against a host folder — so the controls are absent
     /// by design rather than missing.
     private func configurationOnlyChip(compact: Bool) -> some View {
@@ -3653,7 +3653,7 @@ extension FloatingInputCard {
         )
         .help(
             Text(
-                "The Osaurus agent helps you configure Osaurus. It doesn't use the sandbox or a working folder.",
+                "The Intelligence agent helps you configure Intelligence. It doesn't use the sandbox or a working folder.",
                 bundle: .module
             )
         )
@@ -3673,7 +3673,7 @@ extension FloatingInputCard {
     }
 
     /// Read-only indicator of the app the frozen screen-context snapshot will be
-    /// about (the app focused just before Osaurus). Rendered as a quiet,
+    /// about (the app focused just before Intelligence). Rendered as a quiet,
     /// right-aligned status line above the context-token count — just a
     /// viewfinder glyph plus the app name, in muted text — so it pairs with the
     /// budget readout rather than reading as a control.
@@ -3883,7 +3883,7 @@ extension FloatingInputCard {
                 .foregroundColor(.orange)
 
             Text(
-                "\(modelName)\(ctxBlurb) is too small to configure Osaurus.",
+                "\(modelName)\(ctxBlurb) is too small to configure Intelligence.",
                 bundle: .module
             )
             .font(theme.font(size: CGFloat(theme.captionSize), weight: .medium))
@@ -7354,7 +7354,7 @@ private struct SendNowButton: View {
 /// CTA as the balance runs low or hits zero — router-billed sessions only.
 private struct FloatingCreditsChip: View {
     let isRouterBilledSession: Bool
-    /// Total micro-USD spent on the Osaurus Router this session (popover row).
+    /// Total micro-USD spent on the Intelligence Router this session (popover row).
     let sessionSpendMicro: Int
     let metaCompact: Bool
     let metaUltraCompact: Bool

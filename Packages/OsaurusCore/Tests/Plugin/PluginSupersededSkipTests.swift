@@ -41,7 +41,7 @@ struct PluginSupersededSkipTests {
 
     @Test func supersededVerificationFailuresAreDropped() {
         // A superseded plugin with (say) a missing consent marker must show
-        // the "Built into Osaurus" banner, not a load error — its failure
+        // the "Built into Intelligence" banner, not a load error — its failure
         // entry is dropped while other plugins' failures are preserved.
         let failures = [
             "osaurus.browser": "consent_required: Plugin has not been approved",

@@ -413,7 +413,7 @@ struct ClaudePluginSpecTests {
         let error = ClaudeMarketplaceInstallPreviewError.reviewRequired(
             pluginName: "https://example.com/plugin?token=secret-token",
             reason:
-                "This entry is not in the bundled importability catalog yet, so Osaurus cannot preview what would be installed."
+                "This entry is not in the bundled importability catalog yet, so Intelligence cannot preview what would be installed."
         )
 
         let message = error.errorDescription ?? ""
@@ -427,7 +427,7 @@ struct ClaudePluginSpecTests {
     // MARK: - hasImportableComponents
 
     /// A manifest that only carries auxiliary markdown / hooks (no skills,
-    /// agents, commands, or MCP) ships nothing Osaurus can install, so the
+    /// agents, commands, or MCP) ships nothing Intelligence can install, so the
     /// browse + detail surfaces must treat it as non-importable.
     @Test func hasImportableComponentsFalseForHooksOnlyManifest() {
         let repo = GitHubRepo(owner: "anthropics", name: "claude-plugins-official")

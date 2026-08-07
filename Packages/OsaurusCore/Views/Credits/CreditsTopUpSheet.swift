@@ -2,7 +2,7 @@
 //  CreditsTopUpSheet.swift
 //  osaurus
 //
-//  Amount picker for adding Osaurus Router credits. Quick presets fill a single
+//  Amount picker for adding Intelligence Router credits. Quick presets fill a single
 //  amount field (the source of truth), then the chosen micro-USD amount is handed
 //  to Stripe Checkout via `OsaurusRouterAccountService.createCheckout(amountMicro:)`.
 //

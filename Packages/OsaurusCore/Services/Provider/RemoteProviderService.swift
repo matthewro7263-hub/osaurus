@@ -150,7 +150,7 @@ public actor RemoteProviderService: ToolCapableService {
     private var availableModels: [String]
     private var session: URLSession
     private var cachedOAuthTokens: RemoteProviderOAuthTokens?
-    /// Stable provider-compatible UUIDv7 per Osaurus conversation. GPT-5.6's
+    /// Stable provider-compatible UUIDv7 per Intelligence conversation. GPT-5.6's
     /// Responses Lite path uses this value consistently for `session-id`,
     /// `x-session-affinity`, and `prompt_cache_key`.
     private var codexResponsesLiteSessionIds: [String: String] = [:]
@@ -381,7 +381,7 @@ public actor RemoteProviderService: ToolCapableService {
         self.availableModels = models
     }
 
-    /// Unprefixed Osaurus Router model ids that advertise image/vision input
+    /// Unprefixed Intelligence Router model ids that advertise image/vision input
     /// in the `/models` capability catalog. Pushed by `RemoteProviderManager`
     /// on connect and on catalog refetch; consulted when normalizing user
     /// media for the Router wire (non-vision upstream adapters reject
@@ -486,7 +486,7 @@ public actor RemoteProviderService: ToolCapableService {
     /// Drain a delta stream into a single visible-text string, dropping the
     /// `\u{FFFE}` hint sentinels (billing/reasoning/tool/prefill/stats) that the
     /// streaming path interleaves with model text. The one-shot entrypoint uses
-    /// this for the streaming-only Osaurus agent + router providers so sentinels
+    /// this for the streaming-only Intelligence agent + router providers so sentinels
     /// never leak into the returned text (e.g. the distill JSON). A single
     /// `StreamingToolHint.isSentinel` check covers every variant — they share
     /// the sentinel prefix.
@@ -506,8 +506,8 @@ public actor RemoteProviderService: ToolCapableService {
         parameters: GenerationParameters,
         requestedModel: String?
     ) async throws -> String {
-        // The native Osaurus agent (/agents/{id}/run) and the streaming-first
-        // Osaurus Router both reject the non-streaming path below: a
+        // The native Intelligence agent (/agents/{id}/run) and the streaming-first
+        // Intelligence Router both reject the non-streaming path below: a
         // `stream:false` request returns a body that isn't a decodable
         // chat-completion, so it throws a DecodingError — the root cause of
         // distillation failing against `osaurus/*` core models. Stream instead
@@ -622,7 +622,7 @@ public actor RemoteProviderService: ToolCapableService {
         toolChoice: ToolChoiceOption?,
         requestedModel: String?
     ) async throws -> String {
-        // Mode 2 — native Osaurus agent run: tools execute server-side and the
+        // Mode 2 — native Intelligence agent run: tools execute server-side and the
         // peer only exposes a streaming endpoint, so route through
         // generateOneShot (consumes the SSE stream). Mode 1 falls through to the
         // standard OpenAI-compatible non-streaming path so local tool calls are
@@ -708,7 +708,7 @@ public actor RemoteProviderService: ToolCapableService {
         toolChoice: ToolChoiceOption?,
         requestedModel: String?
     ) async throws -> AsyncThrowingStream<String, Error> {
-        // Mode 2 — native Osaurus agent run. The /agents/{id}/run endpoint
+        // Mode 2 — native Intelligence agent run. The /agents/{id}/run endpoint
         // handles the full inference+tool loop server-side and streams back
         // only text deltas; no tool invocations are propagated to the client.
         // Mode 1 (no `runAsRemoteAgent`) falls through and treats the `.osaurus`
@@ -1028,7 +1028,7 @@ public actor RemoteProviderService: ToolCapableService {
         _ message: @autoclosure () -> String
     ) {
         guard providerType == .osaurusRouter, routerStreamDebugEnabled else { return }
-        print("[Osaurus][Router][Stream] \(message())")
+        print("[Intelligence][Router][Stream] \(message())")
     }
 
     private static func routerStreamFinalDebug(
@@ -1044,7 +1044,7 @@ public actor RemoteProviderService: ToolCapableService {
 
     private static func logRouterEmptyStreamIfNeeded(_ diagnostics: RouterStreamDiagnostics?) {
         guard let diagnostics, diagnostics.shouldLogEmptyTerminal else { return }
-        print("[Osaurus][Router][EmptyStream] \(diagnostics.sanitizedSummary)")
+        print("[Intelligence][Router][EmptyStream] \(diagnostics.sanitizedSummary)")
     }
 
     /// Coarse per-event classification kind for the router diagnostics
@@ -1520,7 +1520,7 @@ public actor RemoteProviderService: ToolCapableService {
         let receivedBytes = calls.reduce(0) { $0 + $1.args.utf8.count }
         let label = names.isEmpty ? "tool call" : "tool call '\(names)'"
         print(
-            "[Osaurus] Discarding output-limited \(label): "
+            "[Intelligence] Discarding output-limited \(label): "
                 + "received \(receivedBytes) argument bytes (\(finishMarker))"
         )
         return .streamingError(
@@ -1724,7 +1724,7 @@ public actor RemoteProviderService: ToolCapableService {
             // the stream normally.
             guard !state.accumulatedToolCalls.isEmpty else {
                 print(
-                    "[Osaurus] Warning: Skipping unparseable provider SSE event: "
+                    "[Intelligence] Warning: Skipping unparseable provider SSE event: "
                         + "\(error.localizedDescription) (\(jsonData.count) bytes)"
                 )
                 return .continue
@@ -1733,7 +1733,7 @@ public actor RemoteProviderService: ToolCapableService {
             // event" report gives no way to identify the offending frame shape.
             let payloadPrefix = String(decoding: jsonData.prefix(200), as: UTF8.self)
             print(
-                "[Osaurus] Failed to parse provider SSE event while receiving tool arguments: "
+                "[Intelligence] Failed to parse provider SSE event while receiving tool arguments: "
                     + "\(error.localizedDescription) (\(jsonData.count) bytes) "
                     + "payloadPrefix=\(payloadPrefix)"
             )
@@ -1762,7 +1762,7 @@ public actor RemoteProviderService: ToolCapableService {
     /// and emit a final `usage` chunk we can surface as completion-token
     /// telemetry. Scoped to the genuinely OpenAI-compatible `/chat/completions`
     /// targets (xAI/Grok, OpenAI-compatible third parties, Azure OpenAI). The
-    /// Osaurus Router carries billed token counts in its own summary frame;
+    /// Intelligence Router carries billed token counts in its own summary frame;
     /// Anthropic, Gemini, the Responses API, and Codex use different request and
     /// usage shapes — all excluded here so only the proven-compatible path
     /// changes its outbound request and dispatch timing.
@@ -1853,7 +1853,7 @@ public actor RemoteProviderService: ToolCapableService {
                         args: argsString,
                         thoughtSignature: funcCall.thoughtSignature
                     )
-                    print("[Osaurus] Gemini tool call detected: index=\(idx), name=\(funcCall.name)")
+                    print("[Intelligence] Gemini tool call detected: index=\(idx), name=\(funcCall.name)")
                     yield(StreamingToolHint.encode(funcCall.name))
                     yield(StreamingToolHint.encodeArgs(argsString))
                 case .inlineData(let imageData):
@@ -1975,7 +1975,7 @@ public actor RemoteProviderService: ToolCapableService {
                     args: initialArgs,
                     thoughtSignature: nil
                 )
-                print("[Osaurus] Anthropic tool call detected: index=\(idx), name=\(toolBlock.name)")
+                print("[Intelligence] Anthropic tool call detected: index=\(idx), name=\(toolBlock.name)")
                 yield(StreamingToolHint.encode(toolBlock.name))
                 if !initialArgs.isEmpty {
                     yield(StreamingToolHint.encodeArgs(initialArgs))
@@ -2104,7 +2104,7 @@ public actor RemoteProviderService: ToolCapableService {
                 state.accumulatedToolCalls[idx] = (
                     id: funcCall.call_id, name: funcCall.name, args: "", thoughtSignature: nil
                 )
-                print("[Osaurus] Open Responses tool call detected: index=\(idx), name=\(funcCall.name)")
+                print("[Intelligence] Open Responses tool call detected: index=\(idx), name=\(funcCall.name)")
                 yield(StreamingToolHint.encode(funcCall.name))
             }
 
@@ -2320,7 +2320,7 @@ public actor RemoteProviderService: ToolCapableService {
         ) {
         case .ready(let invocations):
             print(
-                "[Osaurus] Stream ended: emitting \(invocations.count) tool call(s) "
+                "[Intelligence] Stream ended: emitting \(invocations.count) tool call(s) "
                     + "'\(invocations.map(\.toolName).joined(separator: "', '"))' "
                     + "(finish_reason: \(state.lastFinishReason ?? "none"))"
             )
@@ -2337,7 +2337,7 @@ public actor RemoteProviderService: ToolCapableService {
                     tools: tools
                 )
             {
-                print("[Osaurus] Fallback: detected inline tool call '\(name)' in text")
+                print("[Intelligence] Fallback: detected inline tool call '\(name)' in text")
                 continuation.finish(
                     throwing: ServiceToolInvocation(
                         toolName: name,
@@ -2380,7 +2380,7 @@ public actor RemoteProviderService: ToolCapableService {
             configuredProviderType: self.provider.providerType,
             request: request
         )
-        // Native Osaurus peers: the plaintext request (Bearer included) is
+        // Native Intelligence peers: the plaintext request (Bearer included) is
         // sealed into a `/secure/call` envelope per attempt inside the
         // producer, and the SSE response is decrypted frame-by-frame before
         // the line parser. No downgrade path — if the peer can't handshake,
@@ -2842,7 +2842,7 @@ public actor RemoteProviderService: ToolCapableService {
             )
         let isReasoningModel = OpenAIReasoningProfile.matches(modelId: model)
 
-        // Strict wire targets get sanitized tool parameters; Osaurus still
+        // Strict wire targets get sanitized tool parameters; Intelligence still
         // validates calls locally against the original full schema.
         let wireTools: [Tool]?
         if let tools,
@@ -2917,7 +2917,7 @@ public actor RemoteProviderService: ToolCapableService {
             request.streamOptions = StreamOptions(include_usage: true)
         }
         // Local-only key used to keep Codex Responses Lite affinity stable
-        // across every turn in the same Osaurus conversation. The actual wire
+        // across every turn in the same Intelligence conversation. The actual wire
         // value is a provider-compatible UUIDv7 generated by the service.
         if !isAgentRun, provider.providerType == .openAICodex,
             let sessionId = parameters.sessionId, !sessionId.isEmpty
@@ -3223,7 +3223,7 @@ public actor RemoteProviderService: ToolCapableService {
         return stream
     }
 
-    /// Endpoint URL for a native Osaurus peer, split by mode. This is the single
+    /// Endpoint URL for a native Intelligence peer, split by mode. This is the single
     /// place the Mode 1 / Mode 2 routing decision lives (exposed `internal` for
     /// tests):
     ///
@@ -3277,18 +3277,18 @@ public actor RemoteProviderService: ToolCapableService {
         }
 
         // Mode 2 hard guard (defense-in-depth): a remote-agent run must only
-        // ever target a native Osaurus peer's `/agents/{address}/run`. If
-        // routing ever lands a `runAsRemoteAgent` request on a non-Osaurus
+        // ever target a native Intelligence peer's `/agents/{address}/run`. If
+        // routing ever lands a `runAsRemoteAgent` request on a non-Intelligence
         // provider (e.g. a stale model prefix pointing at a local third-party
         // provider), fail fast with a clear error instead of POSTing
         // `/chat/completions` — that path produced the opaque upstream 404
         // ("Model default not found ['fugu', ...]") this guard exists to stop.
         if request.runAsRemoteAgent && provider.providerType != .osaurus {
             RemoteAgentRunLog.clientError(
-                "agent run blocked: provider '\(provider.name)' type=\(provider.providerType.rawValue) is not an Osaurus agent endpoint"
+                "agent run blocked: provider '\(provider.name)' type=\(provider.providerType.rawValue) is not an Intelligence agent endpoint"
             )
             throw RemoteProviderServiceError.requestFailed(
-                "Remote agent run cannot use provider '\(provider.name)' — it is not an Osaurus agent endpoint. "
+                "Remote agent run cannot use provider '\(provider.name)' — it is not an Intelligence agent endpoint. "
                     + "Reconnect to the remote agent and try again."
             )
         }
@@ -3354,7 +3354,7 @@ public actor RemoteProviderService: ToolCapableService {
                 url = geminiURL
             }
         } else if requestProviderType == .osaurus {
-            // Native Osaurus peer, split by mode (see `osaurusEndpointURL`):
+            // Native Intelligence peer, split by mode (see `osaurusEndpointURL`):
             // Mode 2 (`runAsRemoteAgent`) → /agents/{address}/run (the agent
             // runs fully server-side); Mode 1 → the OpenAI-compatible
             // /chat/completions inference endpoint.
@@ -3500,9 +3500,9 @@ public actor RemoteProviderService: ToolCapableService {
     }
 
     /// Collapse consecutive `tool` messages that share a `tool_call_id` into a
-    /// single message. Anthropic — and the Osaurus Router fan-out to Claude —
+    /// single message. Anthropic — and the Intelligence Router fan-out to Claude —
     /// reject more than one `tool_result` per `tool_use_id` ("each tool_use
-    /// must have a single result"). Osaurus intentionally emits extra same-id
+    /// must have a single result"). Intelligence intentionally emits extra same-id
     /// `tool` turns to carry transient `[System Notice]` feedback (KV-cache
     /// stable; see `AgentToolLoop.appendingTransientNotices`), so the duplicates
     /// are merged here at the remote wire boundary — concatenating their text so
@@ -3775,7 +3775,7 @@ public actor RemoteProviderService: ToolCapableService {
 
     /// Router fan-out advertises one OpenAI-compatible request to many
     /// upstreams, so it uses the strictest shared chat-completions history
-    /// shape. Assistant history leaves Osaurus as string `content` because
+    /// shape. Assistant history leaves Intelligence as string `content` because
     /// several upstreams reject assistant arrays or omitted assistant content
     /// on tool-call turns.
     ///
@@ -3881,7 +3881,7 @@ public actor RemoteProviderService: ToolCapableService {
         guard !removedKinds.isEmpty else { return message }
 
         let summary = Self.removedMediaSummary(removedKinds)
-        let notice = "[Osaurus: \(summary) removed — not supported by this model on Osaurus Router]"
+        let notice = "[Intelligence: \(summary) removed — not supported by this model on Intelligence Router]"
         wirePairingLogger.warning(
             "Router wire: removed unsupported user media (\(summary, privacy: .public)) for non-capable model (truthful removal)"
         )
@@ -4028,7 +4028,7 @@ public actor RemoteProviderService: ToolCapableService {
             return (textContent.isEmpty ? nil : textContent, toolCalls.isEmpty ? nil : toolCalls)
 
         case .osaurus:
-            // Native Osaurus agents execute tools server-side and expose only
+            // Native Intelligence agents execute tools server-side and expose only
             // text deltas to this client, so no client-dispatched tool_calls
             // are returned from the legacy peer endpoint.
             let response = try JSONDecoder().decode(ChatCompletionResponse.self, from: data)
@@ -5170,7 +5170,7 @@ extension OpenResponsesRequest {
 
 extension RemoteProviderService {
     /// Whether the provider route needs the tool schema narrowed for wire
-    /// compatibility. This is not local validation weakening: Osaurus still
+    /// compatibility. This is not local validation weakening: Intelligence still
     /// validates tool calls against the original schema. The narrowed copy is
     /// only what we advertise to remote providers that reject restricted
     /// top-level JSON Schema keys.
@@ -5179,7 +5179,7 @@ extension RemoteProviderService {
     /// top-level `oneOf`/`anyOf`/`allOf`/`enum`/`const`/`not` (nested uses are
     /// accepted); Azure OpenAI runs the same validator, and Anthropic's
     /// Messages API rejects top-level `oneOf`/`allOf`/`anyOf` on
-    /// `input_schema`. Osaurus Router is a provider-agnostic fan-out boundary,
+    /// `input_schema`. Intelligence Router is a provider-agnostic fan-out boundary,
     /// so it uses the strict wire subset regardless of the current model's
     /// upstream.
     static func enforcesTopLevelParameterSchemaRestrictions(
@@ -5201,7 +5201,7 @@ extension RemoteProviderService {
     ]
 
     /// Strip only the top-level offenders; everything nested is preserved.
-    /// Osaurus's own preflight still validates tool arguments against the
+    /// Intelligence's own preflight still validates tool arguments against the
     /// full schema, so the constraint is enforced locally — it's just not
     /// advertised to a provider that would reject the request outright.
     static func strippingRestrictedTopLevelSchemaKeys(_ tool: Tool) -> Tool {
@@ -5259,7 +5259,7 @@ extension RemoteProviderService {
             return try await fetchGeminiModels(from: provider)
         }
 
-        // Native Osaurus agent — fetch all models from the server's /models endpoint
+        // Native Intelligence agent — fetch all models from the server's /models endpoint
         if provider.providerType == .osaurus {
             return try await fetchOsaurusModels(from: provider)
         }
@@ -5715,7 +5715,7 @@ extension RemoteProviderService {
         let discovery = try decodeOsaurusRouterModelsDiscovery(data: data)
         if discovery.staleCount > 0 {
             print(
-                "[Osaurus] Router model discovery: \(discovery.models.count) fresh models (\(discovery.staleCount) stale hidden of \(discovery.totalCount) total)"
+                "[Intelligence] Router model discovery: \(discovery.models.count) fresh models (\(discovery.staleCount) stale hidden of \(discovery.totalCount) total)"
             )
         }
         return discovery
@@ -5738,7 +5738,7 @@ extension RemoteProviderService {
         )
     }
 
-    /// Fetch models for a native Osaurus agent.
+    /// Fetch models for a native Intelligence agent.
     /// Tries the server's /models endpoint first (returns all available models so the user can
     /// select one in the picker). Falls back to GET /agents/{id} when /models is unavailable.
     private static func fetchOsaurusModels(from provider: RemoteProvider) async throws -> [String] {
@@ -5807,7 +5807,7 @@ extension RemoteProviderService {
         )
     }
 
-    /// Live metadata for a paired/discovered Osaurus agent, fetched from
+    /// Live metadata for a paired/discovered Intelligence agent, fetched from
     /// `GET /agents/{id}` after connect (Mode 2). All fields are optional so a
     /// partial / legacy peer response still yields whatever it could resolve.
     public struct RemoteAgentMetadata: Sendable, Equatable {
@@ -5827,7 +5827,7 @@ extension RemoteProviderService {
         public let quickActions: [AgentQuickAction]?
     }
 
-    /// Fetch a paired/discovered Osaurus agent's *live* metadata (effective
+    /// Fetch a paired/discovered Intelligence agent's *live* metadata (effective
     /// model + name/description/avatar), used to pin the model chip and surface
     /// the remote agent's own identity/avatar in Mode 2 (remote agent run).
     /// Returns nil only when the peer can't be reached. Routes through the
@@ -5908,7 +5908,7 @@ extension RemoteProviderService {
         await fetchOsaurusAgentMetadata(from: provider)?.effectiveModel
     }
 
-    /// Metadata GET against an Osaurus peer.
+    /// Metadata GET against an Intelligence peer.
     ///
     /// When the provider has a pinned `remoteAgentAddress` the peer is expected
     /// to speak the Secure Channel, so metadata is treated exactly like chat
@@ -6088,7 +6088,7 @@ extension RemoteProviderService {
             return mergeFireworksModelIds(discovered: discovered, catalog: catalog)
         } catch {
             print(
-                "[Osaurus] Fireworks catalog discovery failed, using /models result only: \(ProviderDiagnosticRedactor.safe(error.localizedDescription, maxLength: 240))"
+                "[Intelligence] Fireworks catalog discovery failed, using /models result only: \(ProviderDiagnosticRedactor.safe(error.localizedDescription, maxLength: 240))"
             )
             return discovered
         }

@@ -2,7 +2,7 @@
 //  OsaurusRunningInstanceInspector.swift
 //  osaurus
 //
-//  Detects duplicate running Osaurus instances. Providers that push events
+//  Detects duplicate running Intelligence instances. Providers that push events
 //  to a single live connection (Slack Socket Mode) deliver each envelope to
 //  only one instance, so a forgotten second copy (for example an Xcode debug
 //  build next to the installed app) silently consumes the events the user is
@@ -32,6 +32,6 @@ enum OsaurusRunningInstanceInspector {
 
     static func duplicateInstanceWarning(instanceCount: Int) -> String? {
         guard instanceCount > 1 else { return nil }
-        return "\(instanceCount) Osaurus instances are running. Slack delivers each Socket Mode event to only one connection, so the other instance may consume your messages. Quit the extra instance (for example an Xcode debug build) and try again."
+        return "\(instanceCount) Intelligence instances are running. Slack delivers each Socket Mode event to only one connection, so the other instance may consume your messages. Quit the extra instance (for example an Xcode debug build) and try again."
     }
 }

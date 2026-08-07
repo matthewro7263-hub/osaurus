@@ -30,7 +30,7 @@ final class BlockMemoizer {
     private var lastVersion = -1
     /// The agent name baked into cached header blocks. A change (e.g. switching
     /// from a local agent to a remote one) must force a full rebuild so stale
-    /// "Osaurus" headers aren't kept by the fast / incremental paths.
+    /// "Intelligence" headers aren't kept by the fast / incremental paths.
     private var lastAgentName: String?
     /// Must match `streamingTurnId` for the fast path — `generateBlocks` depends on it for typing / prefill UI.
     private var lastStreamingTurnId: UUID?

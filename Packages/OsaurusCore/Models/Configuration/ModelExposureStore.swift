@@ -14,7 +14,7 @@ public enum ModelExposureKind: Sendable {
     /// Installed local MLX models and the Apple Foundation model.
     /// Exposed by default.
     case local
-    /// Remote provider models (Osaurus Router and BYOK providers),
+    /// Remote provider models (Intelligence Router and BYOK providers),
     /// identified by their prefixed id (e.g. "osaurus/openai/gpt-5.2").
     /// Hidden by default.
     case remote
@@ -135,7 +135,7 @@ public final class ModelExposureStore: @unchecked Sendable {
         do {
             return try JSONDecoder().decode(ModelExposureSettings.self, from: Data(contentsOf: url))
         } catch {
-            print("[Osaurus] Failed to load ModelExposureSettings: \(error)")
+            print("[Intelligence] Failed to load ModelExposureSettings: \(error)")
             return nil
         }
     }
@@ -151,10 +151,10 @@ public final class ModelExposureStore: @unchecked Sendable {
                 data,
                 to: url,
                 synchronous: overrideDirectory != nil || OsaurusPaths.overrideRoot != nil,
-                onError: { print("[Osaurus] Failed to save ModelExposureSettings: \($0)") }
+                onError: { print("[Intelligence] Failed to save ModelExposureSettings: \($0)") }
             )
         } catch {
-            print("[Osaurus] Failed to save ModelExposureSettings: \(error)")
+            print("[Intelligence] Failed to save ModelExposureSettings: \(error)")
         }
     }
 }

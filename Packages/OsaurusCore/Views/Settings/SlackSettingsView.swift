@@ -227,7 +227,7 @@ struct SlackSettingsView: View {
     private var connectSectionContent: some View {
         VStack(alignment: .leading, spacing: 20) {
             Text(
-                "Osaurus connects out to Slack over Socket Mode — no webhook, public URL, or Request URL is needed.",
+                "Intelligence connects out to Slack over Socket Mode — no webhook, public URL, or Request URL is needed.",
                 bundle: .module
             )
             .font(.system(size: 12))
@@ -286,7 +286,7 @@ struct SlackSettingsView: View {
             .buttonStyle(PlainButtonStyle())
 
             Text(
-                "The manifest already enables Socket Mode and the message event subscriptions. You never enter a Request URL — Osaurus receives events over an outgoing connection.",
+                "The manifest already enables Socket Mode and the message event subscriptions. You never enter a Request URL — Intelligence receives events over an outgoing connection.",
                 bundle: .module
             )
             .font(.system(size: 11))
@@ -534,7 +534,7 @@ struct SlackSettingsView: View {
                 SettingsToggle(
                     title: L("Continue Participating Threads"),
                     description: L(
-                        "Accept follow-ups without another mention only after Osaurus has replied in that Slack thread."
+                        "Accept follow-ups without another mention only after Intelligence has replied in that Slack thread."
                     ),
                     isOn: $inboundContinueThreads
                 )
@@ -592,7 +592,7 @@ struct SlackSettingsView: View {
     }
 
     /// Exact test message the user should send, mentioning the Slack bot user
-    /// (a frequent failure is mentioning the Osaurus agent name instead).
+    /// (a frequent failure is mentioning the Intelligence agent name instead).
     private var testPromptRow: some View {
         let botName = discovery?.identity.user
         let prompt = "@\(botName ?? "your-slack-bot") hello"
@@ -623,8 +623,8 @@ struct SlackSettingsView: View {
 
             Text(
                 botName == nil
-                    ? L("Mention the Slack bot user, not the Osaurus agent name. Load from Slack to fill in the bot name.")
-                    : L("Mention the Slack bot user, not the Osaurus agent name.")
+                    ? L("Mention the Slack bot user, not the Intelligence agent name. Load from Slack to fill in the bot name.")
+                    : L("Mention the Slack bot user, not the Intelligence agent name.")
             )
             .font(.system(size: 10))
             .foregroundColor(theme.tertiaryText)
@@ -1407,7 +1407,7 @@ struct SlackSettingsView: View {
             L("Confirm the message was sent in a channel selected as readable, by a person in Authorized Senders."),
             L("Confirm the Slack app has Socket Mode on and the app_mention/message event subscriptions (the recommended manifest includes them)."),
             L("Confirm the bot has been invited to the channel (/invite @your-bot)."),
-            L("Mention the Slack bot user, not the Osaurus agent name."),
+            L("Mention the Slack bot user, not the Intelligence agent name."),
         ]
         if let warning = OsaurusRunningInstanceInspector.duplicateInstanceWarning(
             instanceCount: OsaurusRunningInstanceInspector.runningInstanceCount()
@@ -1524,10 +1524,10 @@ struct SlackSettingsView: View {
     /// (App Manifest page) for the change to take effect.
     static let recommendedManifest = """
     display_information:
-      name: Osaurus
+      name: Intelligence
     features:
       bot_user:
-        display_name: Osaurus
+        display_name: Intelligence
         always_online: true
     oauth_config:
       scopes:

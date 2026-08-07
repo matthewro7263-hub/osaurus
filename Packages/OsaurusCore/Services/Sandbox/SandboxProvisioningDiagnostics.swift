@@ -300,7 +300,7 @@ public enum SandboxProvisioningDiagnostics {
                         L(
                             "The sandbox requires macOS 26 or later; this host reports macOS \(operatingSystemMajorVersion)."
                         ),
-                    repairSuggestion: L("Run Osaurus sandbox provisioning on macOS 26 or later."),
+                    repairSuggestion: L("Run Intelligence sandbox provisioning on macOS 26 or later."),
                     locationID: nil,
                     path: nil
                 )
@@ -335,7 +335,7 @@ public enum SandboxProvisioningDiagnostics {
                     severity: .info,
                     status: .missing,
                     title: L("Sandbox configuration file is missing"),
-                    detail: L("Osaurus will use default sandbox settings until a config file is saved."),
+                    detail: L("Intelligence will use default sandbox settings until a config file is saved."),
                     repairSuggestion: L("Open Sandbox settings or run setup to write \(configuration.path)."),
                     locationID: .configFile,
                     path: configuration.path
@@ -481,7 +481,7 @@ public enum SandboxProvisioningDiagnostics {
         let specs: [LocationSpec] = [
             LocationSpec(
                 id: .root,
-                title: L("Osaurus root"),
+                title: L("Intelligence root"),
                 url: OsaurusPaths.root(),
                 kind: .directory,
                 stage: .hostStorage,
@@ -794,7 +794,7 @@ public enum SandboxProvisioningDiagnostics {
             } else if let minimum = spec.minimumFileBytes, (fileSizeBytes ?? 0) < minimum {
                 status = .emptyFile
                 detail = L("File exists but is empty or smaller than the minimum expected size.")
-                repair = L("Remove \(path) and rerun sandbox setup so Osaurus can download a fresh asset.")
+                repair = L("Remove \(path) and rerun sandbox setup so Intelligence can download a fresh asset.")
                 findings.append(
                     finding(
                         code: .locationEmpty,
@@ -1047,9 +1047,9 @@ public enum SandboxProvisioningDiagnostics {
     ) -> String {
         switch kind {
         case .directory:
-            L("Create the directory with mkdir -p \"\(path)\" or run Set Up Sandbox to let Osaurus create it.")
+            L("Create the directory with mkdir -p \"\(path)\" or run Set Up Sandbox to let Intelligence create it.")
         case .file:
-            L("Run Set Up Sandbox so Osaurus can create or download \(path).")
+            L("Run Set Up Sandbox so Intelligence can create or download \(path).")
         case .socket:
             L("Start the sandbox; this runtime socket is created only while the host bridge is running.")
         }

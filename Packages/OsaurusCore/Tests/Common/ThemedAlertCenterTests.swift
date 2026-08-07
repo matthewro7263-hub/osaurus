@@ -124,7 +124,7 @@ struct ThemedAlertCenterTests {
             title: "Launch",
             message: "Body",
             headerImageNames: ["osaurus-thanks", "ph-cat"],
-            headerImageAccessibilityLabel: "Osaurus dinosaur and the Product Hunt kitty saying thank you",
+            headerImageAccessibilityLabel: "Intelligence dinosaur and the Product Hunt kitty saying thank you",
             buttons: [],
             onDismiss: {}
         )

@@ -76,7 +76,7 @@ struct AgentsView: View {
         agentManager.agents.filter { !$0.isBuiltIn }
     }
 
-    /// The agent to show in the detail view. The built-in Default ("Osaurus")
+    /// The agent to show in the detail view. The built-in Default ("Intelligence")
     /// agent has no configuration surface — its core settings live in
     /// Settings > Chat — so selecting it falls back to the grid (the all-agents
     /// list) instead of opening `AgentDetailView`. This is the single catch-all:
@@ -4055,7 +4055,7 @@ struct AgentDetailView: View {
             subagentPanelDivider
             appleScriptExecutionModeRow
             subagentFootnote(
-                "AppleScript runs on this Mac. The first time the agent controls an app, macOS asks you to allow Automation for Osaurus. Download AppleScript models in Settings → Computer Use → Models."
+                "AppleScript runs on this Mac. The first time the agent controls an app, macOS asks you to allow Automation for Intelligence. Download AppleScript models in Settings → Computer Use → Models."
             )
         case .browserUse:
             // The model-override row is rendered generically above (registry

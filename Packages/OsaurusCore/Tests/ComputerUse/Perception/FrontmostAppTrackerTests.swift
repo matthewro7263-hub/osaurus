@@ -2,9 +2,9 @@
 //  FrontmostAppTrackerTests.swift
 //  OsaurusCoreTests — Computer Use
 //
-//  The tracker remembers the most-recently-active non-Osaurus app so the
+//  The tracker remembers the most-recently-active non-Intelligence app so the
 //  screen-context chip and budget preview can name "what you were just in".
-//  It must ignore Osaurus itself and publish the resolved app name alongside
+//  It must ignore Intelligence itself and publish the resolved app name alongside
 //  the pid.
 //
 
@@ -51,7 +51,7 @@ final class FrontmostAppTrackerTests: XCTestCase {
                     && ($0.localizedName?.isEmpty == false)
             })
         else {
-            throw XCTSkip("No non-Osaurus running app with a name is available in this environment.")
+            throw XCTSkip("No non-Intelligence running app with a name is available in this environment.")
         }
 
         tracker.record(other)

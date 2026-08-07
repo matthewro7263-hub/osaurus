@@ -682,19 +682,19 @@ final class ChatWindowState: ObservableObject {
         return ThemeManager.shared.currentTheme
     }
 
-    /// Built-in default agent renders as the localized "Osaurus" brand
+    /// Built-in default agent renders as the localized "Intelligence" brand
     /// label so the chat header carries the product name instead of the
     /// internal `"Default"` id; custom agents render their stored name
     /// verbatim.
     private static func displayName(for agent: Agent) -> String {
-        agent.isBuiltIn ? L("Osaurus") : agent.name
+        agent.isBuiltIn ? L("Intelligence") : agent.name
     }
 
     /// The identity that should head the chat thread / empty state right now.
     /// In Mode 2 (a discovered/relay agent is selected) this is the *remote*
     /// agent's name + fetched mascot; otherwise it's the local active agent.
     /// Drives message-bubble headers so a remote conversation isn't mislabeled
-    /// "Osaurus" with the local avatar.
+    /// "Intelligence" with the local avatar.
     var effectiveChatIdentity: ChatThreadIdentity {
         if selectedDiscoveredAgentProviderId != nil {
             let remoteName =

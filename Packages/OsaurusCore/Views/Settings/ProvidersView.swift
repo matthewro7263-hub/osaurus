@@ -1393,7 +1393,7 @@ private struct ProviderEditSheet: View {
             return (
                 template.iconSystemName,
                 Text("Connect to \(template.displayName)", bundle: .module),
-                Text("Sign in with your account to give Osaurus access", bundle: .module)
+                Text("Sign in with your account to give Intelligence access", bundle: .module)
             )
         case .configureCustom:
             return (
@@ -1862,7 +1862,7 @@ private struct ProviderEditSheet: View {
             oauthSignInButton(template: template, enabled: true)
 
             Text(
-                "We'll open your browser to sign in. After approving, you'll be redirected back to Osaurus.",
+                "We'll open your browser to sign in. After approving, you'll be redirected back to Intelligence.",
                 bundle: .module
             )
             .font(.system(size: 11))

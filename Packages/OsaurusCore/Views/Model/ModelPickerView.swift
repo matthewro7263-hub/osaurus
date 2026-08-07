@@ -232,7 +232,7 @@ struct ModelPickerView: View {
     /// while open (`refreshConnectedProviders` / `buildModelPickerItems`), so a
     /// tab can briefly disappear mid-refresh; clobbering the user's explicit
     /// choice on that transient absence is what made the picker snap from
-    /// "Local" back to the first tab ("Osaurus"). Rendering still falls back
+    /// "Local" back to the first tab ("Intelligence"). Rendering still falls back
     /// gracefully via `effectiveSelectedTabKey` while a tab is missing, and the
     /// committed key re-resolves the moment it returns.
     ///
@@ -335,11 +335,11 @@ struct ModelPickerView: View {
             if tab.key == Self.favoritesTabKey {
                 return tab.models.map { row(for: $0, providerLabel: providerTitle(for: $0)) }
             }
-            // Context filtering and price sorting only apply to the Osaurus
+            // Context filtering and price sorting only apply to the Intelligence
             // tab, whose models carry context/pricing metadata; other tabs keep
             // their existing alphabetical order. Both steps are no-ops at their
             // default (`.any` / `.default`), so the pipeline is safe to always
-            // run for Osaurus.
+            // run for Intelligence.
             guard tab.isOsaurus else { return makeRows(for: tab) }
             let processed = tab.models
                 .filteredByContext(contextFilter)
@@ -404,7 +404,7 @@ struct ModelPickerView: View {
     var body: some View {
         let tabs = currentTabs
         let rows = visibleRows(in: tabs)
-        // The sort control is offered only on the Osaurus tab (the only tab
+        // The sort control is offered only on the Intelligence tab (the only tab
         // with pricing) and not while the cross-provider search is active.
         let activeTab = tabs.first { $0.key == effectiveSelectedTabKey(in: tabs) }
         let showSort = !isSearching && (activeTab?.isOsaurus ?? false)

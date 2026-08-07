@@ -3,7 +3,7 @@
 //  osaurus
 //
 //  Precomputed classification of which official Claude marketplace plugins
-//  ship something Osaurus can import (skills / agents / commands / MCP) vs.
+//  ship something Intelligence can import (skills / agents / commands / MCP) vs.
 //  those that ship only unsupported parts (hooks / output-styles / lspServers
 //  / etc.).
 //
@@ -21,7 +21,7 @@ import Foundation
 /// Read-only view over the bundled importability catalog. Loaded once and
 /// cached for the process lifetime.
 public struct ClaudeMarketplaceImportabilityCatalog: Sendable {
-    /// Precomputed summary of the Osaurus-importable components a plugin ships.
+    /// Precomputed summary of the Intelligence-importable components a plugin ships.
     /// Display names match the runtime `ClaudeSkillEntry`/`ClaudeAgentEntry`/
     /// `ClaudeCommandEntry.displayName` derivations so the detail view can
     /// render chips identically without resolving the manifest over the network.
@@ -49,12 +49,12 @@ public struct ClaudeMarketplaceImportabilityCatalog: Sendable {
             self.unsupportedComponents = unsupportedComponents
         }
 
-        /// True when the plugin ships nothing Osaurus can import.
+        /// True when the plugin ships nothing Intelligence can import.
         public var isEmpty: Bool {
             skills.isEmpty && agents.isEmpty && commands.isEmpty && !mcp
         }
 
-        /// Total count of components Osaurus knows how to import.
+        /// Total count of components Intelligence knows how to import.
         public var importableCount: Int {
             skills.count + agents.count + commands.count + (mcp ? 1 : 0)
         }
@@ -76,7 +76,7 @@ public struct ClaudeMarketplaceImportabilityCatalog: Sendable {
     }
 
     /// Plugin names (as they appear in `marketplace.json`) that ship nothing
-    /// Osaurus can import. The set is intentionally a denylist: any name NOT
+    /// Intelligence can import. The set is intentionally a denylist: any name NOT
     /// present is treated as importable / visible, so newly added plugins the
     /// bundled catalog hasn't classified yet still appear (and are gated at
     /// install time by `ClaudeMarketplaceService.install`).
@@ -128,7 +128,7 @@ public struct ClaudeMarketplaceImportabilityCatalog: Sendable {
         } else if summary == nil {
             status = .requiresReview
             reason =
-                "This entry is not in the bundled importability catalog yet, so Osaurus cannot preview what would be installed."
+                "This entry is not in the bundled importability catalog yet, so Intelligence cannot preview what would be installed."
         } else {
             status = .importable
             reason = "The bundled catalog found importable plugin components."

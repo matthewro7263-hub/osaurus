@@ -4,7 +4,7 @@
 //
 //  Pins `ChatWindowState.effectiveChatIdentity` — the identity that heads the
 //  chat thread / empty state. The bug it fixes: a Mode 2 (remote agent)
-//  conversation used to render the LOCAL agent's name ("Osaurus") and avatar in
+//  conversation used to render the LOCAL agent's name ("Intelligence") and avatar in
 //  the message thread. The identity must switch to the remote agent's name +
 //  fetched mascot when a discovered/relay agent is selected, and fall back to
 //  the local active agent otherwise.
@@ -90,7 +90,7 @@ struct ChatWindowStateIdentityTests {
 
             // Provider id set but no discovered/relay agent resolved yet (pure
             // ephemeral selection mid-connect): the identity must still report
-            // remote — not silently fall through to the local "Osaurus" label.
+            // remote — not silently fall through to the local "Intelligence" label.
             window.selectedDiscoveredAgentProviderId = UUID()
             window.pinnedRemoteAgentAvatar = nil
 

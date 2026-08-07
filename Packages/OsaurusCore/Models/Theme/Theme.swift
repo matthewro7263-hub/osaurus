@@ -626,7 +626,7 @@ public class ThemeManager: ObservableObject {
     }
 
     private init() {
-        print("[Osaurus] ThemeManager: Initializing...")
+        print("[Intelligence] ThemeManager: Initializing...")
 
         // Load saved appearance mode (cheap config read).
         let config = ServerConfigurationStore.load() ?? ServerConfiguration.default
@@ -656,7 +656,7 @@ public class ThemeManager: ObservableObject {
         //    disk-installed built-in (identical palette) is swapped in by the
         //    deferred load below once it finishes — invisible to the user.
         if let customTheme = startupSelection.activeTheme {
-            print("[Osaurus] ThemeManager: Restoring active theme '\(customTheme.metadata.name)'")
+            print("[Intelligence] ThemeManager: Restoring active theme '\(customTheme.metadata.name)'")
             self.activeCustomTheme = customTheme
             let themeInstance = CustomizableTheme(config: customTheme)
             self.currentTheme = themeInstance
@@ -719,7 +719,7 @@ public class ThemeManager: ObservableObject {
             }.value
 
             guard let self else { return }
-            print("[Osaurus] ThemeManager: Found \(loaded.count) installed themes (deferred)")
+            print("[Intelligence] ThemeManager: Found \(loaded.count) installed themes (deferred)")
             self.installedThemes = loaded
 
             // Only swap the live theme if the user hasn't picked a custom one;
@@ -732,7 +732,7 @@ public class ThemeManager: ObservableObject {
             }
         }
 
-        print("[Osaurus] ThemeManager: Initialization complete")
+        print("[Intelligence] ThemeManager: Initialization complete")
     }
 
     static func startupSelection(
@@ -844,7 +844,7 @@ public class ThemeManager: ObservableObject {
     /// Refresh the list of installed themes
     func refreshInstalledThemes() {
         installedThemes = ThemeConfigurationStore.listThemes()
-        print("[Osaurus] ThemeManager: Refreshed themes, found \(installedThemes.count) themes")
+        print("[Intelligence] ThemeManager: Refreshed themes, found \(installedThemes.count) themes")
     }
 
     /// Save a theme and refresh the list
@@ -870,7 +870,7 @@ public class ThemeManager: ObservableObject {
         // Check if theme exists and is not built-in
         if let theme = installedThemes.first(where: { $0.metadata.id == id }) {
             if theme.isBuiltIn {
-                print("[Osaurus] Cannot delete built-in theme: \(theme.metadata.name)")
+                print("[Intelligence] Cannot delete built-in theme: \(theme.metadata.name)")
                 return false
             }
         }

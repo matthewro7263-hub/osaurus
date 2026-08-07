@@ -1995,7 +1995,7 @@
         /// invoked after `ensureAgentUser` for the same `linuxName` so the
         /// chown target exists.
         ///
-        /// `agentId` ties the token to a specific Osaurus agent so the bridge
+        /// `agentId` ties the token to a specific Intelligence agent so the bridge
         /// server can derive identity from the token alone, without trusting
         /// any caller-supplied header.
         public func provisionBridgeToken(linuxName: String, agentId: UUID) async throws {
@@ -3894,7 +3894,7 @@
     // MARK: - Cross-process VM ownership
 
     /// A process-lifetime advisory lock around the single vmnet-backed
-    /// sandbox. The app and eval CLI can use different Osaurus data roots, so
+    /// sandbox. The app and eval CLI can use different Intelligence data roots, so
     /// the lock lives in the per-user temporary directory. Owner metadata
     /// makes contention actionable before vmnet is touched.
     final class SandboxVMOwnershipLease: @unchecked Sendable {
@@ -3920,11 +3920,11 @@
                 if let owner {
                     return
                         "Sandbox VM is already owned by \(owner.diagnostic). "
-                        + "Stop that Osaurus app or eval process before starting another vmnet sandbox."
+                        + "Stop that Intelligence app or eval process before starting another vmnet sandbox."
                 }
                 return
                     "Sandbox VM is already owned by another process. "
-                    + "Stop other Osaurus app or eval processes before starting vmnet."
+                    + "Stop other Intelligence app or eval processes before starting vmnet."
             }
         }
 
@@ -4014,7 +4014,7 @@
         case userCreationFailed(String)
         case execFailed(String)
         case timeout
-        /// Another Osaurus process owns the single vmnet-backed VM.
+        /// Another Intelligence process owns the single vmnet-backed VM.
         case ownershipConflict(String)
         /// A downloaded artifact failed SHA-256 verification — fail-closed.
         /// Don't dress this up: if the kernel/initfs we just pulled doesn't

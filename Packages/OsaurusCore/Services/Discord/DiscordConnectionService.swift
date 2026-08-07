@@ -151,7 +151,7 @@ enum DiscordConnectionServiceError: LocalizedError, Equatable, Sendable {
         case .writeDisabled:
             return "Discord write access is disabled in settings."
         case .sendConfirmationRequired:
-            return "`confirm_send` must be true before Osaurus posts to Discord."
+            return "`confirm_send` must be true before Intelligence posts to Discord."
         case .messageTooLong:
             return "Discord content is too long, even after splitting into multiple messages."
         case .emptyMessage:

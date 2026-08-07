@@ -409,11 +409,11 @@ struct OpenAICompatibleToolCallAccumulator {
         if let data = repaired.data(using: .utf8),
             (try? JSONSerialization.jsonObject(with: data)) != nil
         {
-            print("[Osaurus] Repaired incomplete tool call JSON (\(json.count) -> \(repaired.count) chars)")
+            print("[Intelligence] Repaired incomplete tool call JSON (\(json.count) -> \(repaired.count) chars)")
             return ValidatedToolCallJSON(json: repaired, wasRepaired: true)
         }
 
-        print("[Osaurus] Warning: Tool call JSON is malformed and could not be repaired: \(json.prefix(200))")
+        print("[Intelligence] Warning: Tool call JSON is malformed and could not be repaired: \(json.prefix(200))")
         return ValidatedToolCallJSON(json: json, wasRepaired: true)
     }
 
@@ -436,7 +436,7 @@ struct OpenAICompatibleToolCallAccumulator {
     ) -> RemoteProviderServiceError {
         let argsSummary = truncatedArgsSummary(from: accumulated, toolName: toolName)
         print(
-            "[Osaurus] Discarding truncated tool call '\(toolName)' - "
+            "[Intelligence] Discarding truncated tool call '\(toolName)' - "
                 + "args needed repair (finish marker: \(finishMarker)). \(argsSummary)"
         )
         return RemoteProviderServiceError.streamingError(
@@ -657,7 +657,7 @@ struct OpenAICompatibleStreamParser {
                 if let id = toolCall.id { current.id = id }
                 if let name = toolCall.function?.name, current.name == nil {
                     current.name = name
-                    print("[Osaurus] OpenAI tool call detected: index=\(idx), name=\(name)")
+                    print("[Intelligence] OpenAI tool call detected: index=\(idx), name=\(name)")
                     yield(StreamingToolHint.encode(name))
                 }
                 if let args = toolCall.function?.arguments {

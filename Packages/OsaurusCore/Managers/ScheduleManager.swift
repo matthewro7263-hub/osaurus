@@ -62,7 +62,7 @@ public final class ScheduleManager {
             self?.checkForMissedSchedules()
             if let self {
                 print(
-                    "[Osaurus] ScheduleManager initialized with \(self.schedules.count) schedules")
+                    "[Intelligence] ScheduleManager initialized with \(self.schedules.count) schedules")
             }
         }
 
@@ -172,7 +172,7 @@ public final class ScheduleManager {
         scheduleNextTimer()
 
         NotificationCenter.default.post(name: .schedulesChanged, object: nil)
-        print("[Osaurus] Created schedule: \(schedule.name)")
+        print("[Intelligence] Created schedule: \(schedule.name)")
 
         return schedule
     }
@@ -189,7 +189,7 @@ public final class ScheduleManager {
         scheduleNextTimer()
 
         NotificationCenter.default.post(name: .schedulesChanged, object: nil)
-        print("[Osaurus] Updated schedule: \(schedule.name)")
+        print("[Intelligence] Updated schedule: \(schedule.name)")
     }
 
     /// Delete a schedule
@@ -209,7 +209,7 @@ public final class ScheduleManager {
         scheduleNextTimer()
 
         NotificationCenter.default.post(name: .schedulesChanged, object: nil)
-        print("[Osaurus] Deleted schedule: \(id)")
+        print("[Intelligence] Deleted schedule: \(id)")
 
         return true
     }
@@ -314,7 +314,7 @@ public final class ScheduleManager {
         // Find the next schedule to run
         let enabledSchedules = schedules.filter { $0.isEnabled }
         guard !enabledSchedules.isEmpty else {
-            print("[Osaurus] No enabled schedules, timer cancelled")
+            print("[Intelligence] No enabled schedules, timer cancelled")
             return
         }
 
@@ -336,13 +336,13 @@ public final class ScheduleManager {
         }
 
         guard let fireDate = soonestDate else {
-            print("[Osaurus] No upcoming schedule runs")
+            print("[Intelligence] No upcoming schedule runs")
             return
         }
 
         let delay = max(0, fireDate.timeIntervalSince(now))
         print(
-            "[Osaurus] Next schedule timer in \(String(format: "%.1f", delay)) seconds (\(schedulesToRun.count) schedule(s))"
+            "[Intelligence] Next schedule timer in \(String(format: "%.1f", delay)) seconds (\(schedulesToRun.count) schedule(s))"
         )
 
         // Use Task with sleep - clean async/await approach that works with @MainActor
@@ -390,7 +390,7 @@ public final class ScheduleManager {
             if case .once(let date) = schedule.frequency {
                 // If the once date is in the past but hasn't run yet
                 if date <= now && schedule.executionAnchor == nil {
-                    print("[Osaurus] Found missed once schedule: \(schedule.name)")
+                    print("[Intelligence] Found missed once schedule: \(schedule.name)")
                     executeSchedule(schedule, loadIntent: .background)
                 }
             } else {
@@ -400,7 +400,7 @@ public final class ScheduleManager {
                     if let nextAfterAnchor = schedule.frequency.nextRunDate(after: anchor),
                         nextAfterAnchor <= now
                     {
-                        print("[Osaurus] Found missed recurring schedule: \(schedule.name)")
+                        print("[Intelligence] Found missed recurring schedule: \(schedule.name)")
                         executeSchedule(schedule, loadIntent: .background)
                     }
                 }
@@ -421,7 +421,7 @@ public final class ScheduleManager {
             schedule.agentId,
             source: "schedule/executeSchedule"
         ) {
-            print("[Osaurus] Skipping schedule '\(schedule.name)': \(rejection.message)")
+            print("[Intelligence] Skipping schedule '\(schedule.name)': \(rejection.message)")
             return
         }
 
@@ -442,11 +442,11 @@ public final class ScheduleManager {
             loadIntent: loadIntent
         )
 
-        print("[Osaurus] Executing schedule: \(triggeredSchedule.name)")
+        print("[Intelligence] Executing schedule: \(triggeredSchedule.name)")
 
         let task = Task { @MainActor in
             guard let handle = await TaskDispatcher.shared.dispatch(request) else {
-                print("[Osaurus] Failed to dispatch schedule: \(triggeredSchedule.name)")
+                print("[Intelligence] Failed to dispatch schedule: \(triggeredSchedule.name)")
                 self.executionTasks.removeValue(forKey: triggeredSchedule.id)
                 return
             }
@@ -504,13 +504,13 @@ public final class ScheduleManager {
                 object: nil,
                 userInfo: userInfo
             )
-            print("[Osaurus] Schedule completed: \(schedule.name)")
+            print("[Intelligence] Schedule completed: \(schedule.name)")
 
         case .cancelled:
-            print("[Osaurus] Schedule cancelled: \(schedule.name)")
+            print("[Intelligence] Schedule cancelled: \(schedule.name)")
 
         case .failed(let error):
-            print("[Osaurus] Schedule failed: \(schedule.name) - \(error)")
+            print("[Intelligence] Schedule failed: \(schedule.name) - \(error)")
         }
     }
 }

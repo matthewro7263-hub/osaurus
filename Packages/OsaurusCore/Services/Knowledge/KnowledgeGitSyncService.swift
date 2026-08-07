@@ -85,7 +85,7 @@ public actor KnowledgeGitSyncService {
                 || detail.localizedCaseInsensitiveContains("not possible to fast-forward")
             {
                 return .needsAttention(
-                    "Local and remote history diverged. Resolve in the folder with your git tools; Osaurus will not merge for you."
+                    "Local and remote history diverged. Resolve in the folder with your git tools; Intelligence will not merge for you."
                 )
             }
             if detail.localizedCaseInsensitiveContains("authentication")

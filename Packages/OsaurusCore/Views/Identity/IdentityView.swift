@@ -2,7 +2,7 @@
 //  IdentityView.swift
 //  osaurus
 //
-//  Osaurus Identity management UI: master address, agent addresses,
+//  Intelligence Identity management UI: master address, agent addresses,
 //  device status, setup flow, and recovery code handling.
 //
 
@@ -176,7 +176,7 @@ struct IdentityView: View {
         case .checking:
             return "Loading identity..."
         case .noIdentity:
-            return "Set up your Osaurus Identity"
+            return "Set up your Intelligence Identity"
         case .ready:
             return drift?.hasDrift == true ? "Identity drift detected" : "Your identity is active"
         }
@@ -670,7 +670,7 @@ private struct IdentitySetupCard: View {
                 .foregroundStyle(theme.accentColor)
 
             VStack(spacing: 8) {
-                Text("Create Your Osaurus Identity", bundle: .module)
+                Text("Create Your Intelligence Identity", bundle: .module)
                     .font(.system(size: 22, weight: .bold, design: .rounded))
                     .foregroundColor(theme.primaryText)
 
@@ -744,7 +744,7 @@ private struct IdentitySetupCard: View {
 
             VStack(spacing: 4) {
                 Text(
-                    "Already using Osaurus on another Mac? With iCloud Keychain enabled on both, your identity restores here automatically — it can take a few minutes to sync.",
+                    "Already using Intelligence on another Mac? With iCloud Keychain enabled on both, your identity restores here automatically — it can take a few minutes to sync.",
                     bundle: .module
                 )
                 .font(.system(size: 11))

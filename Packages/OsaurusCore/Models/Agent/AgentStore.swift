@@ -101,7 +101,7 @@ public enum AgentStore {
                     custom[agent.id] = agent
                 }
             } catch {
-                print("[Osaurus] Failed to load agent from \(file.lastPathComponent): \(error)")
+                print("[Intelligence] Failed to load agent from \(file.lastPathComponent): \(error)")
             }
         }
 
@@ -244,7 +244,7 @@ public enum AgentStore {
             decoder.dateDecodingStrategy = .iso8601
             return try decoder.decode(Agent.self, from: data)
         } catch {
-            print("[Osaurus] Failed to load agent \(id): \(error)")
+            print("[Intelligence] Failed to load agent \(id): \(error)")
             return nil
         }
     }
@@ -252,7 +252,7 @@ public enum AgentStore {
     /// Save an agent (creates or updates). Cannot save built-in agents.
     public static func save(_ agent: Agent) {
         guard !agent.isBuiltIn else {
-            print("[Osaurus] Cannot save built-in agent: \(agent.name)")
+            print("[Intelligence] Cannot save built-in agent: \(agent.name)")
             return
         }
 
@@ -272,11 +272,11 @@ public enum AgentStore {
                 do {
                     try data.write(to: url, options: [.atomic])
                 } catch {
-                    print("[Osaurus] Failed to save agent \(agentId): \(error)")
+                    print("[Intelligence] Failed to save agent \(agentId): \(error)")
                 }
             }
         } catch {
-            print("[Osaurus] Failed to save agent \(agent.id): \(error)")
+            print("[Intelligence] Failed to save agent \(agent.id): \(error)")
         }
     }
 
@@ -284,7 +284,7 @@ public enum AgentStore {
     @discardableResult
     public static func delete(id: UUID) -> Bool {
         if Agent.builtInAgents.contains(where: { $0.id == id }) {
-            print("[Osaurus] Cannot delete built-in agent")
+            print("[Intelligence] Cannot delete built-in agent")
             return false
         }
 
@@ -314,7 +314,7 @@ public enum AgentStore {
             loadedCustomAgents?.removeValue(forKey: id)
             return true
         } catch {
-            print("[Osaurus] Failed to delete agent \(id): \(error)")
+            print("[Intelligence] Failed to delete agent \(id): \(error)")
             return false
         }
     }
@@ -345,7 +345,7 @@ public enum AgentStore {
             try data.write(to: url, options: [.atomic])
             return filename
         } catch {
-            print("[Osaurus] Failed to write custom avatar for \(agentId): \(error)")
+            print("[Intelligence] Failed to write custom avatar for \(agentId): \(error)")
             return nil
         }
     }
@@ -448,7 +448,7 @@ public enum AgentStore {
         do {
             try FileManager.default.removeItem(at: url)
         } catch {
-            print("[Osaurus] Failed to roll back recovered agent record \(id): \(error)")
+            print("[Intelligence] Failed to roll back recovered agent record \(id): \(error)")
         }
     }
 

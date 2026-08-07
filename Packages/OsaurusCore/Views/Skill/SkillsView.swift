@@ -30,7 +30,7 @@ struct SkillsView: View {
     @State private var pendingOverwriteSkillName = ""
     @State private var showOverwriteConfirmation = false
 
-    /// Base skill set for a tab, sliced by source: shipped with Osaurus,
+    /// Base skill set for a tab, sliced by source: shipped with Intelligence,
     /// created/imported by the user, or installed as part of a plugin.
     private func skills(in tab: SkillsTab) -> [Skill] {
         switch tab {

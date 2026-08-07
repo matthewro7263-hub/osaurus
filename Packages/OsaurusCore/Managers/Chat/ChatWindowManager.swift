@@ -489,7 +489,7 @@ public final class ChatWindowManager: NSObject, ObservableObject {
         return prepared
     }
 
-    /// True only for the visible key chat while Osaurus is frontmost. Runtime
+    /// True only for the visible key chat while Intelligence is frontmost. Runtime
     /// residency notifications use this stronger predicate instead of
     /// `lastFocusedWindowId`, which can still refer to a hidden/background
     /// window and must never authorize a speculative replacement warm-up.

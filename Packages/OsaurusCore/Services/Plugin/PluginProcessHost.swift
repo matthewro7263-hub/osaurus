@@ -8,7 +8,7 @@
 //  over stdin/stdout; a wall-clock deadline on every call. On breach the
 //  helper is killed (SIGTERM → 2s → SIGKILL) and lazily respawned on the
 //  next call — the "recover a wedged AX/automation plugin without
-//  restarting Osaurus" primitive the in-process loader can never provide,
+//  restarting Intelligence" primitive the in-process loader can never provide,
 //  because synchronous plugin C code ignores Swift cancellation.
 //
 //  Host-API callbacks (config, db, http, log) arrive as reverse-RPC

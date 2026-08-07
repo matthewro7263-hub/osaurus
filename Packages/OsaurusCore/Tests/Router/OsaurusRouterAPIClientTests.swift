@@ -4,7 +4,7 @@ import Testing
 
 @testable import OsaurusCore
 
-@Suite("Osaurus router API client", .serialized)
+@Suite("Intelligence router API client", .serialized)
 struct OsaurusRouterAPIClientTests {
     @Test func defaultSessionUsesGlobalProxySetting() async throws {
         try await StoragePathsTestLock.shared.run {
@@ -149,7 +149,7 @@ struct OsaurusRouterAPIClientTests {
             #expect(body == #"{"code":"LAUNCH25"}"#)
             return json(
                 """
-                {"redeemed":true,"already_redeemed":false,"campaign_kind":"first_time","amount_micro":"5000000","referral_pending":false,"redemption_message":"Welcome to Osaurus — $5 in credits was added."}
+                {"redeemed":true,"already_redeemed":false,"campaign_kind":"first_time","amount_micro":"5000000","referral_pending":false,"redemption_message":"Welcome to Intelligence — $5 in credits was added."}
                 """
             )
         }
@@ -160,7 +160,7 @@ struct OsaurusRouterAPIClientTests {
         #expect(response.campaignKind == "first_time")
         #expect(response.amountMicro == "5000000")
         #expect(response.referralPending == false)
-        #expect(response.redemptionMessage == "Welcome to Osaurus — $5 in credits was added.")
+        #expect(response.redemptionMessage == "Welcome to Intelligence — $5 in credits was added.")
     }
 
     @Test func redeemCode_decodesIdempotentReferralResult() async throws {

@@ -3,7 +3,7 @@
 //  osaurus
 //
 //  Request body limits for the Server → Settings tab. Persisted to
-//  `server.json` and enforced by Osaurus's HTTP pipeline (`/v1/...`
+//  `server.json` and enforced by Intelligence's HTTP pipeline (`/v1/...`
 //  endpoints and the unauthenticated `/pair` route).
 //
 

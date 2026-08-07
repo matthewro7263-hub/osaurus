@@ -3,7 +3,7 @@
 //  osaurusTests
 //
 //  Pins the load-bearing invariant for combined sandbox + host-read mode:
-//  the sandbox mounts ONLY its own Osaurus-owned workspace, never the
+//  the sandbox mounts ONLY its own Intelligence-owned workspace, never the
 //  user's selected folder. The whole security argument of combined mode
 //  is "shell cannot touch host files because there is no host mount" — if
 //  the workspace mount source ever became the folder root, the boundary
@@ -22,7 +22,7 @@
     struct SandboxWorkspaceMountIsolationTests {
 
         /// The mount source returned for the sandbox is always the
-        /// Osaurus-owned container workspace, not a host folder — even when
+        /// Intelligence-owned container workspace, not a host folder — even when
         /// several concurrent chats have different folders selected.
         @Test func returnsContainerWorkspaceUnchanged() {
             let workspace = OsaurusPaths.containerWorkspace().path

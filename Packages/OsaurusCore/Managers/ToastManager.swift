@@ -37,7 +37,7 @@ public final class ToastManager {
 
     private init() {
         self.configuration = ToastConfigurationStore.load()
-        print("[Osaurus] ToastManager initialized with position: \(configuration.position.displayName)")
+        print("[Intelligence] ToastManager initialized with position: \(configuration.position.displayName)")
     }
 
     // MARK: - Configuration
@@ -46,7 +46,7 @@ public final class ToastManager {
     public func updateConfiguration(_ configuration: ToastConfiguration) {
         self.configuration = configuration
         ToastConfigurationStore.save(configuration)
-        print("[Osaurus] Toast configuration updated: position=\(configuration.position.displayName)")
+        print("[Intelligence] Toast configuration updated: position=\(configuration.position.displayName)")
     }
 
     /// Update a single configuration property
@@ -63,7 +63,7 @@ public final class ToastManager {
     @discardableResult
     public func show(_ toast: Toast) -> UUID {
         guard configuration.enabled else {
-            print("[Osaurus] Toast suppressed (disabled): \(toast.title)")
+            print("[Intelligence] Toast suppressed (disabled): \(toast.title)")
             return toast.id
         }
 
@@ -78,7 +78,7 @@ public final class ToastManager {
         // Schedule auto-dismiss if applicable
         scheduleAutoDismiss(for: toast)
 
-        print("[Osaurus] Toast shown: \(toast.type.rawValue) - \(toast.title)")
+        print("[Intelligence] Toast shown: \(toast.type.rawValue) - \(toast.title)")
 
         return toast.id
     }
@@ -95,7 +95,7 @@ public final class ToastManager {
             toasts.removeAll { $0.id == id }
         }
 
-        print("[Osaurus] Toast dismissed: \(id)")
+        print("[Intelligence] Toast dismissed: \(id)")
     }
 
     /// Dismiss all toasts
@@ -111,7 +111,7 @@ public final class ToastManager {
             toasts.removeAll()
         }
 
-        print("[Osaurus] All toasts dismissed")
+        print("[Intelligence] All toasts dismissed")
     }
 
     /// Update an existing toast (useful for transitioning loading to success/error)
@@ -129,7 +129,7 @@ public final class ToastManager {
         progress: Double? = nil
     ) {
         guard let index = toasts.firstIndex(where: { $0.id == id }) else {
-            print("[Osaurus] Toast not found for update: \(id)")
+            print("[Intelligence] Toast not found for update: \(id)")
             return
         }
 
@@ -163,7 +163,7 @@ public final class ToastManager {
             scheduleAutoDismiss(for: toast)
         }
 
-        print("[Osaurus] Toast updated: \(id) - \(toast.type.rawValue) - \(toast.title)")
+        print("[Intelligence] Toast updated: \(id) - \(toast.type.rawValue) - \(toast.title)")
     }
 
     // MARK: - Convenience Methods

@@ -109,7 +109,7 @@ struct ServerModelsTabContent: View {
                         emptyStateRow(
                             icon: "antenna.radiowaves.left.and.right",
                             message: L(
-                                "No remote providers connected. Models from Osaurus Router and your own providers appear here once connected."
+                                "No remote providers connected. Models from Intelligence Router and your own providers appear here once connected."
                             )
                         )
                     }
@@ -362,7 +362,7 @@ struct ServerModelsTabContent: View {
     // MARK: - Helpers
 
     /// Strips the provider prefix from a prefixed remote id, using the same
-    /// slug rule as `RemoteProviderManager` ("Osaurus" -> "osaurus/").
+    /// slug rule as `RemoteProviderManager` ("Intelligence" -> "osaurus/").
     private static func unprefixedRemoteId(_ prefixedId: String, providerName: String) -> String {
         let prefix =
             providerName

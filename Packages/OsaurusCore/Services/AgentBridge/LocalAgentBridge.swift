@@ -703,7 +703,7 @@ public final class LocalAgentBridge: @unchecked Sendable, AgentRuntimeBridge {
         // `osaurus-evals` CLI. Log instead of crashing the headless run;
         // the bundled app path is unaffected.
         guard Bundle.main.bundleIdentifier != nil else {
-            print("[Osaurus] notify (headless, suppressed): \(agentName) · \(title) — \(body)")
+            print("[Intelligence] notify (headless, suppressed): \(agentName) · \(title) — \(body)")
             return
         }
         // `postAgentEvent` is `nonisolated` (it dispatches the actual

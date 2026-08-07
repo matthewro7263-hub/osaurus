@@ -36,7 +36,7 @@ struct StorageLocationStandardsTests {
             legacyApplicationSupportRootPresent: legacyPresent,
             legacyApplicationSupportMergeMarkerPath: markerPath,
             legacyApplicationSupportMergeMarked: legacyMergeMarked,
-            appleSpecCandidateRootPath: support.map { "\($0)/Osaurus" },
+            appleSpecCandidateRootPath: support.map { "\($0)/Intelligence" },
             appleSpecCandidateRootPresent: candidatePresent,
             modelsRootPath: modelsRootPath
         )
@@ -66,8 +66,8 @@ struct StorageLocationStandardsTests {
     func applicationSupportRoot() {
         let report = StorageLocationStandards.audit(
             makeInputs(
-                activeRootPath: "/Users/sam/Library/Application Support/Osaurus",
-                modelsRootPath: "/Users/sam/Library/Application Support/Osaurus/models"
+                activeRootPath: "/Users/sam/Library/Application Support/Intelligence",
+                modelsRootPath: "/Users/sam/Library/Application Support/Intelligence/models"
             )
         )
 
@@ -117,8 +117,8 @@ struct StorageLocationStandardsTests {
     func pathNormalization() {
         let report = StorageLocationStandards.audit(
             makeInputs(
-                activeRootPath: "/Users/sam/Library/Application Support/./Osaurus/",
-                modelsRootPath: "/Users/sam/Library/Application Support/Osaurus/models"
+                activeRootPath: "/Users/sam/Library/Application Support/./Intelligence/",
+                modelsRootPath: "/Users/sam/Library/Application Support/Intelligence/models"
             )
         )
 
@@ -198,7 +198,7 @@ struct StorageLocationStandardsTests {
     func legacyRootWithCompliantActive() {
         let report = StorageLocationStandards.audit(
             makeInputs(
-                activeRootPath: "/Users/sam/Library/Application Support/Osaurus",
+                activeRootPath: "/Users/sam/Library/Application Support/Intelligence",
                 legacyPresent: true,
                 modelsRootPath: "/Volumes/External/MLXModels"
             )

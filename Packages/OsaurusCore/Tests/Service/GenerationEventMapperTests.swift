@@ -305,7 +305,7 @@ struct GenerationEventMapperTests {
     /// Ling/Bailing uses the same typed reasoning channel as other local
     /// reasoning-capable families. If a no-thinking prompt still emits
     /// `.reasoning`, that is a runtime/template/parser row to root-cause, not
-    /// something Osaurus should hide by merging reasoning into visible content.
+    /// something Intelligence should hide by merging reasoning into visible content.
     @Test func reasoning_stays_separate_for_ling_family() async throws {
         let events: [Generation] = [
             .chunk("Hi! "),

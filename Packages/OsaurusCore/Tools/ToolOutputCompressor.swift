@@ -28,7 +28,7 @@
 //     only crush a payload we have first validated as well-formed JSON, and we
 //     scan the ORIGINAL bytes (never reserialize), so key order, string
 //     contents, number lexemes, and escaping are all preserved exactly.
-//     NB: Osaurus's own envelopes already serialize compact
+//     NB: Intelligence's own envelopes already serialize compact
 //     (`.osaurusCanonical` = `[.sortedKeys, .withoutEscapingSlashes]`), so this
 //     is a no-op on our own tool JSON. The win lands on EXTERNAL pretty JSON
 //     that arrives as a raw result — `shell_run` of `… | jq .`, MCP provider

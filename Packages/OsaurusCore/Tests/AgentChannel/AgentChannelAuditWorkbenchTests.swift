@@ -165,7 +165,7 @@ struct AgentChannelAuditWorkbenchTests {
                 roomId: "room-1",
                 providerMessageId: "outbound-1",
                 direction: .outbound,
-                authorName: "Osaurus",
+                authorName: "Intelligence",
                 content: "Bearer super-secret-token-12345 sent to person@example.com",
                 payloadJSON: #"{"Authorization":"Bearer super-secret-token-12345"}"#
             )

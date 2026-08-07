@@ -2,7 +2,7 @@
 //  SandboxStdioRunner.swift
 //  osaurus
 //
-//  Owns a single stdio MCP subprocess running inside the Osaurus sandbox.
+//  Owns a single stdio MCP subprocess running inside the Intelligence sandbox.
 //  One runner per provider: it spawns the linux process via
 //  `SandboxManager.execInteractive`, holds the stdin/stdout/stderr
 //  bridges, and vends an `MCPStdioSandboxTransport` for `MCP.Client`.

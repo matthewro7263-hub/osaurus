@@ -19,7 +19,7 @@ public final class AgentNameDetector: Sendable {
     /// IDs of agents enabled for VAD detection
     private let enabledAgentIds: [UUID]
 
-    /// Custom wake phrase (e.g., "Hey Osaurus")
+    /// Custom wake phrase (e.g., "Hey Intelligence")
     private let customWakePhrase: String
 
     /// Cached agent names for matching

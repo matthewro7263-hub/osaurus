@@ -2,7 +2,7 @@
 //  AgentEntity.swift
 //  osaurus
 //
-//  App Intents entity + query for Osaurus agents. The query reads the live
+//  App Intents entity + query for Intelligence agents. The query reads the live
 //  agent list directly from disk via `AgentStore` (the app is unsandboxed and
 //  shares `~/.osaurus/`), so picker population works without a live server.
 //
@@ -10,7 +10,7 @@
 import AppIntents
 import OsaurusCore
 
-/// A selectable Osaurus agent, used by `RunAgentIntent`.
+/// A selectable Intelligence agent, used by `RunAgentIntent`.
 struct AgentEntity: AppEntity {
     static let typeDisplayRepresentation: TypeDisplayRepresentation = "Agent"
     static let defaultQuery = AgentQuery()
@@ -24,7 +24,7 @@ struct AgentEntity: AppEntity {
 }
 
 /// Reads the agent list from disk. Built-in agents are excluded here: the
-/// built-in "Osaurus" agent is reached through `AskOsaurusIntent`, mirroring
+/// built-in "Intelligence" agent is reached through `AskOsaurusIntent`, mirroring
 /// `GET /agents`, which also omits built-ins.
 struct AgentQuery: EntityQuery, EntityStringQuery {
     func entities(for ids: [AgentEntity.ID]) async throws -> [AgentEntity] {

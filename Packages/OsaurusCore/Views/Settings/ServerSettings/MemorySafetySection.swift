@@ -47,7 +47,7 @@ struct MemorySafetySection: View {
             SettingsField(
                 label: "Safety Level",
                 hint:
-                    "0 favors performance, 2 is Safe Auto, 3 is strict, and 4 removes automatic Osaurus caps."
+                    "0 favors performance, 2 is Safe Auto, 3 is strict, and 4 removes automatic Intelligence caps."
             ) {
                 VStack(alignment: .leading, spacing: 8) {
                     Slider(value: sliderBinding, in: 0 ... 4, step: 1)

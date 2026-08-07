@@ -86,7 +86,7 @@ public enum ServerRuntimeSettingsStore {
             cachedSnapshot = decoded
             return decoded
         } catch {
-            print("[Osaurus] Failed to load ServerRuntimeSettings: \(error)")
+            print("[Intelligence] Failed to load ServerRuntimeSettings: \(error)")
             return nil
         }
     }
@@ -134,7 +134,7 @@ public enum ServerRuntimeSettingsStore {
                 object: nil
             )
         } catch {
-            print("[Osaurus] Failed to save ServerRuntimeSettings: \(error)")
+            print("[Intelligence] Failed to save ServerRuntimeSettings: \(error)")
         }
     }
 
@@ -190,7 +190,7 @@ public enum ServerRuntimeSettingsStore {
 
     /// Whether the user explicitly selected the dangerous profile with no
     /// replacement physical-memory ceiling. This is the shared switch for
-    /// Osaurus-owned load refusal/send/eviction gates; keeping it here prevents
+    /// Intelligence-owned load refusal/send/eviction gates; keeping it here prevents
     /// the settings UI and runtime from assigning different meanings to the
     /// final slider position.
     public nonisolated static func automaticMemoryLimitsDisabled(
@@ -214,9 +214,9 @@ public enum ServerRuntimeSettingsStore {
         )
     }
 
-    /// The one Osaurus-owned memory-plan resolver used by settings,
+    /// The one Intelligence-owned memory-plan resolver used by settings,
     /// diagnostics, cache construction, and model loads. In the explicit No
-    /// Automatic Limits mode, blank custom fields remove Osaurus percentage
+    /// Automatic Limits mode, blank custom fields remove Intelligence percentage
     /// caps while explicit advanced/cache/concurrency overrides remain in
     /// force. Engine/platform allocation failures can still occur.
     public nonisolated static func resolvedMemorySafetyPlan(
@@ -244,7 +244,7 @@ public enum ServerRuntimeSettingsStore {
                 plan.concurrency.maxConcurrentSequences = nil
             }
             plan.warnings.append(
-                "No automatic Osaurus memory caps, load refusals, or percentage-based evictions are applied. Explicit advanced/cache/concurrency overrides remain in force; physical and Metal working-set guidance stays visible, and engine/platform allocations can still fail."
+                "No automatic Intelligence memory caps, load refusals, or percentage-based evictions are applied. Explicit advanced/cache/concurrency overrides remain in force; physical and Metal working-set guidance stays visible, and engine/platform allocations can still fail."
             )
         } else {
             plan.resolvedLoadBudgetBytes = plan.loadConfiguration.memoryLimit.resolve(
@@ -278,7 +278,7 @@ public enum ServerRuntimeSettingsStore {
         return min(max(resolved, 1), 32)
     }
 
-    /// Canonicalize Osaurus-owned runtime policy.
+    /// Canonicalize Intelligence-owned runtime policy.
     ///
     /// Older builds exposed the same effective cap in two places:
     /// `cache.defaultMaxKVSize` and
@@ -292,7 +292,7 @@ public enum ServerRuntimeSettingsStore {
         _ settings: VMLXServerRuntimeSettings
     ) -> VMLXServerRuntimeSettings {
         var canonical = settings
-        // Osaurus does not currently expose or execute a SMELT path. Persist
+        // Intelligence does not currently expose or execute a SMELT path. Persist
         // an explicit disabled value rather than the vMLX contract's
         // forward-compatible engine-selected default, so a future engine pin
         // cannot silently activate it behind the absent UI.
@@ -344,7 +344,7 @@ public enum ServerRuntimeSettingsStore {
     ) -> VMLXServerRuntimeSettings {
         var normalized = canonicalizedContextAndKVPolicy(settings)
         // vmlx-swift e095d0f changed the engine default from "MTP off" to
-        // "auto". Existing Osaurus installs persisted the old default exactly,
+        // "auto". Existing Intelligence installs persisted the old default exactly,
         // so without this repair tuned MXFP8/MTP bundles still never reach the
         // tensor+tuning-gated autodetect path after upgrade.
         if normalized.mtp.mode == .off,
@@ -354,7 +354,7 @@ public enum ServerRuntimeSettingsStore {
         {
             normalized.mtp.mode = .auto
         }
-        // Osaurus product default for block-diffusion models: 16 denoising
+        // Intelligence product default for block-diffusion models: 16 denoising
         // steps (~74 tok/s on diffusiongemma-26B-A4B MXFP4, coherent) vs the
         // bundle's 48 (~37 tok/s). Seeded exactly once; afterwards a blank
         // field is an explicit "use bundle default" choice.
@@ -366,7 +366,7 @@ public enum ServerRuntimeSettingsStore {
             normalized.generation.diffusionMaxDenoisingSteps = 16
             writeDiffusionDefaultsMigrationMarker()
         }
-        // Osaurus product default: quantize the unquantized Gemma 4 QAT tied
+        // Intelligence product default: quantize the unquantized Gemma 4 QAT tied
         // head to q6 (GGUF Q6_K-parity head bandwidth) instead of fp16
         // passthrough. This is the safe speed lever — affine head quantization,
         // no compile/model-switch risk — and is the largest out-of-box Gemma 4
@@ -689,7 +689,7 @@ public enum ServerRuntimeSettingsStore {
         directoryURL().appendingPathComponent(cacheDefaultsMigrationMarkerName)
     }
 
-    /// One-shot seed of the Osaurus diffusion default (16 denoising steps,
+    /// One-shot seed of the Intelligence diffusion default (16 denoising steps,
     /// the measured speed/quality knee for diffusiongemma-26B-A4B). The
     /// marker keeps a user's later "blank = bundle default" choice sticky.
     static let diffusionDefaultsMigrationMarkerName =
@@ -705,7 +705,7 @@ public enum ServerRuntimeSettingsStore {
         try? Data().write(to: url, options: [.atomic])
     }
 
-    /// Osaurus product default for the tied-LM-head codec: q6 (6-bit affine,
+    /// Intelligence product default for the tied-LM-head codec: q6 (6-bit affine,
     /// the bandwidth/quality point matching the llama.cpp Q6_K output head used
     /// by the documented GGUF baselines). Gemma 4 QAT bundles ship the 262k
     /// tied head UNQUANTIZED (fp16), which streams ~1 GB/token; q6 is the safe

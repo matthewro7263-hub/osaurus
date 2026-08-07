@@ -119,7 +119,7 @@ final class RedeemCodeService: ObservableObject {
             // Identity setup is a local keychain operation, not a network
             // call — "check your connection" would point the user at the
             // wrong problem.
-            state = .failure(L("We couldn’t set up your Osaurus Identity. Please try again."))
+            state = .failure(L("We couldn’t set up your Intelligence Identity. Please try again."))
             return
         }
 
@@ -185,7 +185,7 @@ final class RedeemCodeService: ObservableObject {
         case .firstActionPending:
             state = .failure(L("Finish the welcome-credit choice before trying this code."))
         case .noIdentity:
-            state = .failure(L("Set up your Osaurus Identity before redeeming a code."))
+            state = .failure(L("Set up your Intelligence Identity before redeeming a code."))
         case .invalidResponse:
             state = .failure(L("The redeem service returned an invalid response. Please try again."))
         case .invalidURL, .server, .belowMinimumTopUp, .insufficientFunds,

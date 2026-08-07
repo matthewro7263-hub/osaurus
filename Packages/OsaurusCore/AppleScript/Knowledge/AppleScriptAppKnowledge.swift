@@ -12,7 +12,7 @@
 //  name appears in the task text (word-boundary, case-insensitive), or — when
 //  the task names no app but asks about the "frontmost"/"current" app — the
 //  frontmost app. The same fallback covers narrow working-document anaphora
-//  ("the file" / "the document") because users must switch into Osaurus to
+//  ("the file" / "the document") because users must switch into Intelligence to
 //  submit those tasks. No match → no injection (a battery query gets no Safari
 //  dictionary just because Safari was the working app).
 //
@@ -91,7 +91,7 @@ public enum AppleScriptAppKnowledge {
     /// Resolve narrow working-app anaphora into the child task once the live
     /// desktop snapshot has identified exactly one target app. The parent may
     /// legitimately say "the file" because that is how a user refers to the
-    /// document they just left to open Osaurus; leaving the app name only in a
+    /// document they just left to open Intelligence; leaving the app name only in a
     /// separate system section proved too weak for small AppleScript models,
     /// which could reinterpret the old text as a filename and search disk.
     ///

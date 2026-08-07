@@ -167,7 +167,7 @@ public enum TTSConfigurationStore {
         do {
             return try JSONDecoder().decode(TTSConfiguration.self, from: Data(contentsOf: url))
         } catch {
-            print("[Osaurus] Failed to load TTSConfiguration: \(error)")
+            print("[Intelligence] Failed to load TTSConfiguration: \(error)")
             return TTSConfiguration.default
         }
     }
@@ -180,7 +180,7 @@ public enum TTSConfigurationStore {
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
             try encoder.encode(configuration).write(to: url, options: [.atomic])
         } catch {
-            print("[Osaurus] Failed to save TTSConfiguration: \(error)")
+            print("[Intelligence] Failed to save TTSConfiguration: \(error)")
         }
     }
 }

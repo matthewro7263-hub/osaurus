@@ -91,7 +91,7 @@ struct ImportGuideSheet: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(
-                "Bring conversations from other AI apps into Osaurus and continue them with any model. Export your chats first:",
+                "Bring conversations from other AI apps into Intelligence and continue them with any model. Export your chats first:",
                 bundle: .module
             )
             .font(.system(size: 13))

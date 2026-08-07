@@ -63,7 +63,7 @@ public struct ScreenContextDistiller: Sendable {
         return min(max(0, w), side) * min(max(0, h), side)
     }
 
-    /// Osaurus's own identity, used to exclude it from the "what you're doing"
+    /// Intelligence's own identity, used to exclude it from the "what you're doing"
     /// signal (it's usually frontmost when the user hits send).
     private struct SelfIdentity {
         let pid: Int32
@@ -87,8 +87,8 @@ public struct ScreenContextDistiller: Sendable {
     }
 
     /// Build a snapshot from the given driver. `selfPid` / `selfBundleId`
-    /// identify Osaurus so it can be excluded from the "what you're doing"
-    /// signal; `preferredPid` is the working-app fallback used when Osaurus is
+    /// identify Intelligence so it can be excluded from the "what you're doing"
+    /// signal; `preferredPid` is the working-app fallback used when Intelligence is
     /// itself frontmost (see `FrontmostAppTracker`).
     public func capture(
         using driver: MacDriver,
@@ -227,17 +227,17 @@ public struct ScreenContextDistiller: Sendable {
         identity: SelfIdentity,
         preferredPid: Int32?
     ) -> WorkingApp? {
-        // 1. The genuine frontmost app, when Osaurus didn't steal focus.
+        // 1. The genuine frontmost app, when Intelligence didn't steal focus.
         if let active, !identity.matches(pid: active.pid, bundleId: nil) {
             return WorkingApp(pid: active.pid, name: active.app, windowTitle: active.title)
         }
-        // 2. The app the user was on right before Osaurus took focus.
+        // 2. The app the user was on right before Intelligence took focus.
         if let preferredPid,
             let match = apps.first(where: { $0.pid == preferredPid }),
             !identity.owns(match) {
             return WorkingApp(pid: match.pid, name: match.name, windowTitle: nil)
         }
-        // 3. Best-effort: the first visible non-Osaurus app, else any non-Osaurus app.
+        // 3. Best-effort: the first visible non-Intelligence app, else any non-Intelligence app.
         let candidate =
             apps.first(where: { !$0.hidden && !identity.owns($0) })
             ?? apps.first(where: { !identity.owns($0) })
@@ -254,7 +254,7 @@ public struct ScreenContextDistiller: Sendable {
         identity: SelfIdentity
     ) async -> [ScreenContextSnapshot.WindowRef] {
         // Scan the working app first so its windows lead the list, then the
-        // rest, skipping Osaurus and hidden apps.
+        // rest, skipping Intelligence and hidden apps.
         var ordered: [CUAppListing] = []
         if let workingPid = working?.pid, let workingApp = apps.first(where: { $0.pid == workingPid }) {
             ordered.append(workingApp)
@@ -657,7 +657,7 @@ public struct ScreenContextDistiller: Sendable {
     /// (`Foo.swift`). Only unambiguous patterns produce a signal, so a plain
     /// document/site title (e.g. "Weather — Safari") yields nothing rather than a
     /// guessed, possibly-wrong label. App shells encode this in the title
-    /// reliably (Slack: "#engineering — Osaurus"; editors: "File.swift — folder")
+    /// reliably (Slack: "#engineering — Intelligence"; editors: "File.swift — folder")
     /// even when the body content is virtualized/inaccessible.
     private func parseActiveContext(_ title: String?) -> [String] {
         guard let title = cleaned(title, limit: maxItemChars) else { return [] }
@@ -951,7 +951,7 @@ public struct ScreenContextDistiller: Sendable {
 
 extension ScreenContextDistiller {
     /// Capture a snapshot for the chat send path using the real macOS driver,
-    /// Osaurus's own identity, and the working-app hint from the frontmost
+    /// Intelligence's own identity, and the working-app hint from the frontmost
     /// tracker.
     @MainActor
     public static func captureForChat(

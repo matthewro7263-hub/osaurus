@@ -54,7 +54,7 @@ struct MLXModel: Identifiable, Codable {
 
     /// Human-readable provenance for externally-discovered models
     /// (e.g. "Hugging Face cache", "LM Studio"). `nil` for normal catalog
-    /// and Osaurus-downloaded entries.
+    /// and Intelligence-downloaded entries.
     let externalSource: String?
 
     init(
@@ -408,7 +408,7 @@ struct MLXModel: Identifiable, Codable {
     /// — the dominant cost of the Models tab badge and grid recomputes.
     var isDownloaded: Bool {
         // Bypass the id-keyed cache for pinned (`rootDirectory`) and
-        // external (`bundleDirectory`) bundles so a same-id Osaurus entry
+        // external (`bundleDirectory`) bundles so a same-id Intelligence entry
         // can't shadow their on-disk state.
         let usesSharedCache = rootDirectory == nil && bundleDirectory == nil
         if usesSharedCache, let cached = MLXModelDownloadCache.value(for: id) {
@@ -482,7 +482,7 @@ struct MLXModel: Identifiable, Codable {
     /// watchdog on a cold or slow disk when the Models grid renders many rows.
     var downloadedAt: Date? {
         // Bypass the shared cache for pinned (`rootDirectory`) and external
-        // (`bundleDirectory`) bundles so a same-id Osaurus entry can't shadow
+        // (`bundleDirectory`) bundles so a same-id Intelligence entry can't shadow
         // their on-disk timestamp — mirrors `isDownloaded`.
         let usesSharedCache = rootDirectory == nil && bundleDirectory == nil
         if usesSharedCache {
@@ -519,7 +519,7 @@ struct MLXModel: Identifiable, Codable {
         // disk, which trips the main-thread hang watchdog when the grid
         // evaluates this per row. Bypass the shared cache for pinned
         // (`rootDirectory`) and external (`bundleDirectory`) bundles, matching
-        // `isDownloaded`, so a same-id Osaurus entry can't shadow their state.
+        // `isDownloaded`, so a same-id Intelligence entry can't shadow their state.
         let usesSharedCache = rootDirectory == nil && bundleDirectory == nil
         if usesSharedCache, let cached = MLXModelDownloadCache.cachedVLM(for: id) {
             return cached
@@ -535,7 +535,7 @@ struct MLXModel: Identifiable, Codable {
     func computeIsVLM() -> Bool {
         if ModelFamilyNames.isStepFamily(id) || ModelFamilyNames.isStepFamily(name) {
             // Step 3.7 bundles can carry upstream vision metadata, but this
-            // Osaurus/vMLX path is the Step text runtime. Keep picker
+            // Intelligence/vMLX path is the Step text runtime. Keep picker
             // capability detection text-only until Step VLM is wired and
             // proven, and avoid blocking picker rebuilds on large external
             // bundle metadata reads.

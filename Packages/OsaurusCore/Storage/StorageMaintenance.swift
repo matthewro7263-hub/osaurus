@@ -2,7 +2,7 @@
 //  StorageMaintenance.swift
 //  osaurus
 //
-//  Periodic SQLite maintenance for the five Osaurus databases. Runs:
+//  Periodic SQLite maintenance for the five Intelligence databases. Runs:
 //
 //  - `PRAGMA optimize`         every `optimizeInterval` (default 6h)
 //  - `PRAGMA wal_checkpoint(TRUNCATE)` every `checkpointInterval` (default 7d)
@@ -181,7 +181,7 @@ public actor StorageMaintenance {
 
 // MARK: - Database handle abstraction
 
-/// Type-erased handle for the five Osaurus databases so the
+/// Type-erased handle for the five Intelligence databases so the
 /// maintenance loop can iterate over them. Each `*Database` class
 /// registers itself when it opens, deregisters when it closes.
 public final class OsaurusDatabaseHandle: @unchecked Sendable {

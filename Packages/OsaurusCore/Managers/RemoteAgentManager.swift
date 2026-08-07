@@ -187,7 +187,7 @@ public final class RemoteAgentManager: ObservableObject {
         }
 
         // Prefer the HPKE-sealed credential. Fall back to plaintext only for
-        // senders running an older Osaurus that ignored `encPub` — without a
+        // senders running an older Intelligence that ignored `encPub` — without a
         // signed channel binding for the receiver we can't reject plaintext
         // outright without breaking cross-version invites.
         let resolvedApiKey: String

@@ -480,9 +480,9 @@ final class SSEResponseWriter: ResponseWriter {
         writeSSEChunk(chunk, context: context)
     }
 
-    /// Emit an Osaurus extension progress chunk for local prefill. The chunk
+    /// Emit an Intelligence extension progress chunk for local prefill. The chunk
     /// deliberately uses empty `choices` so OpenAI-compatible text parsers can
-    /// ignore it while Osaurus UI/API clients render progress.
+    /// ignore it while Intelligence UI/API clients render progress.
     func writePrefillProgress(
         _ progress: PrefillProgressState,
         model: String,

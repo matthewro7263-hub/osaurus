@@ -123,7 +123,7 @@ struct TelegramConnectionTests {
                     "message_id": 77,
                     "date": 1782427200,
                     "chat": { "id": -100111222333, "type": "group", "title": "Ops" },
-                    "from": { "id": 42, "is_bot": true, "first_name": "Osaurus", "username": "osaurus_bot" },
+                    "from": { "id": 42, "is_bot": true, "first_name": "Intelligence", "username": "osaurus_bot" },
                     "text": "Hello <b>ops</b>"
                   }
                 }
@@ -160,7 +160,7 @@ struct TelegramConnectionTests {
                     "message_id": 78,
                     "date": 1782427200,
                     "chat": { "id": -100111222333, "type": "group", "title": "Ops" },
-                    "from": { "id": 42, "is_bot": true, "first_name": "Osaurus", "username": "osaurus_bot" },
+                    "from": { "id": 42, "is_bot": true, "first_name": "Intelligence", "username": "osaurus_bot" },
                     "text": "plain"
                   }
                 }

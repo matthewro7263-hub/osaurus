@@ -84,7 +84,7 @@ enum AgentChannelLiveProofReadiness {
         }
         manualProof.append("Send one inbound Telegram message from an authorized sender.")
         manualProof.append("Confirm an unauthorized sender in the same group is ignored.")
-        manualProof.append("Restart Osaurus and confirm the Telegram inbox and configuration persist.")
+        manualProof.append("Restart Intelligence and confirm the Telegram inbox and configuration persist.")
 
         return AgentChannelLiveProofReadinessReport(
             kind: .telegram,
@@ -145,7 +145,7 @@ enum AgentChannelLiveProofReadiness {
         }
         manualProof.append("Receive one Slack message through Socket Mode from an authorized sender.")
         manualProof.append("Confirm an unauthorized sender in the same channel is ignored.")
-        manualProof.append("Restart Osaurus and confirm Slack transport health and configuration persist.")
+        manualProof.append("Restart Intelligence and confirm Slack transport health and configuration persist.")
 
         return AgentChannelLiveProofReadinessReport(
             kind: .slack,
@@ -189,7 +189,7 @@ enum AgentChannelLiveProofReadiness {
         }
         manualProof.append("Receive one Discord message through polling from an authorized sender.")
         manualProof.append("Confirm an unauthorized sender in the same channel is ignored.")
-        manualProof.append("Restart Osaurus and confirm Discord transport health and configuration persist.")
+        manualProof.append("Restart Intelligence and confirm Discord transport health and configuration persist.")
 
         return AgentChannelLiveProofReadinessReport(
             kind: .discord,
@@ -214,7 +214,7 @@ enum AgentChannelLiveProofReadiness {
             )
         }
         if !diagnostics.fullDiskAccess {
-            blockers.append("Grant Full Disk Access so Osaurus can read the Messages database.")
+            blockers.append("Grant Full Disk Access so Intelligence can read the Messages database.")
         }
         // imsg exposes no sign-in probe; only a future helper release could
         // report a definite signed-out state.
@@ -222,7 +222,7 @@ enum AgentChannelLiveProofReadiness {
             blockers.append("Sign in to Messages.app with an iMessage account on this Mac.")
         } else if diagnostics.messagesSignedIn == nil {
             manualProof.append(
-                "Confirm Messages.app is signed in with an Apple Account on this Mac (Osaurus cannot probe this)."
+                "Confirm Messages.app is signed in with an Apple Account on this Mac (Intelligence cannot probe this)."
             )
         }
         if !diagnostics.receiveStorageEnabled {
@@ -242,7 +242,7 @@ enum AgentChannelLiveProofReadiness {
                 blockers.append("Add at least one writable iMessage chat or turn writes off.")
             }
             if !diagnostics.automationMessages {
-                blockers.append("Grant Messages Automation so Osaurus can send through Messages.app.")
+                blockers.append("Grant Messages Automation so Intelligence can send through Messages.app.")
             }
         }
         appendDiagnosticFailures(diagnostics.failures, to: &blockers)
@@ -254,7 +254,7 @@ enum AgentChannelLiveProofReadiness {
         }
         manualProof.append("Receive one inbound iMessage from an authorized sender.")
         manualProof.append("Confirm an unauthorized sender in the same chat is ignored.")
-        manualProof.append("Restart Osaurus and confirm the iMessage cursor, inbox, and configuration persist.")
+        manualProof.append("Restart Intelligence and confirm the iMessage cursor, inbox, and configuration persist.")
         if diagnostics.advancedActionsEnabled {
             if diagnostics.bridgeAvailable {
                 manualProof.append(
@@ -317,7 +317,7 @@ enum AgentChannelLiveProofReadiness {
         manualProof.append("Receive one inbound WhatsApp message from an authorized sender.")
         manualProof.append("Confirm an unauthorized sender in the same chat is ignored.")
         manualProof.append(
-            "Restart Osaurus and confirm the WhatsApp link, inbox, and configuration persist."
+            "Restart Intelligence and confirm the WhatsApp link, inbox, and configuration persist."
         )
         notes.append(
             "WhatsApp uses the unofficial Web multi-device protocol; the account can be logged out remotely, so re-link readiness is part of live proof."

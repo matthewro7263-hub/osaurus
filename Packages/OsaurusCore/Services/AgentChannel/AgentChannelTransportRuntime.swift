@@ -253,7 +253,7 @@ actor AgentChannelTransportSupervisor {
     func refreshDiscordRuntime(now: Date = Date()) async {
         let configuration = discordConfiguration()
         // Platform presence only needs the bot token — a send-only Discord
-        // setup should still show the bot online while Osaurus runs.
+        // setup should still show the bot online while Intelligence runs.
         if discordHasBotToken() {
             if !discordPresenceStarted {
                 discordPresenceStarted = true

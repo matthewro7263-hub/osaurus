@@ -2,7 +2,7 @@
 //  PluginConfigurationDomain.swift
 //  osaurus
 //
-//  Default-agent configure tool for Osaurus plugins (central registry).
+//  Default-agent configure tool for Intelligence plugins (central registry).
 //  One tool, `osaurus_plugin`, fans out across two actions:
 //   - install
 //   - uninstall
@@ -18,7 +18,7 @@ enum PluginConfigurationDomain {
     static let domain = ConfigurationDomain(
         id: "plugins",
         displayName: "Plugins",
-        summary: "Osaurus plugins from the central registry. Install and uninstall by `plugin_id`.",
+        summary: "Intelligence plugins from the central registry. Install and uninstall by `plugin_id`.",
         menuHint: "install / uninstall plugins (e.g. weather, search, calendar)",
         searchKeywords: [
             "plugin", "plugins",

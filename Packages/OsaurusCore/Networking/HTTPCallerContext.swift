@@ -7,7 +7,7 @@
 //  local server spawns, and absent everywhere else (app chat, plugins,
 //  evaluators, warmup). Downstream gates use it to distinguish "this inference
 //  was triggered by an inbound HTTP request" — and whether that caller proved
-//  possession of a valid Osaurus access key — from app-internal work, without
+//  possession of a valid Intelligence access key — from app-internal work, without
 //  threading a flag through every request struct.
 //
 

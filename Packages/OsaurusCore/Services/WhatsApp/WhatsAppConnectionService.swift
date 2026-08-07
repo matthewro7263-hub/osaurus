@@ -115,7 +115,7 @@ enum WhatsAppConnectionServiceError: LocalizedError, Equatable, Sendable {
         case .writeDisabled:
             return "WhatsApp write access is disabled in settings."
         case .sendConfirmationRequired:
-            return "`confirm_send` must be true before Osaurus sends a WhatsApp message."
+            return "`confirm_send` must be true before Intelligence sends a WhatsApp message."
         case .messageTooLong:
             return "WhatsApp message content is too long, even after splitting into multiple messages."
         case .emptyMessage:

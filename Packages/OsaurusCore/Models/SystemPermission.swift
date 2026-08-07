@@ -83,7 +83,7 @@ enum SystemPermission: String, CaseIterable, Codable, Sendable {
         case .automationMail:
             return L("Allows plugins to read and send emails in Mail.app via AppleScript.")
         case .automationMessages:
-            return L("Allows Osaurus to send messages through Messages.app via Apple Events.")
+            return L("Allows Intelligence to send messages through Messages.app via Apple Events.")
         case .calendar:
             return L("Allows plugins to access your calendar to read and create events directly.")
         case .reminders:

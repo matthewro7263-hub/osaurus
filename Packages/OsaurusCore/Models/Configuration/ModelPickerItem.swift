@@ -99,8 +99,8 @@ struct ModelPickerItem: Identifiable, Hashable {
     /// Description of the model (optional)
     let description: String?
 
-    /// Input price in micro-USD per million tokens, parsed from the Osaurus
-    /// router metadata. Used only to sort the Osaurus tab by price; `nil` for
+    /// Input price in micro-USD per million tokens, parsed from the Intelligence
+    /// router metadata. Used only to sort the Intelligence tab by price; `nil` for
     /// items without router pricing (foundation, local, plain remote).
     let inputPriceMicroPerMTok: Int64?
 
@@ -108,8 +108,8 @@ struct ModelPickerItem: Identifiable, Hashable {
     /// unknown, matching `inputPriceMicroPerMTok`.
     let outputPriceMicroPerMTok: Int64?
 
-    /// Context window in tokens, from the Osaurus router metadata. Used only to
-    /// filter the Osaurus tab by context limit; `nil` when unknown.
+    /// Context window in tokens, from the Intelligence router metadata. Used only to
+    /// filter the Intelligence tab by context limit; `nil` when unknown.
     let contextLength: Int?
 
     /// Whether Router metadata explicitly advertises tool calling. Nil for
@@ -320,7 +320,7 @@ extension ModelPickerItem {
         return bare.lowercased().hasPrefix("gpt-5.6")
     }
 
-    /// Create an Osaurus Router model picker item enriched with the router's
+    /// Create an Intelligence Router model picker item enriched with the router's
     /// per-model metadata (underlying provider, pricing, context, capabilities).
     /// The metadata is rendered in the picker row's existing second line via
     /// `description`, so no table-layout changes are needed.
@@ -355,7 +355,7 @@ extension ModelPickerItem {
     }
 }
 
-// MARK: - Osaurus Router metadata presentation
+// MARK: - Intelligence Router metadata presentation
 
 extension OsaurusRouterModel {
     /// Compact one-line summary for the model picker: underlying provider,
@@ -561,7 +561,7 @@ extension ModelPickerItem {
 
 // MARK: - Sorting
 
-/// User-chosen ordering for the Osaurus tab. The default keeps the existing
+/// User-chosen ordering for the Intelligence tab. The default keeps the existing
 /// alphabetical order; the price options sort by per-million-token cost.
 enum ModelPickerSortOrder: Hashable {
     case `default`
@@ -569,7 +569,7 @@ enum ModelPickerSortOrder: Hashable {
     case priceHighToLow
 }
 
-/// Minimum-context filter for the Osaurus tab. Each case keeps models whose
+/// Minimum-context filter for the Intelligence tab. Each case keeps models whose
 /// context window is at least `minTokens`; `.any` disables the filter.
 enum ModelPickerContextFilter: CaseIterable, Identifiable, Hashable {
     case any
@@ -603,7 +603,7 @@ enum ModelPickerContextFilter: CaseIterable, Identifiable, Hashable {
     }
 }
 
-/// Vision-capability filter for the Osaurus tab.
+/// Vision-capability filter for the Intelligence tab.
 enum ModelPickerVisionFilter: CaseIterable, Identifiable, Hashable {
     case any
     case visionOnly
@@ -640,7 +640,7 @@ extension Array where Element == ModelPickerItem {
         }
     }
 
-    /// Sort by Osaurus router price (input rate primary, output as tiebreak).
+    /// Sort by Intelligence router price (input rate primary, output as tiebreak).
     /// Items without pricing sort last in either direction so a missing rate
     /// never jumps to the top of a "cheapest first" list. Falls back to the
     /// receiver unchanged for `.default`.
@@ -683,10 +683,10 @@ struct ModelPickerTab: Identifiable, Equatable {
 
     var id: String { key }
 
-    /// The Osaurus Router tab, identified by provider title (matching how
+    /// The Intelligence Router tab, identified by provider title (matching how
     /// `groupedByTab()` pins it). This is the only tab whose models carry
     /// pricing, so it's the only one offering the price-sort control.
-    var isOsaurus: Bool { title == "Osaurus" }
+    var isOsaurus: Bool { title == "Intelligence" }
 }
 
 // MARK: - Grouping
@@ -823,8 +823,8 @@ extension Array where Element == ModelPickerItem {
             )
         }
 
-        let osaurusTabs = remoteOrder.filter { $0.title == "Osaurus" }
-        let otherRemoteTabs = remoteOrder.filter { $0.title != "Osaurus" }
+        let osaurusTabs = remoteOrder.filter { $0.title == "Intelligence" }
+        let otherRemoteTabs = remoteOrder.filter { $0.title != "Intelligence" }
         let orderedRemoteTabs = osaurusTabs + otherRemoteTabs
 
         for entry in orderedRemoteTabs {

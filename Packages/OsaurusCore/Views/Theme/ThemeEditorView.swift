@@ -1103,9 +1103,9 @@ struct ThemeEditorView: View {
 
         themeToSave.metadata.updatedAt = Date()
 
-        print("[Osaurus] ThemeEditor: Saving theme '\(themeToSave.metadata.name)' (id: \(themeToSave.metadata.id))")
+        print("[Intelligence] ThemeEditor: Saving theme '\(themeToSave.metadata.name)' (id: \(themeToSave.metadata.id))")
         themeManager.saveTheme(themeToSave)
-        print("[Osaurus] ThemeEditor: Theme saved successfully")
+        print("[Intelligence] ThemeEditor: Theme saved successfully")
 
         withAnimation { showSaveConfirmation = true }
 
@@ -1132,14 +1132,14 @@ struct ThemeEditorView: View {
                     return resized.base64EncodedString()
                 }.value
                 guard let encoded else {
-                    print("[Osaurus] Failed to import image")
+                    print("[Intelligence] Failed to import image")
                     return
                 }
                 editingTheme.background.imageData = encoded
                 editingTheme.background.type = .image
             }
         case .failure(let error):
-            print("[Osaurus] Image import failed: \(error)")
+            print("[Intelligence] Image import failed: \(error)")
         }
     }
 

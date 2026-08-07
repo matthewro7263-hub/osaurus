@@ -208,7 +208,7 @@ struct ModelProfileRegistryTests {
     /// Laguna bundles (`model_type=laguna`) must match
     /// `LagunaThinkingProfile` so the model-options reasoning toggle
     /// drives the `enable_thinking` Jinja kwarg honoured by the shipped
-    /// `laguna_glm_thinking_v5/chat_template.jinja`. Osaurus exposes the
+    /// `laguna_glm_thinking_v5/chat_template.jinja`. Intelligence exposes the
     /// control without forcing parser-side behavior; the displayed default
     /// mirrors the bundle/runtime default.
     @Test("Laguna bundles match LagunaThinkingProfile (all quant tiers)")
@@ -235,7 +235,7 @@ struct ModelProfileRegistryTests {
     }
 
     /// Ling-2.6 Flash / Bailing uses `enable_thinking` to select the upstream
-    /// `detailed thinking on/off` directive. Osaurus exposes the option without
+    /// `detailed thinking on/off` directive. Intelligence exposes the option without
     /// injecting a hidden default; explicit user/API choices still pass through.
     @Test("Ling bundles expose thinking toggle")
     func ling_matchesRuntimeProfileWithThinkingToggle() {

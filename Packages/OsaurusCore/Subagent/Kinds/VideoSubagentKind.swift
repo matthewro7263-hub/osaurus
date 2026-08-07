@@ -271,9 +271,9 @@ final class VideoSubagentKind: SubagentKind, @unchecked Sendable {
         guard url.path.hasPrefix(approvedRoot + "/") else {
             throw SubagentError.invalidArgs(
                 message:
-                    "Remote video source images must come from an Osaurus attachment or generated artifact.",
+                    "Remote video source images must come from an Intelligence attachment or generated artifact.",
                 field: "source_path",
-                expected: "a file path inside the current Osaurus artifact store"
+                expected: "a file path inside the current Intelligence artifact store"
             )
         }
         let ext = url.pathExtension.lowercased()

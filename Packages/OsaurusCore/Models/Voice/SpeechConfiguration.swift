@@ -246,7 +246,7 @@ public enum SpeechConfigurationStore {
         do {
             return try JSONDecoder().decode(SpeechConfiguration.self, from: Data(contentsOf: url))
         } catch {
-            print("[Osaurus] Failed to load SpeechConfiguration: \(error)")
+            print("[Intelligence] Failed to load SpeechConfiguration: \(error)")
             return SpeechConfiguration.default
         }
     }
@@ -259,7 +259,7 @@ public enum SpeechConfigurationStore {
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
             try encoder.encode(configuration).write(to: url, options: [.atomic])
         } catch {
-            print("[Osaurus] Failed to save SpeechConfiguration: \(error)")
+            print("[Intelligence] Failed to save SpeechConfiguration: \(error)")
         }
     }
 

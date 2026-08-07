@@ -2,7 +2,7 @@
 //  SecureChannelE2ETests.swift
 //  OsaurusCoreTests
 //
-//  End-to-end tests for the Osaurus Secure Channel against a real NIO
+//  End-to-end tests for the Intelligence Secure Channel against a real NIO
 //  server: encrypted calls through `/secure/call` (buffered and SSE), the
 //  426 hard-require gate on agent run/dispatch, replay rejection, and
 //  unknown-session handling.

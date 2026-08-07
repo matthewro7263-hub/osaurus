@@ -73,7 +73,7 @@ public enum XAIOAuthService {
     /// xAI's shared OAuth client. Its loopback redirect (`127.0.0.1:56121
     /// /callback`) is pre-registered against this client, so the host/port/path
     /// below must match exactly. xAI may label the consent app using its shared
-    /// app name because this client is not Osaurus-specific.
+    /// app name because this client is not Intelligence-specific.
     public static let clientId = "b1a00492-073a-47ea-816f-4c329264a828"
     public static let scope = "openid profile email offline_access grok-cli:access api:access"
     public static let issuer = "https://auth.x.ai"

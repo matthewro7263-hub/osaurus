@@ -286,10 +286,10 @@ public actor ModelRuntime {
         /// Numeric allocator-cache cap resolved from the user-visible
         /// memory-safety plan used for this exact load. `nil` means no numeric
         /// cap; the family-specific uncapped requirement is tracked separately
-        /// so ordinary models still use Osaurus's dynamic reuse heuristic.
+        /// so ordinary models still use Intelligence's dynamic reuse heuristic.
         let allocatorCacheLimitBytes: Int?
         /// Plain affine DSV4 requires MLX's admitted allocator ceiling rather
-        /// than Osaurus's generic weight-scaled reuse heuristic. Its routed
+        /// than Intelligence's generic weight-scaled reuse heuristic. Its routed
         /// decode intermediates otherwise churn out of the allocator cache on
         /// every token even though RAM admission already accepted the model.
         let requiresUncappedMLXAllocatorCache: Bool
@@ -2330,7 +2330,7 @@ public actor ModelRuntime {
         )
     }
 
-    /// Keep Osaurus's weight-scaled reuse heuristic as a ceiling, but never
+    /// Keep Intelligence's weight-scaled reuse heuristic as a ceiling, but never
     /// exceed the allocator cap visibly resolved for any resident model. The
     /// previous post-load assignment discarded Safe Auto's 128 MiB cap and
     /// silently replaced it with at least 1 GiB.
@@ -3618,7 +3618,7 @@ public actor ModelRuntime {
         // One-time, idempotent bundle-metadata repair for the Laguna XS 2.1
         // release that shipped an incorrect/missing top_k in some artifacts.
         // This happens before both compatibility inspection and
-        // `loadModelContainer`, so Osaurus and vMLX read the same corrected
+        // `loadModelContainer`, so Intelligence and vMLX read the same corrected
         // files. It is intentionally not an in-memory/global sampler override:
         // explicit request top_k retains precedence after this migration.
         do {
@@ -3641,7 +3641,7 @@ public actor ModelRuntime {
                 code: 422,
                 userInfo: [
                     NSLocalizedDescriptionKey:
-                        "Laguna XS 2.1 requires top_k 20, but Osaurus could not update its generation metadata. \(error.localizedDescription)"
+                        "Laguna XS 2.1 requires top_k 20, but Intelligence could not update its generation metadata. \(error.localizedDescription)"
                 ]
             )
         }
@@ -4112,7 +4112,7 @@ public actor ModelRuntime {
         // (prefix, paged, block disk, legacy disk, SSM rederive, KV
         // codec, defaultMaxKVSize, longPromptMultiplier) flows into
         // BatchEngine. The diskCacheDirectory override is either the
-        // user-configured disk directory or the writable Osaurus default;
+        // user-configured disk directory or the writable Intelligence default;
         // when that path is unusable, disable disk cache instead of letting
         // vmlx fall back to a different implicit location.
         var config = resolvedSettings.cacheCoordinatorConfig(
@@ -4317,7 +4317,7 @@ public actor ModelRuntime {
         // and no rotating/hybrid layers — which silently force-enabled
         // TurboQuant on multiple families. TurboQuant's per-step
         // compress/decompress cost outweighs its RAM savings at the context
-        // lengths Osaurus serves and measurably regresses decode:
+        // lengths Intelligence serves and measurably regresses decode:
         //   Gemma 4 26B-A4B MXFP4  92.3 -> 54.0 tok/s  (-42%)
         //   Gemma 4 12B    MXFP4   48.6 -> 34.5 tok/s  (-29%)
         // (M5 Max RunBench, greedy, kvMode none vs tq33, 2026-06-12). Every
@@ -5425,7 +5425,7 @@ public actor ModelRuntime {
         // when this was generic.
         //
         // Gemma 4's native template already has a required-tool contract in
-        // its fallback path. Live Osaurus agent runs add a much larger system
+        // its fallback path. Live Intelligence agent runs add a much larger system
         // prompt than strict `/v1/chat/completions`; for Gemma, schema
         // filtering alone lets forced `complete` degrade into a plain-text
         // summary. Add the same required-tool wording as a request-local

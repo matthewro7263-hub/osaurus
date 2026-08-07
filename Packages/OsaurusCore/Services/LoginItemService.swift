@@ -39,7 +39,7 @@ final class LoginItemService {
                     }
                 }
             } catch {
-                print("[Osaurus] Failed to update Start at Login state: \(error)")
+                print("[Intelligence] Failed to update Start at Login state: \(error)")
             }
         }
     }

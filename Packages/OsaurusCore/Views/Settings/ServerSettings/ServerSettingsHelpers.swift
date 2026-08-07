@@ -9,7 +9,7 @@
 //    surfaces a status chip for `needsBridge` / `future` controls.
 //  • `ServerSettingsPlannedBanner` — inline "Planned" callout used
 //    inside `SettingsSubsection`s to flag fields vmlx persists today
-//    but Osaurus doesn't yet bridge.
+//    but Intelligence doesn't yet bridge.
 //  • `OptionalIntField` / `OptionalDoubleField` / `OptionalStringField`
 //    — boilerplate-killing wrappers around `StyledSettingsTextField`
 //    for the (very common) "text input mirrors an `Optional<T>` binding"
@@ -93,7 +93,7 @@ struct ServerSettingsCard<Content: View>: View {
 }
 
 /// Inline "Planned" callout used inside `SettingsSubsection`s to flag
-/// fields that vmlx persists today but Osaurus does not yet bridge.
+/// fields that vmlx persists today but Intelligence does not yet bridge.
 struct ServerSettingsPlannedBanner: View {
     let blurb: String
 

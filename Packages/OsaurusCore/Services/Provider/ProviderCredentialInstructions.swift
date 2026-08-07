@@ -276,17 +276,17 @@ public enum ProviderCredentialInstructionsCatalog {
         }
     }
 
-    /// Special entry for the Osaurus-Agent peer path. `.osaurus` has no
+    /// Special entry for the Intelligence-Agent peer path. `.osaurus` has no
     /// `ProviderPreset` because it isn't a third-party vendor — it's
-    /// another Osaurus instance reachable over the local network. The
+    /// another Intelligence instance reachable over the local network. The
     /// sheet still needs an entry so the user can paste a pairing key.
     public static func osaurusAgentEntry() -> ProviderCredentialInstructions {
         ProviderCredentialInstructions(
             providerType: .osaurus,
-            displayName: L("Osaurus Agent"),
+            displayName: L("Intelligence Agent"),
             authMethod: .apiKey,
             getKeyURL: nil,
-            keyFormatHint: L("Paste the pairing API key from the remote Osaurus."),
+            keyFormatHint: L("Paste the pairing API key from the remote Intelligence."),
             storageAuthType: .apiKey,
             presetId: ""
         )

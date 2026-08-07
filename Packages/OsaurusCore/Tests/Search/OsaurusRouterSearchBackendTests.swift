@@ -3,7 +3,7 @@ import Testing
 
 @testable import OsaurusCore
 
-@Suite("Osaurus router search backend", .serialized)
+@Suite("Intelligence router search backend", .serialized)
 struct OsaurusRouterSearchBackendTests {
 
     // MARK: - Request mapping

@@ -54,7 +54,7 @@ struct GitHubTokenPromptSheet: View {
                     text: Text(
                         .init(
                             L(
-                                "Create a token using [this link](https://github.com/settings/tokens/new?description=Osaurus) (no scopes needed)"
+                                "Create a token using [this link](https://github.com/settings/tokens/new?description=Intelligence) (no scopes needed)"
                             )
                         )
                     )

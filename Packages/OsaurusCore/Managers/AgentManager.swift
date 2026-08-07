@@ -458,7 +458,7 @@ public final class AgentManager: ObservableObject {
     /// Update an existing agent
     public func update(_ agent: Agent) {
         guard !agent.isBuiltIn else {
-            print("[Osaurus] Cannot update built-in agent")
+            print("[Intelligence] Cannot update built-in agent")
             return
         }
         var updated = agent
@@ -751,7 +751,7 @@ extension AgentManager {
 
     /// Get the effective sandbox execution config for an agent.
     ///
-    /// The built-in Default ("Osaurus") agent is configuration-only: it never
+    /// The built-in Default ("Intelligence") agent is configuration-only: it never
     /// runs autonomous exec, so it always resolves to `nil` (off) regardless
     /// of any stored value or sandbox availability. Custom agents carry their
     /// own persisted value (seeded ON at creation for new agents where the
@@ -1206,7 +1206,7 @@ extension AgentManager {
         // Handle custom agents
         guard var agent = agent(for: agentId) else { return }
         guard !agent.isBuiltIn else {
-            print("[Osaurus] Cannot update built-in agent's model")
+            print("[Intelligence] Cannot update built-in agent's model")
             return
         }
 

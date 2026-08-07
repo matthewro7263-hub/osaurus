@@ -36,7 +36,7 @@ struct ProviderCredentialPromptSheet: View {
     @State private var preferApiKeyEntry = false
 
     /// Stable preset for branding/help. Falls back to `.custom` when
-    /// the request didn't carry a preset (Osaurus peer agent path) —
+    /// the request didn't carry a preset (Intelligence peer agent path) —
     /// `.custom` skips the gradient and the help-steps card.
     private var preset: ProviderPreset {
         request.preset ?? .custom
@@ -755,7 +755,7 @@ struct ProviderCredentialPromptSheet: View {
     /// inline test button. Sources from `preset.configuration` so the
     /// five legacy-shaped vendors (OpenRouter, DeepSeek, xAI, Venice,
     /// Ollama) each ping their own host. Falls back to the legacy
-    /// provider-type defaults when no preset is attached (Osaurus peer
+    /// provider-type defaults when no preset is attached (Intelligence peer
     /// agent) or when Codex bypasses the preset path.
     private func testConnectionDefaults() -> (
         host: String, providerProtocol: RemoteProviderProtocol, port: Int?, basePath: String

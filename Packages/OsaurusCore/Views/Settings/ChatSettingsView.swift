@@ -316,8 +316,8 @@ struct ChatSettingsView: View {
                 StyledSettingsTextArea(
                     label: "System Prompt",
                     text: $tempSystemPrompt,
-                    placeholder: "Enter the default Osaurus agent's instructions...",
-                    hint: "Optional. Persona for the built-in Osaurus agent."
+                    placeholder: "Enter the default Intelligence agent's instructions...",
+                    hint: "Optional. Persona for the built-in Intelligence agent."
                 )
                 .settingsLandingAnchor("settings.chat.systemPrompt")
 
@@ -366,7 +366,7 @@ struct ChatSettingsView: View {
                 SettingsToggle(
                     title: L("Clipboard Monitoring"),
                     description:
-                        "Automatically detect and offer text from any app as context. Includes 'grab selection' feature when summoning Osaurus.",
+                        "Automatically detect and offer text from any app as context. Includes 'grab selection' feature when summoning Intelligence.",
                     isOn: $tempEnableClipboardMonitoring
                 )
 

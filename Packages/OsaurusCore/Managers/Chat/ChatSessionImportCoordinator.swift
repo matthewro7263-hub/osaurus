@@ -129,7 +129,7 @@ enum ChatSessionImportCoordinator {
         panel.allowedContentTypes = [.json, .zip]
         panel.title = L("Import Conversations")
         panel.message = L(
-            "Choose an export from ChatGPT, Claude, Grok, Gemini, or Open WebUI (.zip or .json), or an Osaurus import JSON file."
+            "Choose an export from ChatGPT, Claude, Grok, Gemini, or Open WebUI (.zip or .json), or an Intelligence import JSON file."
         )
 
         Task { @MainActor in

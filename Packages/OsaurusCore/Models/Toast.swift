@@ -170,7 +170,7 @@ public enum ToastConfigurationStore {
         do {
             return try JSONDecoder().decode(ToastConfiguration.self, from: Data(contentsOf: fileURL))
         } catch {
-            print("[Osaurus] Failed to load toast configuration: \(error)")
+            print("[Intelligence] Failed to load toast configuration: \(error)")
             return .default
         }
     }
@@ -181,7 +181,7 @@ public enum ToastConfigurationStore {
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
             try encoder.encode(configuration).write(to: fileURL, options: [.atomic])
         } catch {
-            print("[Osaurus] Failed to save toast configuration: \(error)")
+            print("[Intelligence] Failed to save toast configuration: \(error)")
         }
     }
 }

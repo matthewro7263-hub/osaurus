@@ -43,7 +43,7 @@ public enum ScheduleStore {
                 let schedule = try decoder.decode(Schedule.self, from: data)
                 schedules.append(schedule)
             } catch {
-                print("[Osaurus] Failed to load schedule from \(file.lastPathComponent): \(error)")
+                print("[Intelligence] Failed to load schedule from \(file.lastPathComponent): \(error)")
             }
         }
 
@@ -62,7 +62,7 @@ public enum ScheduleStore {
             decoder.dateDecodingStrategy = .iso8601
             return try decoder.decode(Schedule.self, from: data)
         } catch {
-            print("[Osaurus] Failed to load schedule \(id): \(error)")
+            print("[Intelligence] Failed to load schedule \(id): \(error)")
             return nil
         }
     }
@@ -84,7 +84,7 @@ public enum ScheduleStore {
             let data = try encoder.encode(scheduleToSave)
             try data.write(to: url, options: [.atomic])
         } catch {
-            print("[Osaurus] Failed to save schedule \(schedule.id): \(error)")
+            print("[Intelligence] Failed to save schedule \(schedule.id): \(error)")
         }
     }
 
@@ -98,7 +98,7 @@ public enum ScheduleStore {
             try FileManager.default.removeItem(at: url)
             return true
         } catch {
-            print("[Osaurus] Failed to delete schedule \(id): \(error)")
+            print("[Intelligence] Failed to delete schedule \(id): \(error)")
             return false
         }
     }

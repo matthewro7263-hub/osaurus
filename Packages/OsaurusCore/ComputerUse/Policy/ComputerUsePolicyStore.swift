@@ -30,7 +30,7 @@ public enum ComputerUsePolicyStore {
                 cached = policy
                 return policy
             } catch {
-                print("[Osaurus] Failed to load AutonomyPolicy: \(error)")
+                print("[Intelligence] Failed to load AutonomyPolicy: \(error)")
             }
         }
         // Never auto-write a default on missing-file (see ToolConfigurationStore).
@@ -108,7 +108,7 @@ public enum ComputerUsePolicyStore {
                 encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
                 try encoder.encode(policy).write(to: url, options: [.atomic])
             } catch {
-                print("[Osaurus] Failed to save AutonomyPolicy: \(error)")
+                print("[Intelligence] Failed to save AutonomyPolicy: \(error)")
             }
         }
     }

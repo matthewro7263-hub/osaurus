@@ -40,21 +40,21 @@ public struct AgentQuickAction: Codable, Identifiable, Sendable, Equatable {
         ]
     }
 
-    /// Setup-oriented quick actions for the built-in Osaurus configuration
+    /// Setup-oriented quick actions for the built-in Intelligence configuration
     /// agent (`Agent.defaultId`). These nudge the user toward the two flows
-    /// unique to this agent — configuring Osaurus and asking how it works —
+    /// unique to this agent — configuring Intelligence and asking how it works —
     /// instead of the generic chat prompts.
     public static var defaultConfigurationQuickActions: [AgentQuickAction] {
         [
             AgentQuickAction(
                 icon: "questionmark.circle",
-                text: L("What can Osaurus do?"),
-                prompt: L("What can Osaurus do? Give me a quick tour of its features.")
+                text: L("What can Intelligence do?"),
+                prompt: L("What can Intelligence do? Give me a quick tour of its features.")
             ),
             AgentQuickAction(
                 icon: "checklist",
                 text: L("What's configured?"),
-                prompt: L("What's currently configured in Osaurus?")
+                prompt: L("What's currently configured in Intelligence?")
             ),
             AgentQuickAction(
                 icon: "arrow.down.circle",
@@ -69,7 +69,7 @@ public struct AgentQuickAction: Codable, Identifiable, Sendable, Equatable {
             AgentQuickAction(
                 icon: "slider.horizontal.3",
                 text: L("Change a setting"),
-                prompt: L("I want to change an Osaurus setting.")
+                prompt: L("I want to change an Intelligence setting.")
             ),
             AgentQuickAction(
                 icon: "person.2",
@@ -271,7 +271,7 @@ public struct Agent: Codable, Identifiable, Sendable, Equatable {
 
     // MARK: - Built-in Agents
 
-    /// Well-known UUID for the default Osaurus agent
+    /// Well-known UUID for the default Intelligence agent
     public static let defaultId = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
 
     /// Check whether an agent ID string refers to the default (built-in) agent.
@@ -282,16 +282,16 @@ public struct Agent: Codable, Identifiable, Sendable, Equatable {
         id == defaultId.uuidString
     }
 
-    /// The default agent — front door to configuring Osaurus.
-    /// Renders as "Osaurus" in chat and the picker; subtitle nudges
+    /// The default agent — front door to configuring Intelligence.
+    /// Renders as "Intelligence" in chat and the picker; subtitle nudges
     /// users toward the configure flow that's unique to this agent.
     /// `avatar: "green"` resolves the bundled `osaurus-avatar-green`
     /// asset in `NativeMessageCellView`/`SharedHeaderComponents`.
     public static var `default`: Agent {
         Agent(
             id: defaultId,
-            name: "Osaurus",
-            description: L("Sets up Osaurus and answers questions about the app"),
+            name: "Intelligence",
+            description: L("Sets up Intelligence and answers questions about the app"),
             systemPrompt: "",
             themeId: nil,
             defaultModel: nil,

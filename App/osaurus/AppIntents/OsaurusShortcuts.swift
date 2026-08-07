@@ -2,7 +2,7 @@
 //  OsaurusShortcuts.swift
 //  osaurus
 //
-//  Declares the App Shortcuts so Osaurus's intents appear in Shortcuts,
+//  Declares the App Shortcuts so Intelligence's intents appear in Shortcuts,
 //  Spotlight, and Siri without the user assembling them by hand.
 //
 
@@ -18,7 +18,7 @@ struct OsaurusShortcuts: AppShortcutsProvider {
             phrases: [
                 "Ask \(.applicationName)"
             ],
-            shortTitle: "Ask Osaurus",
+            shortTitle: "Ask Intelligence",
             systemImageName: "bubble.left.and.text.bubble.right"
         )
         AppShortcut(

@@ -96,7 +96,7 @@ public struct ChatConfiguration: Codable, Equatable, Sendable {
     public var disableTools: Bool
 
     // MARK: - Clipboard Settings
-    /// When true, Osaurus will monitor the clipboard for new text content to offer as context.
+    /// When true, Intelligence will monitor the clipboard for new text content to offer as context.
     public var enableClipboardMonitoring: Bool
 
     // MARK: - Model Warm-Up

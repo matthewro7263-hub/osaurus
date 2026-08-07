@@ -30,7 +30,7 @@ struct EnabledCapabilitiesManifestTests {
     func rendersGroupedToolsWithIntro() throws {
         let groups = [
             Group(
-                pluginDisplay: "Osaurus Mail",
+                pluginDisplay: "Intelligence Mail",
                 skills: [],
                 tools: [
                     Cap(name: "list_messages", description: "List inbox messages"),
@@ -49,7 +49,7 @@ struct EnabledCapabilitiesManifestTests {
         #expect(!rendered.contains("capabilities_load"))
         #expect(!rendered.contains("capabilities_discover"))
         #expect(rendered.contains("Worked example"))
-        #expect(rendered.contains("<plugin: Osaurus Mail>"))
+        #expect(rendered.contains("<plugin: Intelligence Mail>"))
         #expect(rendered.contains("  tool/list_messages — List inbox messages"))
         #expect(rendered.contains("  tool/send_message — Send an email"))
     }
@@ -58,8 +58,8 @@ struct EnabledCapabilitiesManifestTests {
     func skillRendersBeforeTools() throws {
         let groups = [
             Group(
-                pluginDisplay: "Osaurus Browser",
-                skills: [Cap(name: "Osaurus Browser", description: "Drive the browser")],
+                pluginDisplay: "Intelligence Browser",
+                skills: [Cap(name: "Intelligence Browser", description: "Drive the browser")],
                 tools: [Cap(name: "browser_navigate", description: "Open a URL")]
             )
         ]
@@ -67,7 +67,7 @@ struct EnabledCapabilitiesManifestTests {
             SystemPromptTemplates.enabledCapabilitiesManifest(groups: groups)
         )
         #expect(!rendered.contains("(skill)"))
-        let skillIndex = try #require(rendered.range(of: "skill/Osaurus Browser"))
+        let skillIndex = try #require(rendered.range(of: "skill/Intelligence Browser"))
         let toolIndex = try #require(rendered.range(of: "tool/browser_navigate —"))
         #expect(skillIndex.lowerBound < toolIndex.lowerBound)
     }
@@ -190,7 +190,7 @@ struct EnabledCapabilitiesManifestTests {
         let groups = [
             Group(
                 groupId: "osaurus-mail",
-                pluginDisplay: "Osaurus Mail",
+                pluginDisplay: "Intelligence Mail",
                 skills: [Cap(name: "Mail Helper", description: "Email skill")],
                 tools: [
                     Cap(name: "list_messages", description: "List inbox messages"),
@@ -201,7 +201,7 @@ struct EnabledCapabilitiesManifestTests {
         let rendered = try #require(
             SystemPromptTemplates.enabledCapabilitiesManifest(groups: groups, compact: true)
         )
-        #expect(rendered.contains("plugin/osaurus-mail — Osaurus Mail"))
+        #expect(rendered.contains("plugin/osaurus-mail — Intelligence Mail"))
         // Skill-governed plugins are flagged so the model expects the skill.
         #expect(rendered.contains("skill-governed"))
         // The whole point: no per-tool / per-skill id enumeration.

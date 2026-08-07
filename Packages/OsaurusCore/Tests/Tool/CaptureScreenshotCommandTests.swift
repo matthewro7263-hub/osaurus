@@ -146,7 +146,7 @@ struct CaptureScreenshotCommandTests {
                 let blocks = ContentBlock.generateBlocks(
                     from: [restored],
                     streamingTurnId: nil,
-                    agentName: "Osaurus"
+                    agentName: "Intelligence"
                 )
                 let artifacts = blocks.compactMap { block -> SharedArtifact? in
                     if case let .sharedArtifact(artifact) = block.kind {

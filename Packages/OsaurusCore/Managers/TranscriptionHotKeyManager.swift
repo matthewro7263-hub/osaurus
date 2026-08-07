@@ -18,7 +18,7 @@ public final class TranscriptionHotKeyManager {
     private var eventHandlerRef: EventHandlerRef?
     private var action: (() -> Void)?
 
-    /// Unique signature for transcription mode hotkey: 'OTMS' (Osaurus Transcription Mode)
+    /// Unique signature for transcription mode hotkey: 'OTMS' (Intelligence Transcription Mode)
     private let hotKeySignature: OSType = 0x4F54_4D53
 
     /// Unique ID for transcription hotkey (different from chat hotkey ID 100)

@@ -2,7 +2,7 @@
 //  OsaurusRouterSearchBackend.swift
 //  osaurus
 //
-//  Hosted, credit-billed search through the Osaurus Router (`/v1/search`,
+//  Hosted, credit-billed search through the Intelligence Router (`/v1/search`,
 //  `/v1/contents`). Deliberately NOT a `SearchBackend` in the cascade: the
 //  manager tries it first when premium search is gated on, and any failure
 //  or empty result falls through to the existing provider cascade unchanged.

@@ -64,7 +64,7 @@ struct IMessageRPCFramingTests {
         #expect(IMessageCapabilities.parse(statusJSON: Data("{}".utf8)) == nil)
     }
 
-    /// Every RPC method name Osaurus dispatches must exist in the pinned
+    /// Every RPC method name Intelligence dispatches must exist in the pinned
     /// helper's advertised surface; a rename upstream must fail this lock
     /// instead of silently degrading to "method not found" at runtime.
     @Test func dispatchedMethodNamesMatchPinnedHelperSurface() {
@@ -1215,8 +1215,8 @@ struct IMessageConnectionServiceTests {
             #expect(!diagnostics.failures.contains { $0.contains("Sign in to Messages.app") })
             #expect(diagnostics.notes.contains { $0.contains("sign-in state cannot be probed") })
             // Advanced-on + bridge-off must be called out, and the note must
-            // state that Osaurus never disables the protections itself.
-            #expect(diagnostics.notes.contains { $0.contains("Osaurus never changes") })
+            // state that Intelligence never disables the protections itself.
+            #expect(diagnostics.notes.contains { $0.contains("Intelligence never changes") })
             let home = FileManager.default.homeDirectoryForCurrentUser.path
             #expect(!diagnostics.failures.joined().contains(home))
 

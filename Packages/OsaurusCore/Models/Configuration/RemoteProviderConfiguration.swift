@@ -109,8 +109,8 @@ public enum RemoteProviderType: String, Codable, Sendable, CaseIterable {
     case openResponses = "openResponses"  // Open Responses API — used for official OpenAI and any compatible provider
     case openAICodex = "openAICodex"  // ChatGPT/Codex OAuth backend
     case gemini = "gemini"  // Google Gemini API
-    case osaurus = "osaurus"  // Native Osaurus agent — full server-side execution via /agents/{id}/run
-    case osaurusRouter = "osaurusRouter"  // Hosted Osaurus Router — identity-signed billed inference
+    case osaurus = "osaurus"  // Native Intelligence agent — full server-side execution via /agents/{id}/run
+    case osaurusRouter = "osaurusRouter"  // Hosted Intelligence Router — identity-signed billed inference
 
     public var displayName: String {
         switch self {
@@ -120,8 +120,8 @@ public enum RemoteProviderType: String, Codable, Sendable, CaseIterable {
         case .openResponses: return L("Open Responses")
         case .openAICodex: return L("OpenAI Codex")
         case .gemini: return L("Google Gemini")
-        case .osaurus: return L("Osaurus Agent")
-        case .osaurusRouter: return L("Osaurus")
+        case .osaurus: return L("Intelligence Agent")
+        case .osaurusRouter: return L("Intelligence")
         }
     }
 
@@ -179,7 +179,7 @@ public struct RemoteProvider: Codable, Identifiable, Sendable, Equatable {
     // Keys for headers that should be stored in Keychain (not persisted in config)
     public var secretHeaderKeys: [String]
 
-    /// The UUID of the agent on the remote Osaurus server. Only used when providerType == .osaurus.
+    /// The UUID of the agent on the remote Intelligence server. Only used when providerType == .osaurus.
     public var remoteAgentId: UUID?
 
     /// The crypto address (e.g. "0x...") of the remote agent, used to build relay tunnel URLs.
@@ -379,7 +379,7 @@ public struct RemoteProvider: Codable, Identifiable, Sendable, Equatable {
             headers["Authorization"] = "Bearer \(tokens.accessToken)"
         }
 
-        // OpenRouter app attribution: surfaces Osaurus on openrouter.ai/rankings.
+        // OpenRouter app attribution: surfaces Intelligence on openrouter.ai/rankings.
         // Constants live on `OpenRouterOAuthService.Attribution` so the OAuth
         // app row and these per-request headers can't drift. nil-checks let
         // user-supplied customHeaders win.
@@ -590,7 +590,7 @@ public enum RemoteProviderConfigurationStore {
         } catch {
             // Return empty in-memory config but never overwrite the existing file;
             // that would permanently destroy the user's providers.
-            print("[Osaurus] Failed to load RemoteProviderConfiguration: \(error)")
+            print("[Intelligence] Failed to load RemoteProviderConfiguration: \(error)")
             return RemoteProviderConfiguration()
         }
     }
@@ -610,10 +610,10 @@ public enum RemoteProviderConfigurationStore {
                 data,
                 to: url,
                 synchronous: OsaurusPaths.overrideRoot != nil,
-                onError: { print("[Osaurus] Failed to save RemoteProviderConfiguration: \($0)") }
+                onError: { print("[Intelligence] Failed to save RemoteProviderConfiguration: \($0)") }
             )
         } catch {
-            print("[Osaurus] Failed to save RemoteProviderConfiguration: \(error)")
+            print("[Intelligence] Failed to save RemoteProviderConfiguration: \(error)")
         }
     }
 

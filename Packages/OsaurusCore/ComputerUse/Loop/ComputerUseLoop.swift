@@ -241,9 +241,9 @@ public enum ComputerUseLoop {
         let watermark = CompactionWatermark()
 
         // Driver state. Seed the target from the frontmost app, but never
-        // Osaurus itself: `activeWindow()` returns nil when we're frontmost (we
+        // Intelligence itself: `activeWindow()` returns nil when we're frontmost (we
         // can't — and must not — perceive our own UI). Fall back to the app the
-        // user was on right before switching to Osaurus (the same working-app
+        // user was on right before switching to Intelligence (the same working-app
         // hint screen context uses) so a task started from the chat window still
         // has a sensible target instead of none.
         var currentPid: Int32? = await driver.activeWindow()?.pid

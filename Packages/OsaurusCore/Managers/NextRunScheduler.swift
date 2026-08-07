@@ -92,7 +92,7 @@ public final class NextRunScheduler {
         tickerTask = Task { @MainActor [weak self] in
             await self?.runLoop()
         }
-        print("[Osaurus] NextRunScheduler started")
+        print("[Intelligence] NextRunScheduler started")
     }
 
     /// Arm a one-shot start for when the storage key becomes resident.

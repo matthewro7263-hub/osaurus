@@ -103,7 +103,7 @@ public struct Skill: Codable, Identifiable, Sendable, Equatable {
 
     /// All built-in skills
     ///
-    /// Every preset is grounded in real Osaurus tools (like `render_chart`,
+    /// Every preset is grounded in real Intelligence tools (like `render_chart`,
     /// `web_search`, `applescript`) rather than generic persona advice, so
     /// enabling a skill teaches the agent a concrete workflow it could not
     /// otherwise know.
@@ -115,7 +115,7 @@ public struct Skill: Codable, Identifiable, Sendable, Equatable {
                 name: L("Web Researcher"),
                 description: L("Live web research with source retrieval, cross-checking, and cited reports"),
                 version: "1.0.0",
-                author: "Osaurus",
+                author: "Intelligence",
                 category: L("research"),
                 keywords: [
                     "research", "web", "search", "sources", "fact-check", "citations",
@@ -158,7 +158,7 @@ public struct Skill: Codable, Identifiable, Sendable, Equatable {
                 name: L("Content Summarizer"),
                 description: L("Extract key points and create structured summaries"),
                 version: "1.1.0",
-                author: "Osaurus",
+                author: "Intelligence",
                 category: L("productivity"),
                 keywords: [
                     "summarize", "summary", "tldr", "key-points", "digest", "condense",
@@ -203,7 +203,7 @@ public struct Skill: Codable, Identifiable, Sendable, Equatable {
                 name: L("Mac Automator"),
                 description: L("Control and query Mac apps with AppleScript automation"),
                 version: "1.0.0",
-                author: "Osaurus",
+                author: "Intelligence",
                 category: L("automation"),
                 keywords: [
                     "mac", "automate", "applescript", "automation", "app", "safari",
@@ -225,7 +225,7 @@ public struct Skill: Codable, Identifiable, Sendable, Equatable {
                     - Report exactly what was done, including anything skipped or failed
 
                     ## When automation fails
-                    - Check whether the target app is running and whether Osaurus has Automation permission (System Settings → Privacy & Security → Automation)
+                    - Check whether the target app is running and whether Intelligence has Automation permission (System Settings → Privacy & Security → Automation)
                     - Retry once with a simpler, more explicit goal before giving up
                     - Fall back to step-by-step instructions the user can follow manually
                     """,
@@ -240,7 +240,7 @@ public struct Skill: Codable, Identifiable, Sendable, Equatable {
                 name: L("Personal Organizer"),
                 description: L("Manage calendar events, reminders, email, and messages"),
                 version: "1.0.0",
-                author: "Osaurus",
+                author: "Intelligence",
                 category: L("productivity"),
                 keywords: [
                     "calendar", "events", "reminders", "schedule", "email", "mail",
@@ -277,7 +277,7 @@ public struct Skill: Codable, Identifiable, Sendable, Equatable {
                 name: L("Document Builder"),
                 description: L("Create spreadsheets and presentations, delivered as downloadable files"),
                 version: "1.0.0",
-                author: "Osaurus",
+                author: "Intelligence",
                 category: L("productivity"),
                 keywords: [
                     "spreadsheet", "excel", "xlsx", "csv", "presentation", "powerpoint",
@@ -317,7 +317,7 @@ public struct Skill: Codable, Identifiable, Sendable, Equatable {
                 name: L("Workspace Assistant"),
                 description: L("Work on files in the mounted folder: read, edit, search, run commands, commit"),
                 version: "1.0.0",
-                author: "Osaurus",
+                author: "Intelligence",
                 category: L("development"),
                 keywords: [
                     "files", "folder", "workspace", "code", "edit", "shell",
@@ -361,7 +361,7 @@ public struct Skill: Codable, Identifiable, Sendable, Equatable {
                 name: L("Data Keeper"),
                 description: L("Keep structured records across chats in the agent's private database"),
                 version: "1.0.0",
-                author: "Osaurus",
+                author: "Intelligence",
                 category: L("productivity"),
                 keywords: [
                     "track", "log", "record", "database", "expenses", "habits",
@@ -404,7 +404,7 @@ public struct Skill: Codable, Identifiable, Sendable, Equatable {
                 name: L("Autonomous Scheduler"),
                 description: L("Set up recurring or delayed self-running tasks with notifications"),
                 version: "1.0.0",
-                author: "Osaurus",
+                author: "Intelligence",
                 category: L("automation"),
                 keywords: [
                     "schedule", "recurring", "automate", "later", "daily", "weekly",
@@ -441,7 +441,7 @@ public struct Skill: Codable, Identifiable, Sendable, Equatable {
                 name: L("Data Visualizer"),
                 description: L("Render charts and graphs from attached, retrieved, or computed data"),
                 version: "1.0.0",
-                author: "Osaurus",
+                author: "Intelligence",
                 category: L("productivity"),
                 keywords: ["chart", "graph", "plot", "visualize", "bar", "line", "pie", "data", "table", "csv"],
                 instructions: """
@@ -962,7 +962,7 @@ extension Skill {
                 keywords = raw.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }
             }
 
-            // Osaurus-specific metadata
+            // Intelligence-specific metadata
             if let idString = metadata["osaurus-id"] as? String {
                 osaurusId = UUID(uuidString: idString)
             }
@@ -971,9 +971,9 @@ extension Skill {
             pluginId = metadata["osaurus-plugin-id"] as? String
         }
 
-        // Top-level `keywords:` fallback. Osaurus exports keywords under
+        // Top-level `keywords:` fallback. Intelligence exports keywords under
         // `metadata:`, but skill files in the wild commonly put them at the
-        // top level of the frontmatter (the Osaurus legacy format does too).
+        // top level of the frontmatter (the Intelligence legacy format does too).
         // Keywords are the discovery signal `SkillSearchService` indexes, so
         // dropping them on import silently degrades capabilities_discover.
         if keywords.isEmpty, let raw = frontmatter["keywords"] as? String, !raw.isEmpty {
@@ -1014,7 +1014,7 @@ extension Skill {
         return hasName && !hasId
     }
 
-    /// Parse from either Osaurus or Agent Skills format (auto-detect)
+    /// Parse from either Intelligence or Agent Skills format (auto-detect)
     public static func parseAnyFormat(from markdown: String) throws -> Skill {
         if isAgentSkillsFormat(markdown) {
             return try parseAgentSkillsFormat(from: markdown)

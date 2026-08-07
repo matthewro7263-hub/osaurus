@@ -134,7 +134,7 @@ struct LiveVoiceResidentPreencodeIntegrationTests {
         #expect(submittedEmbedding.shape == embedding.shape)
 
         print(
-            "[Osaurus][LiveVoiceIntegration] model=\(resident.name) warm_ms=\(warmMs) samples=\(samples.count) encode_ms=\(result.encodeMs) embedding_shape=\(embedding.shape) composer_submit=preencoded"
+            "[Intelligence][LiveVoiceIntegration] model=\(resident.name) warm_ms=\(warmMs) samples=\(samples.count) encode_ms=\(result.encodeMs) embedding_shape=\(embedding.shape) composer_submit=preencoded"
         )
     }
 

@@ -2,7 +2,7 @@
 //  RemoteAgent.swift
 //  osaurus
 //
-//  Persistent record of an agent that lives on someone ELSE's Osaurus
+//  Persistent record of an agent that lives on someone ELSE's Intelligence
 //  instance, paired to this device via a `osaurus://...?pair=...` deeplink.
 //
 //  The matching `osk-v1` access key is held by `RemoteProviderKeychain`

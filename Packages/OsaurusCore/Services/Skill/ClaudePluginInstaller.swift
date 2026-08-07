@@ -4,7 +4,7 @@
 //
 //  Installs a "Claude plugin" (claude-for-legal-style) discovered by
 //  `GitHubSkillService.fetchPlugins`. Maps each compatible part to its
-//  Osaurus equivalent and tags everything with a stable plugin id so the
+//  Intelligence equivalent and tags everything with a stable plugin id so the
 //  whole bundle can be enabled/disabled/uninstalled as a unit.
 //
 
@@ -117,7 +117,7 @@ public struct ClaudePluginInstallReport: Sendable {
         /// deep-link straight to the provider's editor and `missingKeys`
         /// to tell the user *which* env vars are still empty.
         public var stdioProvidersNeedingConfiguration: [PendingMCPProvider] = []
-        /// Stdio MCP servers we couldn't import because the Osaurus sandbox
+        /// Stdio MCP servers we couldn't import because the Intelligence sandbox
         /// is not available on this machine (older macOS, container runtime
         /// not provisioned, etc.). Imported plugins must run sandboxed; we
         /// don't offer to install them on the host.
@@ -1071,7 +1071,7 @@ public final class ClaudePluginInstaller {
     // MARK: - SKILL.md parsing with free-form fallback
 
     /// Try to parse a SKILL.md the strict way first (YAML frontmatter with
-    /// either `name:` Agent-Skills format or `id:` Osaurus format). When that
+    /// either `name:` Agent-Skills format or `id:` Intelligence format). When that
     /// fails because the file ships *no* frontmatter at all — a real
     /// production pattern in `anthropics/financial-services/plugins/vertical-plugins/*`
     /// where each skill starts with `# <Title>\n\ndescription: …\n\n## Workflow`

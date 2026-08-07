@@ -5,7 +5,7 @@
 //  In-process `NSAppleScript` execution with a hard timeout watchdog. Running
 //  the script in-process (rather than shelling out to `osascript`) is
 //  deliberate: macOS attributes the resulting Automation / Apple Events
-//  permission prompts to "Osaurus", so the first `tell application …` triggers
+//  permission prompts to "Intelligence", so the first `tell application …` triggers
 //  the OS consent dialog for THIS app and subsequent runs are governed by the
 //  user's choice in System Settings → Privacy & Security → Automation. This
 //  mirrors the existing in-process probes in `SystemPermissionService`.
@@ -55,7 +55,7 @@ public struct AppleScriptExecutionResult: Sendable, Equatable {
         case runtimeError
         /// `-1743` / `errAEEventNotPermitted`: the OS Automation permission for
         /// the target app isn't granted. The send itself triggers the system
-        /// consent dialog (attributed to Osaurus); the user must approve it.
+        /// consent dialog (attributed to Intelligence); the user must approve it.
         case permissionRequired
         /// The run exceeded its timeout and was abandoned.
         case timedOut

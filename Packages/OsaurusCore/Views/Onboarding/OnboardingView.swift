@@ -128,7 +128,7 @@ public struct OnboardingView: View {
         }
     }
 
-    /// One-shot background warm-up for the managed Osaurus brain: create the
+    /// One-shot background warm-up for the managed Intelligence brain: create the
     /// identity master key when missing (fresh install — no biometric prompt),
     /// then attempt the Router connect so its model catalog is populated by
     /// the time `pinSelectedBrainModel` looks for it. Safe to run for users
@@ -553,7 +553,7 @@ public struct OnboardingView: View {
     }
 
     /// Pin the new/active agent's default model to the brain source the user
-    /// committed to on the Configure AI step (managed Osaurus, local, or
+    /// committed to on the Configure AI step (managed Intelligence, local, or
     /// bring-your-own-key). Selecting local or a provider never routes through
     /// the hosted router implicitly — only the explicit `.osaurus` choice pins
     /// a router model.

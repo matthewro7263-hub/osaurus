@@ -368,7 +368,7 @@ public struct SearchProviderConfiguration: Codable, Sendable {
     public var routing: [String: [String]]
     /// One-time migration marker: keys copied from the osaurus.search plugin.
     public var pluginKeysMigrated: Bool
-    /// Premium (Osaurus Router hosted) search preference. `nil` = never
+    /// Premium (Intelligence Router hosted) search preference. `nil` = never
     /// resolved: the manager decides the default once — on for free-only
     /// setups, off when the user already runs their own API/custom providers
     /// (their configuration is never reordered or overridden). Explicit user
@@ -461,7 +461,7 @@ public enum SearchProviderConfigurationStore {
             do {
                 return try JSONDecoder().decode(SearchProviderConfiguration.self, from: Data(contentsOf: url))
             } catch {
-                print("[Osaurus] Failed to load SearchProviderConfiguration: \(error)")
+                print("[Intelligence] Failed to load SearchProviderConfiguration: \(error)")
             }
         }
         // Never auto-save the default here (see MCPProviderConfigurationStore.load);
@@ -477,7 +477,7 @@ public enum SearchProviderConfigurationStore {
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
             try encoder.encode(configuration).write(to: url, options: [.atomic])
         } catch {
-            print("[Osaurus] Failed to save SearchProviderConfiguration: \(error)")
+            print("[Intelligence] Failed to save SearchProviderConfiguration: \(error)")
         }
     }
 }

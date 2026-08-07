@@ -45,7 +45,7 @@ public struct CapabilityClaimsTranscript: Sendable, Codable {
 
     /// Every tool call across every iteration, flattened in order. The
     /// deterministic transcript checks (did it discover/load before
-    /// answering; did it load `Osaurus Browser` before browser tools)
+    /// answering; did it load `Intelligence Browser` before browser tools)
     /// read this list.
     public let toolCalls: [ToolInvocation]
     /// The model's last assistant message text — what the LLM judge

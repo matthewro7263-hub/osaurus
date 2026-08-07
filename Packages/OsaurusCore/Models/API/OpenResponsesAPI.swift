@@ -702,7 +702,7 @@ public struct ResponseInProgressEvent: Codable, Sendable {
 /// response.output_item.added event
 public struct OutputItemAddedEvent: Codable, Sendable {
     public let type: String
-    public let sequence_number: Int?  // Osaurus-specific; not sent by all providers (e.g. OpenAI)
+    public let sequence_number: Int?  // Intelligence-specific; not sent by all providers (e.g. OpenAI)
     public let output_index: Int
     public let item: OpenResponsesOutputItem
 
@@ -819,7 +819,7 @@ public struct ReasoningSummaryTextDoneEvent: Codable, Sendable {
 /// response.output_item.done event
 public struct OutputItemDoneEvent: Codable, Sendable {
     public let type: String
-    public let sequence_number: Int?  // Osaurus-specific; not sent by all providers (e.g. OpenAI)
+    public let sequence_number: Int?  // Intelligence-specific; not sent by all providers (e.g. OpenAI)
     public let output_index: Int
     public let item: OpenResponsesOutputItem
 
@@ -834,7 +834,7 @@ public struct OutputItemDoneEvent: Codable, Sendable {
 /// response.function_call_arguments.delta event
 public struct FunctionCallArgumentsDeltaEvent: Codable, Sendable {
     public let type: String
-    public let sequence_number: Int?  // Osaurus-specific; not sent by all providers (e.g. OpenAI)
+    public let sequence_number: Int?  // Intelligence-specific; not sent by all providers (e.g. OpenAI)
     public let item_id: String?  // Not present in all provider implementations
     public let output_index: Int
     public let call_id: String
@@ -853,7 +853,7 @@ public struct FunctionCallArgumentsDeltaEvent: Codable, Sendable {
 /// response.function_call_arguments.done event
 public struct FunctionCallArgumentsDoneEvent: Codable, Sendable {
     public let type: String
-    public let sequence_number: Int?  // Osaurus-specific; not sent by all providers (e.g. OpenAI)
+    public let sequence_number: Int?  // Intelligence-specific; not sent by all providers (e.g. OpenAI)
     public let item_id: String?  // Not present in all provider implementations
     public let output_index: Int
     public let call_id: String

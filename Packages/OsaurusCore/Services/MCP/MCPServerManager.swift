@@ -38,7 +38,7 @@ final class MCPServerManager {
 
         // Initialize MCP server
         let srv = MCP.Server(
-            name: "Osaurus MCP",
+            name: "Intelligence MCP",
             version: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0",
             capabilities: .init(
                 // We expose tools only; resources/prompts omitted for now
@@ -143,7 +143,7 @@ final class MCPServerManager {
                     return .init(
                         content: [
                             .text(
-                                text: "Tool '\(params.name)' is disabled in Osaurus settings.",
+                                text: "Tool '\(params.name)' is disabled in Intelligence settings.",
                                 annotations: nil,
                                 _meta: nil
                             )
@@ -182,7 +182,7 @@ final class MCPServerManager {
     nonisolated static func externalMCPDenialMessage(for name: String) -> String? {
         guard ToolRegistry.externallyDeniedToolNames.contains(name) else { return nil }
         return "'\(name)' is not available to external callers. "
-            + "App-only tools can only run from the Osaurus app."
+            + "App-only tools can only run from the Intelligence app."
     }
 
     static func executeToolAsExternalMCP(name: String, argumentsJSON: String) async throws -> String {
@@ -191,7 +191,7 @@ final class MCPServerManager {
                 domain: "ToolRegistry",
                 code: 5,
                 userInfo: [
-                    NSLocalizedDescriptionKey: "Tool '\(name)' is disabled in Osaurus settings."
+                    NSLocalizedDescriptionKey: "Tool '\(name)' is disabled in Intelligence settings."
                 ]
             )
         }

@@ -749,7 +749,7 @@ final class SlackAPIClient: SlackAPIClientProtocol, @unchecked Sendable {
         var request = URLRequest(url: url)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue("Osaurus Slack Native Agent Channel", forHTTPHeaderField: "User-Agent")
+        request.setValue("Intelligence Slack Native Agent Channel", forHTTPHeaderField: "User-Agent")
         request.timeoutInterval = 30
         return request
     }

@@ -16,7 +16,7 @@
 //  Stop sequences are enforced by the library via
 //  `GenerateParameters.extraStopStrings` — when one matches, the engine
 //  emits the safe prefix as `.chunk`, halts generation, and finishes the
-//  stream with `.info(stopReason: .stop)`. Osaurus never inspects chunk
+//  stream with `.info(stopReason: .stop)`. Intelligence never inspects chunk
 //  text for stop-sequence matches.
 //
 
@@ -35,7 +35,7 @@ enum GenerationEventMapper {
     /// - Parameter modelName: The resolved model id; used for telemetry only.
     ///   Family-specific reasoning repair belongs in the vmlx parser/template
     ///   path, not in this translation layer. If a no-thinking request still
-    ///   emits `.reasoning`, Osaurus keeps that signal visible for root-cause
+    ///   emits `.reasoning`, Intelligence keeps that signal visible for root-cause
     ///   debugging instead of merging or suppressing it.
     static func map(
         events: AsyncStream<Generation>,

@@ -3,7 +3,7 @@
 //  osaurus
 //
 //  macOS gives GUI apps a soft file-descriptor limit of 256 by default.
-//  Osaurus routinely holds far more: SwiftNIO event loops (one kqueue +
+//  Intelligence routinely holds far more: SwiftNIO event loops (one kqueue +
 //  wakeup pipe per loop across three groups), per-plugin SQLite databases,
 //  chat/memory/knowledge stores, model bundle files, sockets for local and
 //  remote providers, and Bonjour browsing. Under load the default limit is

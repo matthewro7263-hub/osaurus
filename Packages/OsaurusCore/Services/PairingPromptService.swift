@@ -137,7 +137,7 @@ enum PairingPromptService {
                 }
             }
 
-            // Local monitor only — it fires solely while Osaurus is the active
+            // Local monitor only — it fires solely while Intelligence is the active
             // app and this panel is key. The previous GLOBAL monitor approved
             // pairing on a stray Return even when another app was focused,
             // which (combined with the unauthenticated `/pair` endpoint) let a

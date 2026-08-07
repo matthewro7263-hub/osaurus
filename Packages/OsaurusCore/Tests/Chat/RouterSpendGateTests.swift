@@ -2,7 +2,7 @@
 //  RouterSpendGateTests.swift
 //  osaurusTests
 //
-//  Pins the Osaurus Router credit-spend gate for HTTP-origin requests:
+//  Pins the Intelligence Router credit-spend gate for HTTP-origin requests:
 //  key-less loopback callers must not be able to route master-key-signed,
 //  credit-billed requests through the Router unless the user explicitly
 //  opted in. Keyed callers and app-internal sources are unaffected.
@@ -75,7 +75,7 @@ struct RouterSpendGateTests {
 
     private func makeRouterService() -> RemoteProviderService {
         let provider = RemoteProvider(
-            name: "Osaurus",
+            name: "Intelligence",
             host: "127.0.0.1",
             providerProtocol: .http,
             port: 1,  // Unroutable port: reaching the network at all is a bug.

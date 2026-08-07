@@ -159,7 +159,7 @@ public enum ProviderNetworkDiagnostics {
                 title: L("Connection"),
                 value: L("Disabled"),
                 severity: .warning,
-                detail: L("Osaurus will not auto-connect this provider while the row toggle is off."),
+                detail: L("Intelligence will not auto-connect this provider while the row toggle is off."),
                 action: L("Enable the provider before testing or selecting its models.")
             )
         }
@@ -220,7 +220,7 @@ public enum ProviderNetworkDiagnostics {
                 title: L("Authentication"),
                 value: L("None"),
                 severity: .info,
-                detail: L("No Authorization header is added by Osaurus.")
+                detail: L("No Authorization header is added by Intelligence.")
             )
         case .apiKey:
             if apiKeyPresent {
@@ -393,7 +393,7 @@ public enum ProviderNetworkDiagnostics {
             return ProviderDiagnosticRow(
                 id: "models",
                 title: L("Model discovery"),
-                value: L("Remote Osaurus"),
+                value: L("Remote Intelligence"),
                 severity: .info,
                 detail: L("Tries the remote /models endpoint, then falls back to the agent default model.")
             )
@@ -401,7 +401,7 @@ public enum ProviderNetworkDiagnostics {
             return ProviderDiagnosticRow(
                 id: "models",
                 title: L("Model discovery"),
-                value: L("Osaurus Router"),
+                value: L("Intelligence Router"),
                 severity: .info,
                 detail: L("Fetches the signed router /models endpoint and hides stale prices.")
             )
@@ -472,7 +472,7 @@ public enum ProviderNetworkDiagnostics {
                 title: L("Connection"),
                 value: L("Disabled"),
                 severity: .warning,
-                detail: L("Osaurus will not auto-connect this MCP provider while the row toggle is off.")
+                detail: L("Intelligence will not auto-connect this MCP provider while the row toggle is off.")
             )
         }
         if state?.isConnecting == true {
@@ -547,7 +547,7 @@ public enum ProviderNetworkDiagnostics {
                 title: L("Authentication"),
                 value: L("None"),
                 severity: .info,
-                detail: L("No Authorization header is added by Osaurus.")
+                detail: L("No Authorization header is added by Intelligence.")
             )
         case .bearerToken:
             if bearerTokenPresent || hasMCPHeaderCredential(provider) {
@@ -618,7 +618,7 @@ public enum ProviderNetworkDiagnostics {
                 severity: provider.executionHost == .host ? .warning : .ok,
                 detail: provider.executionHost == .host
                     ? L("Runs directly on the macOS host. Prefer full executable paths for GUI-launched apps.")
-                    : L("Runs inside the Osaurus sandbox and is torn down on disconnect.")
+                    : L("Runs inside the Intelligence sandbox and is torn down on disconnect.")
             )
         }
     }

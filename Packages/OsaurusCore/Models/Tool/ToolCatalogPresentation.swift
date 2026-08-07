@@ -82,7 +82,7 @@ enum ToolCatalogPresentation {
     }
 
     /// Maps an exact exposure source to its catalog section. Runtime-managed
-    /// (folder/sandbox execution) and native tools ship with Osaurus, so they
+    /// (folder/sandbox execution) and native tools ship with Intelligence, so they
     /// read as Built-in; unknown sources fall back to Built-in rather than
     /// inventing a technical bucket the user can't act on.
     static func section(for source: ToolExposureSource) -> ToolCatalogSection {

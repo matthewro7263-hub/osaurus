@@ -4,7 +4,7 @@
 //
 //  Pins the included temporary-Cloud contract for onboarding's local-first
 //  path: while the agent's pinned local default downloads, the session
-//  automatically selects a lower-cost, tool-capable Osaurus Router model
+//  automatically selects a lower-cost, tool-capable Intelligence Router model
 //  (never Foundation, another local model, or BYOK); an unreachable Router
 //  leaves the selection empty with recovery UI; and once the local download
 //  lands, the pinned local model replaces the temporary Cloud session.
@@ -37,7 +37,7 @@ struct ChatSessionLocalSetupBridgeTests {
         ModelPickerItem(
             id: id,
             displayName: "Test Cloud Model",
-            source: .remote(providerName: "Osaurus", providerId: Self.routerProviderId),
+            source: .remote(providerName: "Intelligence", providerId: Self.routerProviderId),
             inputPriceMicroPerMTok: inputPrice,
             outputPriceMicroPerMTok: outputPrice,
             contextLength: contextLength,

@@ -69,7 +69,7 @@ struct OpenRouterOAuthServiceTests {
         let attribution = OpenRouterOAuthService.Attribution.self
         #expect(attribution.host == "openrouter.ai")
         #expect(attribution.referrerURL == "https://osaurus.ai")
-        #expect(attribution.appTitle == "Osaurus")
+        #expect(attribution.appTitle == "Intelligence")
         #expect(attribution.refererHeader == "HTTP-Referer")
         #expect(attribution.titleHeader == "X-OpenRouter-Title")
     }

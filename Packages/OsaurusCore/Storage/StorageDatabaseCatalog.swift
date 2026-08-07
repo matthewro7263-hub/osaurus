@@ -47,7 +47,7 @@ public enum StorageDatabaseCatalog {
             // the core databases and `StorageMaintenance` PRAGMA passes
             // can find them when the handles register themselves.
             .init(label: "scheduler", path: OsaurusPaths.schedulerDatabaseFile().path),
-            // On-device Osaurus Router billing ledger. Encrypted with the
+            // On-device Intelligence Router billing ledger. Encrypted with the
             // shared storage key, so it must be rekeyed alongside the core
             // databases on rotation and included in plaintext export.
             .init(label: "router billing", path: OsaurusPaths.billingLedgerDatabaseFile().path),

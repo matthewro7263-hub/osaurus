@@ -56,16 +56,16 @@ struct GenerationParameters: Sendable {
     /// Optional TTFT trace for diagnostic timing instrumentation.
     let ttftTrace: TTFTTrace?
     /// Stable per-logical-step idempotency token. Forwarded only to the
-    /// Osaurus Router (in the request body, so it's covered by the request
+    /// Intelligence Router (in the request body, so it's covered by the request
     /// signature) so connect-phase and transient agent-loop retries that re-POST
     /// the same logical request can be deduped server-side and billed once.
     /// Local services and other remotes ignore it.
     let idempotencyKey: String?
-    /// True when the request targets a paired/discovered remote Osaurus *agent*
+    /// True when the request targets a paired/discovered remote Intelligence *agent*
     /// (Mode 2). `RemoteProviderService` uses this to route `.osaurus` providers
     /// to `/agents/{address}/run` (the agent runs fully server-side) rather than
     /// the plain OpenAI-compatible `/chat/completions` inference path (Mode 1).
-    /// Ignored by local services and non-Osaurus remotes.
+    /// Ignored by local services and non-Intelligence remotes.
     let runAsRemoteAgent: Bool
     /// When true, model-load and prefill progress are not surfaced through
     /// `InferenceProgressManager` (background warm-up requests).
@@ -464,7 +464,7 @@ enum StreamingStatsHint: Sendable {
     }
 }
 
-/// In-band signaling for an Osaurus Router billing event (cost, token counts,
+/// In-band signaling for an Intelligence Router billing event (cost, token counts,
 /// status). Shares the `\u{FFFE}` sentinel so the generic filters in HTTP
 /// handlers and `ChatEngine` drop it from visible output and skip it for token
 /// counting; `ChatView` decodes it to keep + surface the billed turn and to

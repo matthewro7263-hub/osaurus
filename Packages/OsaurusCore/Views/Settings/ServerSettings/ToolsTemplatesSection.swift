@@ -4,7 +4,7 @@
 //
 //  Tool / template controls for the Server → Settings tab. Parser overrides
 //  are engine-wired through vmlx; host/tool-provider controls are persisted
-//  but remain planned until their Osaurus bridges land.
+//  but remain planned until their Intelligence bridges land.
 //
 
 @preconcurrency import MLXLMCommon
@@ -29,7 +29,7 @@ struct ToolsTemplatesSection: View {
             )
             ServerSettingsPlannedBanner(
                 blurb:
-                    "Implicit tool-choice policy is persisted only; OpenAI-compatible requests still use the request's explicit tool choice and Osaurus chat-agent policy."
+                    "Implicit tool-choice policy is persisted only; OpenAI-compatible requests still use the request's explicit tool choice and Intelligence chat-agent policy."
             )
 
             OptionalStringField(

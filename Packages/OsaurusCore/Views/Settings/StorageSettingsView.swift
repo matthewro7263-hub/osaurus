@@ -4,7 +4,7 @@
 //
 //  Settings panel for everything disk-related: where models live (models
 //  directory + external model sources) and how local data is protected at
-//  rest. Osaurus stores local data **plaintext by default** (relying on
+//  rest. Intelligence stores local data **plaintext by default** (relying on
 //  FileVault) for reliability, and lets users opt in to SQLCipher encryption
 //  here. The panel reflects the *actual* on-disk state, exposes the opt-in
 //  toggle (which runs a live migration), and keeps the plaintext-backup /
@@ -83,7 +83,7 @@ public struct StorageSettingsView: View {
             Button(localized: "Enable encryption") { applyEncryption(true) }
         } message: {
             Text(
-                "Osaurus will re-encrypt your databases and attachments with SQLCipher using a key stored in your macOS Keychain. If that key is ever lost — wiping the Keychain, re-signing the app, or migrating Macs without iCloud Keychain — the encrypted data becomes unrecoverable. Keep a plaintext backup if you rely on this data.",
+                "Intelligence will re-encrypt your databases and attachments with SQLCipher using a key stored in your macOS Keychain. If that key is ever lost — wiping the Keychain, re-signing the app, or migrating Macs without iCloud Keychain — the encrypted data becomes unrecoverable. Keep a plaintext backup if you rely on this data.",
                 bundle: .module
             )
         }
@@ -116,7 +116,7 @@ public struct StorageSettingsView: View {
     private var headerView: some View {
         ManagerHeader(
             title: L("Storage"),
-            subtitle: L("Where Osaurus stores data on disk — and how it's protected")
+            subtitle: L("Where Intelligence stores data on disk — and how it's protected")
         )
     }
 
@@ -571,7 +571,7 @@ public struct StorageSettingsView: View {
                 ? L("New data will be encrypted with SQLCipher.")
                 : L("New data will be stored as plaintext, protected by FileVault.")
         case .plaintext:
-            return L("Your databases are not encrypted by Osaurus. macOS FileVault protects them at rest.")
+            return L("Your databases are not encrypted by Intelligence. macOS FileVault protects them at rest.")
         case .encrypted:
             return L("Your databases are encrypted with a 256-bit key in your macOS Keychain.")
         case .mixed:

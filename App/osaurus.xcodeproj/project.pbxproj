@@ -465,7 +465,8 @@
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = osaurus/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Osaurus;
+				INFOPLIST_KEY_CFBundleDisplayName = Intelligence;
+				INFOPLIST_KEY_CFBundleName = Intelligence;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -526,7 +527,8 @@
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = osaurus/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Osaurus;
+				INFOPLIST_KEY_CFBundleDisplayName = Intelligence;
+				INFOPLIST_KEY_CFBundleName = Intelligence;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;

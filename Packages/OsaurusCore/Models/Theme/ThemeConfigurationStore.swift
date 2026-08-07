@@ -15,7 +15,7 @@ public enum ThemeConfigurationStore {
     /// Increment this whenever the built-in Dark/Light palette changes so existing
     /// installations receive the updated colors on next launch.
     /// Schema 6: canonical Dark/Light switched to the native macOS palettes
-    /// (issue #2102); previous palettes retained as Osaurus Dark/Light presets.
+    /// (issue #2102); previous palettes retained as Intelligence Dark/Light presets.
     private static let currentBuiltInThemeSchema = 6
     private static var builtInThemesInstalled = false
 
@@ -102,7 +102,7 @@ public enum ThemeConfigurationStore {
             let data = try encodeTheme(normalizedTheme)
             try data.write(to: themeFileURL(for: normalizedTheme.metadata.id), options: .atomic)
         } catch {
-            print("[Osaurus] Failed to save theme '\(theme.metadata.name)': \(error)")
+            print("[Intelligence] Failed to save theme '\(theme.metadata.name)': \(error)")
         }
     }
 

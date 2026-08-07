@@ -85,7 +85,7 @@ struct ModelReasoningCapabilities: Sendable, Equatable, Hashable {
 
     /// Human label for a wire effort id, matching ChatGPT's own naming.
     /// Unknown ids fall back to a capitalized form so a new catalog level
-    /// still renders sensibly before Osaurus learns its label.
+    /// still renders sensibly before Intelligence learns its label.
     static func displayLabel(forEffort effort: String) -> String {
         switch effort.lowercased() {
         case "none": return L("None")
@@ -365,7 +365,7 @@ enum ModelProfileRegistry {
 /// - instruct: compatibility id for the direct/off rail (`enable_thinking=false`)
 /// - low/high/max: exact 0731 reasoning-effort values passed through to vmlx
 ///
-/// The bundle default is low. The default below is display-only; Osaurus does
+/// The bundle default is low. The default below is display-only; Intelligence does
 /// not synthesize it into requests, so bundle metadata remains authoritative.
 struct DSV4ReasoningProfile: ModelProfile {
     static let displayName = "DSV4 Reasoning"
@@ -633,7 +633,7 @@ struct QwenThinkingProfile: ModelProfile {
 
 /// Nemotron-3 reasoning models — `model_type=nemotron_h` hybrid
 /// Mamba+Attn+MoE bundles whose chat template reads an `enable_thinking`
-/// kwarg. Osaurus exposes the toggle but does not synthesize a reasoning mode:
+/// kwarg. Intelligence exposes the toggle but does not synthesize a reasoning mode:
 /// absent values must let the model bundle/runtime decide.
 ///
 /// Match excludes `coder` variants (none ship today, but mirroring
@@ -666,7 +666,7 @@ struct NemotronThinkingProfile: ModelProfile {
 
 /// Poolside Laguna (`model_type=laguna`) — agentic-coding 33B/3B-active MoE
 /// whose chat template (`laguna_glm_thinking_v5/chat_template.jinja`)
-/// reads an `enable_thinking` Jinja kwarg. Osaurus exposes the native switch
+/// reads an `enable_thinking` Jinja kwarg. Intelligence exposes the native switch
 /// while leaving absent values absent so the shipped template/runtime defaults
 /// remain authoritative. Laguna S 2.1 serving defaults thinking ON through
 /// `default_chat_template_kwargs.enable_thinking=true`, so the display default
@@ -753,7 +753,7 @@ struct Hy3ReasoningProfile: ModelProfile {
 
 /// Ling-2.6 Flash (`model_type=bailing_hybrid`) uses an `enable_thinking`
 /// chat-template kwarg to choose the upstream "detailed thinking on/off"
-/// directive. Osaurus only forwards explicit user/API choices; this is a
+/// directive. Intelligence only forwards explicit user/API choices; this is a
 /// template mode, not an output-shaping guard.
 struct LingRuntimeProfile: ModelProfile {
     static let displayName = "Ling"

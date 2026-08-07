@@ -221,7 +221,7 @@ struct ComputerUseConfirmOverlay: View {
                     Spacer()
                 }
                 Text(
-                    "A screenshot would help here, but this agent uses a cloud model. Osaurus masks sensitive text on-device first, then sends the redacted image. Screenshots need Screen Recording permission.",
+                    "A screenshot would help here, but this agent uses a cloud model. Intelligence masks sensitive text on-device first, then sends the redacted image. Screenshots need Screen Recording permission.",
                     bundle: .module
                 )
                 .font(.system(size: 12))

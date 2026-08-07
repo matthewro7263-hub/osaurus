@@ -213,7 +213,7 @@ struct CacheSection: View {
             )
             OptionalStringField(
                 label: "Disk Cache Directory",
-                placeholder: "Blank = Osaurus default cache directory",
+                placeholder: "Blank = Intelligence default cache directory",
                 help: "Absolute path or ~/... path for persisted disk-cache entries.",
                 value: $draft.cache.blockDisk.directory
             )

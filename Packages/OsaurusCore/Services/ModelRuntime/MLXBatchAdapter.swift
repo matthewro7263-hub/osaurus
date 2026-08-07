@@ -9,7 +9,7 @@
 //  library — osaurus passes `stopSequences` as `GenerateParameters.extraStopStrings`
 //  and forwards every event through `GenerationEventMapper`.
 //
-//  Osaurus no longer parses tool calls, reasoning, or stop sequences at the
+//  Intelligence no longer parses tool calls, reasoning, or stop sequences at the
 //  app layer — see `GenerationEventMapper` for the trivial `Generation` →
 //  `ModelRuntimeEvent` bridge that replaced the old token-level
 //  `StreamAccumulator` and app-side `StopSequenceBuffer`.
@@ -122,7 +122,7 @@ struct MLXBatchAdapter {
 
         // Merge order (per-request always wins): per-request →
         // model-shipped defaults → server runtime defaults → vmlx engine
-        // defaults. Osaurus must not invent sampler defaults.
+        // defaults. Intelligence must not invent sampler defaults.
         let runtimeTopP: Float? = runtimeDefaults.topP.map { Float($0) }
         let runtimeMinP: Float? = runtimeDefaults.minP.map { Float($0) }
         let runtimeTopK: Int? = runtimeDefaults.topK

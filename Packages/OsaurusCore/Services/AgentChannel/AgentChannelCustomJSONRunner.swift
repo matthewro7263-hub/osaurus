@@ -183,7 +183,7 @@ enum AgentChannelCustomJSONRunnerError: LocalizedError, Equatable, Sendable {
         case .writeDisabled(let connectionId):
             return "Custom JSON channel `\(connectionId)` write access is disabled."
         case .sendConfirmationRequired:
-            return "`confirm_send` must be true before Osaurus posts through a custom JSON channel."
+            return "`confirm_send` must be true before Intelligence posts through a custom JSON channel."
         case .emptyMessage:
             return "Custom JSON channel message content must not be empty."
         case .httpStatus(let statusCode, let body, _):

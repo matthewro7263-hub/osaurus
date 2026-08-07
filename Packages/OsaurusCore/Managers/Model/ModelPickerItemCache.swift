@@ -293,7 +293,7 @@ final class ModelPickerItemCache: ObservableObject {
                 && providerInfo.host.lowercased() == officialOpenAIHost
             for modelId in providerInfo.models {
                 let item: ModelPickerItem
-                // Osaurus Router models carry pricing/provider/context metadata;
+                // Intelligence Router models carry pricing/provider/context metadata;
                 // enrich the picker row when we have it, otherwise fall back to a
                 // plain remote item (e.g. before the catalog has loaded).
                 if isOsaurusRouter,

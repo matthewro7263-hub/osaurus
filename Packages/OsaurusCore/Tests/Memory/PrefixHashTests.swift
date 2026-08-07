@@ -157,7 +157,7 @@ struct PrefixHashTests {
 
     @Test func staticPrefixCacheHintIncludesToolSchemaPayload() {
         let manifest = PromptManifest(sections: [
-            .static(id: "platform", label: "Platform", content: "You are Osaurus.")
+            .static(id: "platform", label: "Platform", content: "You are Intelligence.")
         ])
         let compact = fixtureTool(description: "Mutates context.")
         let full = fixtureTool(

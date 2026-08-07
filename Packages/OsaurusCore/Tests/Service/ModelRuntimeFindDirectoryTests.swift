@@ -630,7 +630,7 @@ struct ModelRuntimeFindDirectoryTests {
         // Step 3.7 JANGTQ_K bundles can declare the runtime via
         // `format: "jangtq"` while omitting the older top-level
         // `weight_format` key. vmlx infers the JANGTQ route from the
-        // sidecar/codebook; Osaurus preflight must not block that valid
+        // sidecar/codebook; Intelligence preflight must not block that valid
         // bundle shape.
         let json = #"{"format":"jangtq"}"#
         try Data(json.utf8).write(to: dir.appendingPathComponent("jang_config.json"))

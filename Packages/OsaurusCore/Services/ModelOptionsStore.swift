@@ -83,7 +83,7 @@ final class ModelOptionsStore: ObservableObject {
         let legacyDefaultKeys: Set<String> = ["disableThinking", "reasoningEffort"]
         let defaults = ModelProfileRegistry.defaults(for: modelId)
         return values.filter { key, value in
-            // Before stored options were versioned, Osaurus injected
+            // Before stored options were versioned, Intelligence injected
             // `instruct` for every DSV4 model. The 0731 bundle's native
             // default is now `low`, so comparing only against the current
             // profile default would misclassify that historical injected

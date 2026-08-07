@@ -257,7 +257,7 @@ final class ImageSubagentKind: SubagentKind, @unchecked Sendable {
         case .remoteProvider:
             return model.providerName
         case .osaurusCloud:
-            return "Osaurus Cloud"
+            return "Intelligence Cloud"
         }
     }
 

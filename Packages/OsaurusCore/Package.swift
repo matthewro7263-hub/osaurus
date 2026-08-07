@@ -36,7 +36,7 @@ let package = Package(
         .package(url: "https://github.com/sparkle-project/Sparkle", from: "2.7.0"),
         // Single consolidated vMLX dependency. This package vendors the MLX,
         // MLXLMCommon, MLXLLM, MLXVLM, Tokenizers, Jinja, cache, parser,
-        // MTP, and media-runtime surfaces Osaurus previously pulled from
+        // MTP, and media-runtime surfaces Intelligence previously pulled from
         // separate MLX, inference, tokenizer, template, and transformer pins.
         // Pinned to vmlx main with the deterministic qwen3.5 RMSNorm-shift fix,
         // the full order-dependent-load sweep (#108, no more ~7.5% degenerate
@@ -89,7 +89,7 @@ let package = Package(
         // vmlx-swift#179 additionally recovers Qwen XML plain bracket lists
         // only for schema-declared array<string> tool arguments and routes
         // Gemma's decoded thought-channel opener into reasoning. The static
-        // prefix hint revision lets Osaurus's byte-stable system prefix seed
+        // prefix hint revision lets Intelligence's byte-stable system prefix seed
         // SSD cache boundaries even when mutable DB/tool state changes later
         // in the same rendered system message. The disk-recency revision
         // refreshes accepted KV + recurrent companion groups on restore so
@@ -111,7 +111,7 @@ let package = Package(
         // vmlx-swift#192 adds Nanbeige 4.2's looped-transformer runtime with
         // 44 loop-layer KV slots and fail-closed runtime-contract validation.
         // The atomic BatchEngine-capacity revision exposes one actor-consistent
-        // configured/active/pending snapshot so Osaurus can report and plan
+        // configured/active/pending snapshot so Intelligence can report and plan
         // subagent waves against the engine that actually owns admission.
         // vmlx-swift#195 keeps Qwen 3.5 / Ornith GatedDelta recurrent state
         // in float32 across cold and restored prefix partitions, and admits
@@ -167,7 +167,7 @@ let package = Package(
         // a paired osaurus-side TTSService update.
         .package(url: "https://github.com/FluidInference/FluidAudio.git", "0.14.0" ..< "0.14.2"),
         // VecturaKit 6.x keeps embedding providers out of the core package.
-        // Osaurus supplies its embedder from vmlx-swift so the app graph does
+        // Intelligence supplies its embedder from vmlx-swift so the app graph does
         // not pull a second transformer/embedding stack.
         .package(
             url: "https://github.com/rryam/VecturaKit",
@@ -215,7 +215,7 @@ let package = Package(
         //          below keeps the C compilation path aligned.
         //     `sqlite3.c` itself inlines its own copy of the header
         //     text, so FTS5's SQL-level functionality keeps working;
-        //     we only hide the C-extension API, which Osaurus
+        //     we only hide the C-extension API, which Intelligence
         //     doesn't use.
         //     `Tests/Storage/SQLCipherVendorGuardTests.swift` asserts
         //     the header guard, umbrella define, and cSettings flag
@@ -223,7 +223,7 @@ let package = Package(
         //
         // ⚠️  sqlite3ext.h collision. Newer macOS SDKs append fields
         //     to `sqlite3_api_routines` before our pinned SQLCipher
-        //     adopts that SQLite version. Osaurus does not compile
+        //     adopts that SQLite version. Intelligence does not compile
         //     SQLite loadable extensions, so the umbrella header hides
         //     sqlite3ext.h's loadable-extension API from the Swift
         //     Clang importer while still including the header to keep

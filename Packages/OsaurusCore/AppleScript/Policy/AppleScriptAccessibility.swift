@@ -11,7 +11,7 @@
 //   • `requiresAccessibility` — pure signal detection over the script text, so
 //     the loop can catch a doomed script BEFORE asking the user to approve it.
 //   • `isGranted` / `promptForGrant` — the real AX trust check and the OS grant
-//     dialog (attributed to Osaurus, mirroring `SystemPermissionService`).
+//     dialog (attributed to Intelligence, mirroring `SystemPermissionService`).
 //   • `isAccessibilityDenial` — maps the runtime "assistive access" errors so a
 //     denial that slips past the preflight still reports as a PERMISSION
 //     failure with the right recovery, not a generic runtime error.
@@ -72,7 +72,7 @@ enum AppleScriptAccessibility {
         AXIsProcessTrusted()
     }
 
-    /// Fire the OS "Osaurus would like to control this computer" grant dialog
+    /// Fire the OS "Intelligence would like to control this computer" grant dialog
     /// (no-op if already trusted / already declined — the dialog shows at most
     /// once per TCC state; afterwards the user must toggle System Settings →
     /// Privacy & Security → Accessibility). Main-actor so the TCC prompt

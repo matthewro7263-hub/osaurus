@@ -8,7 +8,7 @@
 //  the scheduler tick reads across all agents every second and the
 //  Activity dashboard is naturally cross-agent. Encrypted via the same
 //  vendored SQLCipher + `StorageKeyManager` setup the rest of the
-//  Osaurus stack uses, so prompts / instructions / error messages in
+//  Intelligence stack uses, so prompts / instructions / error messages in
 //  this file are protected at rest.
 //
 //  Foreign keys to `agents(id)` are not declared because agents live in

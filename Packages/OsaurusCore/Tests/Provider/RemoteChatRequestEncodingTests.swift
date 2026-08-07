@@ -1226,7 +1226,7 @@ struct RemoteChatRequestEncodingTests {
         #expect(normalized.dropFirst().compactMap(\.content) == ["A", "B"])
     }
 
-    /// Regression for the Osaurus Router HTTP 400 "each tool_use must have a
+    /// Regression for the Intelligence Router HTTP 400 "each tool_use must have a
     /// single result": a transient `[System Notice]` riding the prior result's
     /// tool_call_id must not become a second tool entry on the wire.
     @Test func routerWireCompatibleMessages_singleToolEntryOnWireForNoticeRide() throws {

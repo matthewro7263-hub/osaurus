@@ -10,7 +10,7 @@ import Foundation
 enum UncaughtExceptionLogger {
     static let logPath: String = {
         let base = (NSHomeDirectory() as NSString).appendingPathComponent(
-            "Library/Logs/Osaurus"
+            "Library/Logs/Intelligence"
         )
         return (base as NSString).appendingPathComponent("last-crash-reason.log")
     }()
