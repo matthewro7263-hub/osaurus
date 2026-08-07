@@ -135,6 +135,11 @@ final class ServerController: ObservableObject {
     /// bringing the server up (mid-launch server churn — see hang audit).
     private var isLaunchComplete = false
 
+    /// Reentrancy guard for `startServer()`: `isRunning` only flips after
+    /// several suspension points, so an overlapping second call could pass
+    /// the `!isRunning` guard and race a duplicate bind on the same port.
+    private var isStarting = false
+
     // Singleton holder to allow async access to the current controller instance when injected as EnvironmentObject
     @MainActor
     private struct ServerControllerHolder {
@@ -183,7 +188,9 @@ final class ServerController: ObservableObject {
 
     /// Starts the server with current configuration
     func startServer() async {
-        guard !isRunning else { return }
+        guard !isRunning, !isStarting else { return }
+        isStarting = true
+        defer { isStarting = false }
         guard configuration.isValidPort else {
             lastErrorMessage = "Invalid port: \(configuration.port). Port must be between 1 and 65535."
             serverHealth = .error(lastErrorMessage!)
