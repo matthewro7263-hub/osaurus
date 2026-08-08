@@ -237,6 +237,13 @@ public actor AgentBundleService {
         let staging = try makeScratchDirectory(prefix: "osaurus-agent-import-")
         do {
             try await untar(url, into: staging)
+            // `tar` runs before the passphrase unwrap below, so a hostile
+            // bundle's bytes are on disk after nothing more than a file
+            // open. bsdtar's defaults refuse ".." members and extraction
+            // through symlinks today, but that safety lives in the tool,
+            // not in this code: re-check the staged tree ourselves before
+            // anything reads through it.
+            try validateStagedTree(staging)
         } catch {
             try? FileManager.default.removeItem(at: staging)
             throw error
@@ -648,6 +655,46 @@ public actor AgentBundleService {
         // bundle still imports cleanly here.
         process.arguments = ["-xf", bundle.path, "-C", dir.path]
         try await runProcess(process, errorContext: "untar")
+    }
+
+    /// Post-extraction gate on the unpacked tree: no symlinks, and every
+    /// entry must still resolve inside the staging directory. Mirrors
+    /// `SkillImportPolicy`, which likewise refuses to treat the extractor's
+    /// own guarantees as the security boundary. Runs before `activate`
+    /// moves anything into `~/.osaurus/agents/<id>/`.
+    private func validateStagedTree(_ staging: URL) throws {
+        let resolvedRoot = staging.resolvingSymlinksInPath().standardizedFileURL
+        guard
+            let enumerator = FileManager.default.enumerator(
+                at: staging,
+                includingPropertiesForKeys: [.isSymbolicLinkKey],
+                options: []
+            )
+        else {
+            throw AgentBundleError.archiveFailed("untar: unpacked bundle could not be inspected")
+        }
+        for case let entry as URL in enumerator {
+            let name = entry.lastPathComponent
+            guard let values = try? entry.resourceValues(forKeys: [.isSymbolicLinkKey]) else {
+                throw AgentBundleError.archiveFailed("untar: entry \(name) could not be inspected")
+            }
+            guard values.isSymbolicLink != true else {
+                throw AgentBundleError.archiveFailed("untar: entry \(name) is a symbolic link")
+            }
+            let resolved = entry.resolvingSymlinksInPath().standardizedFileURL
+            guard Self.isContained(resolved, in: resolvedRoot) else {
+                throw AgentBundleError.archiveFailed(
+                    "untar: entry \(name) resolves outside the unpack directory"
+                )
+            }
+        }
+    }
+
+    private static func isContained(_ fileURL: URL, in baseDirectory: URL) -> Bool {
+        let fileComponents = fileURL.standardizedFileURL.pathComponents
+        let baseComponents = baseDirectory.standardizedFileURL.pathComponents
+        return fileComponents.count >= baseComponents.count
+            && Array(fileComponents.prefix(baseComponents.count)) == baseComponents
     }
 
     private func runProcess(_ process: Process, errorContext: String) async throws {

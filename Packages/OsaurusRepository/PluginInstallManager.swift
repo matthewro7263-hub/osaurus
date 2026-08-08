@@ -320,8 +320,42 @@ public final class PluginInstallManager: @unchecked Sendable {
         return ToolsPaths.toolsRootDirectory()
     }
 
+    /// Identity allowlist for a plugin id: `^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$`.
+    /// The id becomes a directory name under the tools root and
+    /// `appendingPathComponent` does not normalize `..`, so an id such as
+    /// `../../Library/LaunchAgents` would land an install outside the root.
+    /// Enforced where an id is first accepted — notably manual sideloads,
+    /// which bypass the registry's checksum/signature verification.
+    public static func isValidPluginId(_ pluginId: String) -> Bool {
+        guard !pluginId.isEmpty, pluginId.count <= 128 else { return false }
+        let alphanumeric = Set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
+        let interior = alphanumeric.union(".-_")
+        guard let first = pluginId.first, let last = pluginId.last,
+            alphanumeric.contains(first), alphanumeric.contains(last)
+        else { return false }
+        return pluginId.allSatisfy { interior.contains($0) }
+    }
+
+    /// Last-ditch containment for the id → directory mapping. Deliberately
+    /// narrower than `isValidPluginId`: it neutralizes only ids that could
+    /// escape the tools root, so the many read paths that derive a directory
+    /// from an already-installed id keep resolving exactly as before. An
+    /// escaping id maps to an inert name inside the root, which never exists.
+    static func containedPluginDirectoryName(_ pluginId: String) -> String {
+        if pluginId.isEmpty || pluginId == "." || pluginId == ".."
+            || pluginId.contains("/") || pluginId.contains("\\")
+            || pluginId.contains("\0") || pluginId.hasPrefix("~")
+        {
+            return "invalid-plugin-id"
+        }
+        return pluginId
+    }
+
     public static func toolsPluginDirectory(pluginId: String) -> URL {
-        toolsRootDirectory().appendingPathComponent(pluginId, isDirectory: true)
+        toolsRootDirectory().appendingPathComponent(
+            containedPluginDirectoryName(pluginId),
+            isDirectory: true
+        )
     }
 
     public static func toolsVersionDirectory(pluginId: String, version: SemanticVersion) -> URL {

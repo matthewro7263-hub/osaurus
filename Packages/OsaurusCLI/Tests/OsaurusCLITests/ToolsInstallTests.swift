@@ -206,6 +206,98 @@ final class ToolsInstallTests: XCTestCase {
         }
     }
 
+    func testTraversalPluginIdInManifestIsRejected() throws {
+        let manifest = """
+            {
+              "plugin_id": "../../../../../../Library/LaunchAgents",
+              "version": "1.0.0"
+            }
+            """
+        try manifest.write(
+            to: tempDir.appendingPathComponent("osaurus-plugin.json", isDirectory: false),
+            atomically: true,
+            encoding: .utf8
+        )
+
+        XCTAssertThrowsError(
+            try ToolsInstall.resolveManualInstallIdentity(
+                sourceName: ".",
+                pluginRoot: tempDir,
+                preferManifestIdentity: true
+            )
+        ) { error in
+            XCTAssertTrue(String(describing: error).contains("Invalid plugin_id"))
+        }
+    }
+
+    func testTraversalPluginIdFromPackagedFilenameIsRejected() throws {
+        XCTAssertThrowsError(
+            try ToolsInstall.resolveManualInstallIdentity(sourceName: "..-1.0.0.zip", pluginRoot: tempDir)
+        ) { error in
+            XCTAssertTrue(String(describing: error).contains("Invalid plugin_id"))
+        }
+    }
+
+    func testTraversalPluginIdIsRejectedAtThePublishBoundary() throws {
+        let dylibURL = tempDir.appendingPathComponent("ManualPlugin.dylib", isDirectory: false)
+        try Data("manual-plugin-binary".utf8).write(to: dylibURL)
+        let version = try XCTUnwrap(SemanticVersion.parse("1.0.0"))
+
+        XCTAssertThrowsError(
+            try ToolsInstall.publishManualInstall(
+                pluginRoot: tempDir,
+                pluginId: "../../../../../../Library/LaunchAgents",
+                version: version,
+                grantConsent: false
+            )
+        ) { error in
+            XCTAssertTrue(String(describing: error).contains("Invalid plugin_id"))
+        }
+        // The staged payload must still be where it was: nothing moved.
+        XCTAssertTrue(FileManager.default.fileExists(atPath: dylibURL.path))
+    }
+
+    func testPluginIdAllowlistAcceptsRealIdsAndRejectsUnsafeOnes() {
+        XCTAssertTrue(PluginInstallManager.isValidPluginId("com.example.manual"))
+        XCTAssertTrue(PluginInstallManager.isValidPluginId("my-plugin"))
+        XCTAssertTrue(PluginInstallManager.isValidPluginId("my_plugin_2"))
+        XCTAssertTrue(PluginInstallManager.isValidPluginId("a"))
+        XCTAssertTrue(PluginInstallManager.isValidPluginId("dev.example.packaged"))
+
+        XCTAssertFalse(PluginInstallManager.isValidPluginId(""))
+        XCTAssertFalse(PluginInstallManager.isValidPluginId("."))
+        XCTAssertFalse(PluginInstallManager.isValidPluginId(".."))
+        XCTAssertFalse(PluginInstallManager.isValidPluginId("../evil"))
+        XCTAssertFalse(PluginInstallManager.isValidPluginId("a/b"))
+        XCTAssertFalse(PluginInstallManager.isValidPluginId("a\\b"))
+        XCTAssertFalse(PluginInstallManager.isValidPluginId(".hidden"))
+        XCTAssertFalse(PluginInstallManager.isValidPluginId("/absolute"))
+        XCTAssertFalse(PluginInstallManager.isValidPluginId("trailing."))
+    }
+
+    func testDottedManifestIdentityStillInstallsNormally() throws {
+        let manifest = """
+            {
+              "plugin_id": "com.example.manual",
+              "version": "1.0.0"
+            }
+            """
+        try manifest.write(
+            to: tempDir.appendingPathComponent("osaurus-plugin.json", isDirectory: false),
+            atomically: true,
+            encoding: .utf8
+        )
+
+        let identity = try ToolsInstall.resolveManualInstallIdentity(
+            sourceName: ".",
+            pluginRoot: tempDir,
+            preferManifestIdentity: true
+        )
+
+        XCTAssertEqual(identity.pluginId, "com.example.manual")
+        XCTAssertEqual(identity.version, SemanticVersion.parse("1.0.0"))
+    }
+
     func testManualInstallReceiptIncludesArtifactMetadata() throws {
         let dylibBytes = Data("manual-plugin-binary".utf8)
         let dylibURL = tempDir.appendingPathComponent("ManualPlugin.dylib", isDirectory: false)

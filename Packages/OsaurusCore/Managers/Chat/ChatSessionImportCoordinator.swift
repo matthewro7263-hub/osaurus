@@ -162,6 +162,14 @@ enum ChatSessionImportCoordinator {
                     for url in urls {
                         onProgress(L("Reading \(url.lastPathComponent)…"))
                         do {
+                            // The whole file is read into memory below, so
+                            // an absurdly large (or maliciously crafted)
+                            // pick must fail here rather than OOM the app.
+                            let fileSize =
+                                (try? url.resourceValues(forKeys: [.fileSizeKey]))?.fileSize ?? 0
+                            guard fileSize <= ChatSessionImporter.maximumImportFileBytes else {
+                                throw ChatSessionImporter.ImportError.fileTooLarge
+                            }
                             let data = try Data(contentsOf: url)
                             let result = try ChatSessionImporter.parse(
                                 data: data, onProgress: onProgress)

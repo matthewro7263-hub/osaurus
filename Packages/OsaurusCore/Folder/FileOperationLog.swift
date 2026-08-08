@@ -233,6 +233,21 @@ public actor FileOperationLog {
 
     // MARK: - Private Undo Implementation
 
+    /// Re-run the record-time containment gate on a logged path before undo
+    /// deletes, moves, or overwrites through it. Operations are only logged
+    /// after `FolderToolHelpers.resolvePath` accepted them, but undo derives
+    /// the destructive path far from that gate — so it re-checks here rather
+    /// than depending on an invariant enforced elsewhere.
+    private func resolvedUndoPath(_ path: String, root: URL) throws -> URL {
+        do {
+            return try FolderToolHelpers.resolvePath(path, rootPath: root)
+        } catch {
+            throw FileUndoError.cannotUndo(
+                "Path is not inside the recorded working folder: \(path)"
+            )
+        }
+    }
+
     private func performUndo(_ operation: FileOperation) throws {
         // Undo targets the root captured when the operation was logged, so a
         // later folder switch (or a concurrent chat on another folder) can
@@ -243,7 +258,7 @@ public actor FileOperationLog {
         let root = URL(fileURLWithPath: rootPathString, isDirectory: true)
 
         let fm = FileManager.default
-        let fileURL = root.appendingPathComponent(operation.path)
+        let fileURL = try resolvedUndoPath(operation.path, root: root)
 
         switch operation.type {
         case .create:
@@ -282,7 +297,7 @@ public actor FileOperationLog {
             guard let destPath = operation.destinationPath else {
                 throw FileUndoError.cannotUndo("Move operation missing destination path")
             }
-            let destURL = root.appendingPathComponent(destPath)
+            let destURL = try resolvedUndoPath(destPath, root: root)
 
             if fm.fileExists(atPath: destURL.path) {
                 do {
@@ -300,7 +315,7 @@ public actor FileOperationLog {
             guard let destPath = operation.destinationPath else {
                 throw FileUndoError.cannotUndo("Copy operation missing destination path")
             }
-            let destURL = root.appendingPathComponent(destPath)
+            let destURL = try resolvedUndoPath(destPath, root: root)
 
             if fm.fileExists(atPath: destURL.path) {
                 do {

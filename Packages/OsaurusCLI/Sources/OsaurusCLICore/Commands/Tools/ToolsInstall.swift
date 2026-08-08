@@ -229,6 +229,12 @@ public struct ToolsInstall {
         grantConsent: Bool
     ) throws -> URL {
         let fm = FileManager.default
+        // Second gate on the id right before it becomes a filesystem path:
+        // everything below (createDirectory, moveItem, replaceItemAt) writes
+        // relative to it, so it must never be able to leave the tools root.
+        guard PluginInstallManager.isValidPluginId(pluginId) else {
+            throw ManualInstallError.invalidPluginId("the install target", pluginId)
+        }
         let installDir = PluginInstallManager.toolsVersionDirectory(pluginId: pluginId, version: version)
 
         try createManualInstallReceipt(pluginId: pluginId, version: version, installDir: pluginRoot)
@@ -308,6 +314,11 @@ public struct ToolsInstall {
         }
 
         if let parsed = parsePluginIdAndVersion(from: sourceName) {
+            // A packaged filename is as untrusted as a manifest: "..-1.0.0.zip"
+            // would otherwise become the install directory name.
+            guard PluginInstallManager.isValidPluginId(parsed.pluginId) else {
+                throw ManualInstallError.invalidPluginId("the package filename", parsed.pluginId)
+            }
             return ManualInstallIdentity(pluginId: parsed.pluginId, version: parsed.version, source: .filename)
         }
 
@@ -323,6 +334,13 @@ public struct ToolsInstall {
         }
         guard !manifest.pluginId.isEmpty else {
             throw ManualInstallError.invalidManifestField(manifest.filename, "plugin_id")
+        }
+        // The id becomes the install directory name under Tools/, and this
+        // runs before the consent gate and any signature check, so a
+        // traversal id ("../../Library/LaunchAgents") must be refused here
+        // rather than resolved by FileManager at write time.
+        guard PluginInstallManager.isValidPluginId(manifest.pluginId) else {
+            throw ManualInstallError.invalidPluginId("`\(manifest.filename)`", manifest.pluginId)
         }
         guard let versionString = manifest.version, !versionString.isEmpty else {
             throw ManualInstallError.invalidManifestField(manifest.filename, "version")
@@ -458,6 +476,7 @@ public struct ToolsInstall {
     enum ManualInstallError: Error, CustomStringConvertible {
         case identityUnavailable(sourceName: String)
         case noDylibFound
+        case invalidPluginId(String, String)
         case invalidManifestField(String, String)
         case invalidManifestVersion(String, String)
         case manifestReadFailed(String, String)
@@ -473,6 +492,9 @@ public struct ToolsInstall {
             case .noDylibFound:
                 return
                     "No .dylib found in the plugin payload. Build the plugin first (e.g. `osaurus tools build`) — an install without a binary would produce a broken receipt-less tree."
+            case .invalidPluginId(let source, let value):
+                return
+                    "Invalid plugin_id `\(value)` from \(source). A plugin_id may contain only letters, digits, `.`, `-`, and `_`, and must start and end with a letter or digit."
             case .invalidManifestField(let filename, let field):
                 return "`\(filename)` must include a non-empty `\(field)` for directory installs."
             case .invalidManifestVersion(let filename, let value):

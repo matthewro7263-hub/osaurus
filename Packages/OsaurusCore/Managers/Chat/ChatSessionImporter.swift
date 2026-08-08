@@ -38,10 +38,16 @@ public enum ChatSessionImporter {
         public var unreadable: Int = 0
     }
 
+    /// Ceiling on the size of a file the coordinator will read whole into
+    /// memory. Generous — real ChatGPT exports are multi-GB — but an
+    /// import must fail with a message rather than an OOM kill.
+    public static let maximumImportFileBytes = 8 * 1024 * 1024 * 1024
+
     public enum ImportError: LocalizedError {
         case invalidJSON
         case unrecognizedFormat
         case noConversations
+        case fileTooLarge
 
         public var errorDescription: String? {
             switch self {
@@ -53,6 +59,10 @@ public enum ChatSessionImporter {
                 )
             case .noConversations:
                 return L("No importable conversations were found in the file.")
+            case .fileTooLarge:
+                return L(
+                    "The file is too large to import. Unzip it first, then import the JSON files inside."
+                )
             }
         }
     }

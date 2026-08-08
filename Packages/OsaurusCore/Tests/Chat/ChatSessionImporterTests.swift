@@ -354,7 +354,12 @@ struct ChatSessionImporterTests {
 
     /// Builds a real zip in memory (CRCs left zero — the reader doesn't
     /// verify them) so the archive path is tested without fixtures.
-    private func makeZip(_ entries: [(name: String, data: Data, deflate: Bool)]) throws -> Data {
+    /// `declaredUncompressedSize` overrides the size the headers advertise,
+    /// which is how a zip bomb lies about what it will expand to.
+    private func makeZip(
+        _ entries: [(name: String, data: Data, deflate: Bool)],
+        declaredUncompressedSize: Int? = nil
+    ) throws -> Data {
         func u16(_ v: Int) -> Data { withUnsafeBytes(of: UInt16(v).littleEndian) { Data($0) } }
         func u32(_ v: Int) -> Data { withUnsafeBytes(of: UInt32(v).littleEndian) { Data($0) } }
 
@@ -367,17 +372,18 @@ struct ChatSessionImporterTests {
                 ? try (entry.data as NSData).compressed(using: .zlib) as Data
                 : entry.data
             let method = entry.deflate ? 8 : 0
+            let declared = declaredUncompressedSize ?? entry.data.count
             let localOffset = zip.count
 
             zip.append(Data([0x50, 0x4B, 0x03, 0x04]))
             zip.append(u16(20) + u16(0) + u16(method) + u16(0) + u16(0) + u32(0))
-            zip.append(u32(payload.count) + u32(entry.data.count) + u16(name.count) + u16(0))
+            zip.append(u32(payload.count) + u32(declared) + u16(name.count) + u16(0))
             zip.append(name)
             zip.append(payload)
 
             central.append(Data([0x50, 0x4B, 0x01, 0x02]))
             central.append(u16(20) + u16(20) + u16(0) + u16(method) + u16(0) + u16(0) + u32(0))
-            central.append(u32(payload.count) + u32(entry.data.count) + u16(name.count))
+            central.append(u32(payload.count) + u32(declared) + u16(name.count))
             central.append(u16(0) + u16(0) + u16(0) + u16(0) + u32(0) + u32(localOffset))
             central.append(name)
         }
@@ -417,6 +423,92 @@ struct ChatSessionImporterTests {
             ("user.json", Data("{\"id\": \"user-1\"}".utf8), false)
         ])
         #expect(throws: ChatSessionImporter.ImportError.self) {
+            _ = try ChatSessionImporter.parse(data: zip)
+        }
+    }
+
+    // MARK: - Zip bombs
+
+    @Test func zipEntryDeclaringMoreThanTheEntryBudgetIsRejected() throws {
+        // A bomb's central directory advertises an enormous entry: the
+        // reader must refuse it instead of allocating for the claim.
+        let zip = try makeZip(
+            [("conversations.json", Data(chatGPTExport.utf8), true)],
+            declaredUncompressedSize: ZipArchive.maximumEntryBytes + 1
+        )
+        #expect(throws: ZipArchiveError.self) {
+            _ = try ChatSessionImporter.parse(data: zip)
+        }
+    }
+
+    /// The absolute budget alone is not enough: a bomb that stays just under
+    /// it would still make the reader allocate gigabytes for a few hundred
+    /// stored bytes. The ratio bound refuses anything claiming to expand by
+    /// more than DEFLATE can actually achieve.
+    @Test func zipEntryClaimingImpossibleExpansionRatioIsRejected() throws {
+        let zip = try makeZip(
+            [("conversations.json", Data(chatGPTExport.utf8), true)],
+            declaredUncompressedSize: 512 * 1024 * 1024
+        )
+        #expect(throws: ZipArchiveError.self) {
+            _ = try ChatSessionImporter.parse(data: zip)
+        }
+    }
+
+    /// ...and the ratio bound must not punish real exports. A normally
+    /// compressible entry declaring an ordinary JSON ratio still imports —
+    /// this is the guard against re-introducing the flat cap that would have
+    /// rejected multi-GB ChatGPT exports.
+    @Test func zipEntryWithOrdinaryCompressionRatioStillImports() throws {
+        let zip = try makeZip([("conversations.json", Data(chatGPTExport.utf8), true)])
+        let entry = try #require(ZipArchive.entries(in: zip).first)
+        let extracted = try ZipArchive.extract(entry, from: zip)
+        #expect(extracted == Data(chatGPTExport.utf8))
+    }
+
+    /// A stored (uncompressed) entry cannot amplify at all, so its bound is
+    /// its own compressed size — no ratio slack applies.
+    @Test func storedEntryIsBoundedByItsCompressedSize() throws {
+        let payload = Data(chatGPTExport.utf8)
+        let zip = try makeZip([("conversations.json", payload, false)])
+        let entry = try #require(ZipArchive.entries(in: zip).first)
+        #expect(ZipArchive.maximumInflatedBytes(for: entry) == entry.compressedSize)
+        let extracted = try ZipArchive.extract(entry, from: zip)
+        #expect(extracted == payload)
+    }
+
+    @Test func zipEntryUnderstatingItsSizeInflatesNoFurtherThanDeclared() throws {
+        // The other half of the bomb: the declared size is attacker
+        // controlled, so a liar can understate it. The inflate buffer is
+        // sized from the declaration and never grows, so the output is
+        // truncated rather than expanding to whatever the stream holds.
+        let payload = Data(repeating: 0x41, count: 4 * 1024 * 1024)
+        let zip = try makeZip(
+            [("conversations.json", payload, true)],
+            declaredUncompressedSize: 64
+        )
+        let entry = try #require(ZipArchive.entries(in: zip).first)
+        // Truncated output or a rejected entry are both fine; what must
+        // never happen is materializing the 4 MB the stream really holds.
+        let extracted = try? ZipArchive.extract(entry, from: zip)
+        #expect((extracted?.count ?? 0) <= 64)
+    }
+
+    @Test func zip64OffsetBeyondIntRangeIsRejectedAsCorrupt() throws {
+        func u16(_ v: Int) -> Data { withUnsafeBytes(of: UInt16(v).littleEndian) { Data($0) } }
+        func u32(_ v: Int) -> Data { withUnsafeBytes(of: UInt32(v).littleEndian) { Data($0) } }
+
+        // Zip64 locator pointing at a record offset that doesn't fit in
+        // `Int`: the conversion must fail the archive, not trap.
+        var zip = Data([0x50, 0x4B, 0x06, 0x07])
+        zip.append(u32(0))
+        zip.append(Data(repeating: 0xFF, count: 8))  // zip64 EOCD offset
+        zip.append(u32(1))
+        zip.append(Data([0x50, 0x4B, 0x05, 0x06]))
+        zip.append(u16(0) + u16(0) + u16(0xFFFF) + u16(0xFFFF))
+        zip.append(u32(0) + u32(0xFFFF_FFFF) + u16(0))
+
+        #expect(throws: ZipArchiveError.self) {
             _ = try ChatSessionImporter.parse(data: zip)
         }
     }
