@@ -175,10 +175,7 @@ public struct GlobalProxyConfiguration: Equatable, Sendable {
         }
 
         if let address = IPv4Address(normalized) {
-            let octets = Array(address.rawValue)
-            return octets[0] == 0
-                || octets[0] == 127
-                || (octets[0] == 169 && octets[1] == 254)
+            return isLocalIPv4(Array(address.rawValue))
         }
 
         if let address = IPv6Address(normalized) {
@@ -186,10 +183,33 @@ public struct GlobalProxyConfiguration: Equatable, Sendable {
             let isUnspecified = octets.allSatisfy { $0 == 0 }
             let isLoopback = octets.dropLast().allSatisfy { $0 == 0 } && octets.last == 1
             let isLinkLocal = octets[0] == 0xfe && (octets[1] & 0xc0) == 0x80
-            return isUnspecified || isLoopback || isLinkLocal
+            if isUnspecified || isLoopback || isLinkLocal {
+                return true
+            }
+            // `::ffff:127.0.0.1` and `::127.0.0.1` carry an IPv4 address in the
+            // low 32 bits and reach the very same host, so the embedded address
+            // has to face the same IPv4 checks — otherwise the v6 spelling of a
+            // loopback or link-local proxy slips straight past this guard.
+            let isIPv4Mapped =
+                octets[0 ..< 10].allSatisfy { $0 == 0 }
+                && octets[10] == 0xff
+                && octets[11] == 0xff  // ::ffff:0:0/96
+            let isIPv4Compatible = octets[0 ..< 12].allSatisfy { $0 == 0 }  // ::/96
+            if isIPv4Mapped || isIPv4Compatible {
+                return isLocalIPv4(Array(octets[12 ..< 16]))
+            }
+            return false
         }
 
         return false
+    }
+
+    /// Loopback, "this host", and link-local IPv4 ranges can never be a real
+    /// proxy endpoint. RFC1918 stays allowed on purpose: a LAN proxy is normal.
+    private static func isLocalIPv4(_ octets: [UInt8]) -> Bool {
+        octets[0] == 0
+            || octets[0] == 127
+            || (octets[0] == 169 && octets[1] == 254)
     }
 
     private func key(_ value: CFString) -> AnyHashable {

@@ -7,7 +7,9 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"os"
 	"sync"
 )
@@ -80,27 +82,90 @@ func runRPC(storeDir string) {
 	bridge.writer = writer
 	defer bridge.close()
 
-	scanner := bufio.NewScanner(os.Stdin)
-	// Requests are small, but allow generous frames for forward compatibility.
-	scanner.Buffer(make([]byte, 0, 64*1024), 4*1024*1024)
-	for scanner.Scan() {
-		line := scanner.Bytes()
-		if len(line) == 0 {
-			continue
+	reader := bufio.NewReaderSize(os.Stdin, 64*1024)
+	// A single oversized frame must not take the helper down with it: an
+	// unreadable line is skipped and the loop keeps serving, because exiting
+	// here would silently drop every active watch.subscribe.
+	for {
+		line, err := readFrame(reader)
+		if len(line) > 0 {
+			var request rpcRequest
+			if err := json.Unmarshal(line, &request); err == nil && request.Method != "" &&
+				request.ID != nil { // the Swift side never sends notifications
+				id := *request.ID
+				result, rpcErr := bridge.handle(request.Method, request.Params)
+				if rpcErr != nil {
+					writer.respondError(id, rpcErr.Code, rpcErr.Message)
+				} else {
+					writer.respond(id, result)
+				}
+			}
 		}
-		var request rpcRequest
-		if err := json.Unmarshal(line, &request); err != nil || request.Method == "" {
-			continue
-		}
-		if request.ID == nil {
-			continue // the Swift side never sends notifications
-		}
-		id := *request.ID
-		result, rpcErr := bridge.handle(request.Method, request.Params)
-		if rpcErr != nil {
-			writer.respondError(id, rpcErr.Code, rpcErr.Message)
-		} else {
-			writer.respond(id, result)
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				return // stdin closed: the Swift side is done with us
+			}
+			if errors.Is(err, errFrameTooLong) {
+				// The frame was consumed up to its newline, so the next
+				// iteration resynchronizes on the following request.
+				fmt.Fprintf(os.Stderr, "osaurus-wa: dropping oversized request frame\n")
+				continue
+			}
+			fmt.Fprintf(os.Stderr, "osaurus-wa: stdin read failed: %v\n", err)
+			return
 		}
 	}
+}
+
+// maxFrameBytes bounds a single JSON-RPC line. Requests are small, but the
+// limit stays generous for forward compatibility.
+const maxFrameBytes = 4 * 1024 * 1024
+
+// errFrameTooLong reports a line that exceeded maxFrameBytes. The frame has
+// still been drained through its newline, so the caller can resynchronize.
+var errFrameTooLong = errors.New("request frame exceeds size limit")
+
+// readFrame reads one newline-delimited frame. It returns the frame without
+// its newline, plus an error describing why reading stopped. An oversized
+// frame is discarded (not buffered) and reported as errFrameTooLong after the
+// rest of the line has been drained, so the stream stays aligned.
+func readFrame(reader *bufio.Reader) ([]byte, error) {
+	var frame []byte
+	oversized := false
+	for {
+		chunk, err := reader.ReadSlice('\n')
+		if !oversized {
+			if len(frame)+len(chunk) > maxFrameBytes {
+				oversized = true
+				frame = nil
+			} else {
+				frame = append(frame, chunk...)
+			}
+		}
+		if err == nil {
+			break
+		}
+		if errors.Is(err, bufio.ErrBufferFull) {
+			continue // more of this line is pending
+		}
+		// io.EOF (or a real read error) with a trailing partial line: hand
+		// back whatever arrived so a final unterminated frame still runs.
+		if oversized {
+			return nil, errFrameTooLong
+		}
+		return dropCR(frame), err
+	}
+	if oversized {
+		return nil, errFrameTooLong
+	}
+	return dropCR(frame[:len(frame)-1]), nil
+}
+
+// dropCR strips a trailing carriage return, matching how bufio.ScanLines
+// (which this reader replaced) normalized CRLF-terminated frames.
+func dropCR(data []byte) []byte {
+	if len(data) > 0 && data[len(data)-1] == '\r' {
+		return data[:len(data)-1]
+	}
+	return data
 }

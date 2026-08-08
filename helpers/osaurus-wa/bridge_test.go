@@ -1,7 +1,13 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/json"
+	"errors"
+	"io"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -83,6 +89,140 @@ func TestSanitizeFileName(t *testing.T) {
 	}
 	if !strings.HasSuffix(sanitized, ".jpg") {
 		t.Errorf("truncation must keep the tail (extension), got %q", sanitized)
+	}
+}
+
+// An omitted or zero max_media_bytes must not disable the cap, and a value
+// above the hard ceiling must not raise it — only a stricter cap wins.
+func TestEffectiveMediaLimit(t *testing.T) {
+	cases := []struct {
+		configured int64
+		want       int64
+	}{
+		{0, defaultMaxInboundMediaBytes},
+		{-1, defaultMaxInboundMediaBytes},
+		{defaultMaxInboundMediaBytes + 1, defaultMaxInboundMediaBytes},
+		{1024, 1024},
+		{defaultMaxInboundMediaBytes, defaultMaxInboundMediaBytes},
+	}
+	for _, c := range cases {
+		if got := effectiveMediaLimit(c.configured); got != c.want {
+			t.Errorf("effectiveMediaLimit(%d) = %d, want %d", c.configured, got, c.want)
+		}
+	}
+}
+
+// The sender-declared FileLength is untrusted, so the cap has to bite on the
+// bytes actually written. cappedFile must refuse the write that would cross
+// the limit and leave the file no larger than the limit.
+func TestCappedFileStopsAtLimit(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "media.bin")
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o600)
+	if err != nil {
+		t.Fatalf("open: %v", err)
+	}
+	defer file.Close()
+
+	capped := &cappedFile{File: file, limit: 100}
+	// Mirror production exactly: whatsmeow holds the destination as a plain
+	// io.Writer and copies from an io.TeeReader. A TeeReader is not an
+	// io.WriterTo, so io.Copy must fall through to `dst.(io.ReaderFrom)` —
+	// the branch that silently bypassed the cap before ReadFrom was shadowed.
+	// (Copying from a *bytes.Reader instead would take the src.WriteTo branch
+	// and exercise Write directly, which is why the earlier version of this
+	// test passed against a cap that did nothing in production.)
+	var sink io.Writer = capped
+	src := io.TeeReader(bytes.NewReader(make([]byte, 1024*1024)), io.Discard)
+	// A sender that declared "1 byte" but ships 1 MiB is stopped mid-stream.
+	n, err := io.Copy(sink, src)
+	if !errors.Is(err, errMediaTooLarge) {
+		t.Fatalf("expected errMediaTooLarge, got %v", err)
+	}
+	if !capped.exceeded {
+		t.Error("expected the exceeded flag to be set")
+	}
+	if n > 100 {
+		t.Errorf("wrote %d bytes past the 100-byte limit", n)
+	}
+	info, err := file.Stat()
+	if err != nil {
+		t.Fatalf("stat: %v", err)
+	}
+	if info.Size() > 100 {
+		t.Errorf("file grew to %d bytes past the 100-byte limit", info.Size())
+	}
+}
+
+// Writes at or below the limit must pass through untouched, and a rewind
+// (whatsmeow retries a failed download by seeking back to 0) must rewind the
+// cap accounting too, or a legitimate retry would spuriously trip it.
+func TestCappedFileAllowsLimitAndRewind(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "media.bin")
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o600)
+	if err != nil {
+		t.Fatalf("open: %v", err)
+	}
+	defer file.Close()
+
+	capped := &cappedFile{File: file, limit: 64}
+	if _, err := capped.Write(make([]byte, 64)); err != nil {
+		t.Fatalf("writing exactly the limit must succeed, got %v", err)
+	}
+	if _, err := capped.Write([]byte{0}); !errors.Is(err, errMediaTooLarge) {
+		t.Fatalf("expected errMediaTooLarge past the limit, got %v", err)
+	}
+
+	capped.exceeded = false
+	if _, err := capped.Seek(0, io.SeekStart); err != nil {
+		t.Fatalf("seek: %v", err)
+	}
+	if _, err := capped.Write(make([]byte, 64)); err != nil {
+		t.Errorf("a full rewrite after rewinding must succeed, got %v", err)
+	}
+}
+
+// A frame at or under the limit round-trips; an oversized frame is dropped
+// with errFrameTooLong and the reader stays aligned on the next frame, so a
+// single bad line can never end the RPC loop.
+func TestReadFrameResynchronizesAfterOversizedFrame(t *testing.T) {
+	huge := strings.Repeat("x", maxFrameBytes+1)
+	input := "{\"a\":1}\r\n" + huge + "\n" + "{\"b\":2}\n"
+	reader := bufio.NewReaderSize(strings.NewReader(input), 64*1024)
+
+	// CRLF is normalized away, matching the bufio.Scanner this replaced.
+	frame, err := readFrame(reader)
+	if err != nil || string(frame) != `{"a":1}` {
+		t.Fatalf("first frame = %q, %v", frame, err)
+	}
+
+	frame, err = readFrame(reader)
+	if !errors.Is(err, errFrameTooLong) {
+		t.Fatalf("expected errFrameTooLong, got %q, %v", frame, err)
+	}
+	if len(frame) != 0 {
+		t.Errorf("an oversized frame must not be buffered, got %d bytes", len(frame))
+	}
+
+	frame, err = readFrame(reader)
+	if err != nil || string(frame) != `{"b":2}` {
+		t.Fatalf("expected to resynchronize on the next frame, got %q, %v", frame, err)
+	}
+
+	if frame, err = readFrame(reader); !errors.Is(err, io.EOF) || len(frame) != 0 {
+		t.Fatalf("expected clean EOF, got %q, %v", frame, err)
+	}
+}
+
+// A final frame with no trailing newline must still be handed back (the old
+// bufio.Scanner returned it), alongside the EOF that ends the loop.
+func TestReadFrameReturnsUnterminatedTail(t *testing.T) {
+	reader := bufio.NewReaderSize(strings.NewReader(`{"a":1}`), 64*1024)
+	frame, err := readFrame(reader)
+	if !errors.Is(err, io.EOF) {
+		t.Fatalf("expected io.EOF, got %v", err)
+	}
+	if string(frame) != `{"a":1}` {
+		t.Errorf("expected the unterminated tail, got %q", frame)
 	}
 }
 

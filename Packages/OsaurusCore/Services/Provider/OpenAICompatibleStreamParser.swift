@@ -759,6 +759,19 @@ struct OpenAICompatibleStreamParser {
         return .continue
     }
 
+    /// Apply stop-sequence truncation to a text delta. Returns
+    /// `(maybeTruncated, hitStop)`: when `hitStop` is true the caller should
+    /// yield `maybeTruncated` and finish.
+    ///
+    /// Known limitation: each delta is searched independently, so a stop
+    /// string straddling a delta boundary ("F" then "OO" for stop "FOO") is
+    /// not detected and leaks past truncation. Catching it needs a held-back
+    /// tail of `max(stopLength) - 1` characters carried across deltas in
+    /// `StreamingState`, plus a flush of that tail at every stream-end path
+    /// (`[DONE]`, natural EOF, `dispatchFinal`) — without the flush the tail
+    /// would be silently swallowed from every response, which is worse than
+    /// the leak. This is a secondary net in any case: `stop` is forwarded
+    /// natively upstream, so the provider is the primary enforcer.
     @inline(__always)
     private static func applyStopSequences(
         _ text: String,

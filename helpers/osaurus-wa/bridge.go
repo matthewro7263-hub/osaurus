@@ -5,7 +5,9 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"mime"
 	"net/http"
 	"os"
@@ -1308,6 +1310,76 @@ func extensionForMime(mimetype, mediaType string) string {
 	return ".bin"
 }
 
+// defaultMaxInboundMediaBytes is the ceiling applied to inbound media even
+// when the Swift side omits `max_media_bytes`. A remote sender fully controls
+// both the blob and its declared length, so the helper must never agree to
+// store an unbounded amount on their say-so. It matches the largest value the
+// Swift configuration can ask for, so no legitimate cap is narrowed by it.
+const defaultMaxInboundMediaBytes int64 = 100 * 1024 * 1024
+
+// errMediaTooLarge aborts a streaming download once the *actual* bytes on the
+// wire pass the cap. GetFileLength() is sender-declared and freely forged, so
+// the running write total is the only trustworthy bound.
+var errMediaTooLarge = errors.New("media exceeds size cap")
+
+// effectiveMediaLimit resolves the byte cap for one inbound download. The
+// configured cap wins whenever it is stricter, but the hard ceiling always
+// applies — an omitted or zero `max_media_bytes` must not mean "unlimited".
+func effectiveMediaLimit(maxBytes int64) int64 {
+	if maxBytes > 0 && maxBytes < defaultMaxInboundMediaBytes {
+		return maxBytes
+	}
+	return defaultMaxInboundMediaBytes
+}
+
+// cappedFile adapts *os.File to whatsmeow's File interface while refusing any
+// sequential write past `limit`. Only whatsmeow's streaming download writes
+// sequentially; the in-place decrypt afterwards uses WriteAt within the
+// already-bounded region, so capping Write alone bounds the whole operation.
+// Passing a wrapper (rather than the bare *os.File) also opts out of
+// whatsmeow's fallocate fast path, which would otherwise preallocate against
+// the sender-controlled Content-Length.
+type cappedFile struct {
+	*os.File
+	limit    int64
+	offset   int64
+	exceeded bool
+}
+
+func (f *cappedFile) Write(p []byte) (int, error) {
+	if f.offset+int64(len(p)) > f.limit {
+		f.exceeded = true
+		return 0, errMediaTooLarge
+	}
+	n, err := f.File.Write(p)
+	f.offset += int64(n)
+	return n, err
+}
+
+// onlyWriter hides every method except Write, so io.Copy cannot detect a
+// richer interface on the destination and route around the cap.
+type onlyWriter struct{ io.Writer }
+
+// ReadFrom shadows the *os.File method promoted by the embedded field.
+// whatsmeow downloads with `io.Copy(file, io.TeeReader(resp.Body, hasher))`;
+// a TeeReader is not an io.WriterTo, so io.Copy falls through to
+// `dst.(io.ReaderFrom)`. Without this shadow that resolves to
+// *os.File.ReadFrom, which writes straight to the underlying file and never
+// calls the capped Write above — leaving the cap completely inert.
+func (f *cappedFile) ReadFrom(r io.Reader) (int64, error) {
+	return io.Copy(onlyWriter{f}, r)
+}
+
+// Seek keeps the write accounting in sync with the file: whatsmeow rewinds to
+// the start to retry a failed download, which must rewind the cap too.
+func (f *cappedFile) Seek(offset int64, whence int) (int64, error) {
+	pos, err := f.File.Seek(offset, whence)
+	if err == nil {
+		f.offset = pos
+	}
+	return pos, err
+}
+
 // downloadInboundMedia downloads a watched message's media into the
 // Swift-provided media directory and returns the extra notification fields.
 // Failures degrade to a `media_skipped` reason — the message itself (caption
@@ -1325,12 +1397,12 @@ func (b *bridge) downloadInboundMedia(evt *events.Message, mediaType string) map
 	if part == nil {
 		return nil
 	}
-	if maxBytes > 0 && size > uint64(maxBytes) {
+	limit := effectiveMediaLimit(maxBytes)
+	// Cheap pre-check on the declared length: rejects honestly-labelled
+	// oversized media without touching the network. Senders that lie about
+	// GetFileLength() are caught by the streaming cap below.
+	if size > uint64(limit) {
 		return map[string]any{"media_skipped": "too_large", "media_size": size}
-	}
-	data, err := b.client.Download(context.Background(), part)
-	if err != nil {
-		return map[string]any{"media_skipped": "download_failed"}
 	}
 	name := sanitizeFileName(filename)
 	if name == "" {
@@ -1343,13 +1415,42 @@ func (b *bridge) downloadInboundMedia(evt *events.Message, mediaType string) map
 		return map[string]any{"media_skipped": "write_failed"}
 	}
 	path := filepath.Join(chatDir, name)
-	if err := os.WriteFile(path, data, 0o600); err != nil {
+	// Download to a sibling temp file and rename only on success. whatsmeow can
+	// redeliver the same events.Message after a reconnect, and the destination
+	// path is deterministic — writing in place would let a failed redelivery
+	// truncate (and then delete) media that the first delivery stored fine,
+	// while the Swift side still holds the original media_path.
+	file, err := os.CreateTemp(chatDir, name+".part-*")
+	if err != nil {
+		return map[string]any{"media_skipped": "write_failed"}
+	}
+	tmpPath := file.Name()
+	// Stream to disk instead of buffering the whole blob in RAM, and stop the
+	// moment the real byte count passes the cap.
+	capped := &cappedFile{File: file, limit: limit}
+	downloadErr := b.client.DownloadToFile(context.Background(), part, capped)
+	info, statErr := file.Stat()
+	closeErr := file.Close()
+	if downloadErr != nil {
+		os.Remove(tmpPath)
+		if capped.exceeded || errors.Is(downloadErr, errMediaTooLarge) {
+			return map[string]any{"media_skipped": "too_large", "media_size": size}
+		}
+		return map[string]any{"media_skipped": "download_failed"}
+	}
+	if statErr != nil || closeErr != nil {
+		os.Remove(tmpPath)
+		return map[string]any{"media_skipped": "write_failed"}
+	}
+	// os.CreateTemp already made the file 0600; rename preserves that.
+	if err := os.Rename(tmpPath, path); err != nil {
+		os.Remove(tmpPath)
 		return map[string]any{"media_skipped": "write_failed"}
 	}
 	return map[string]any{
 		"media_path": path,
 		"media_mime": mimetype,
-		"media_size": len(data),
+		"media_size": info.Size(),
 		"filename":   name,
 	}
 }

@@ -10,6 +10,39 @@ import IkigaJSON
 import NIOCore
 import NIOHTTP1
 
+/// Escape a string for embedding between JSON quotes. Only the hand-rolled
+/// last-resort error payloads in this file need it — every primary path
+/// encodes through `IkigaJSONEncoder`, which escapes for itself. Without it a
+/// quote, backslash, or control character in an error message would emit
+/// malformed JSON on a rail the client is already struggling to parse.
+private func jsonEscape(_ string: String) -> String {
+    var escaped = ""
+    escaped.reserveCapacity(string.utf8.count)
+    for scalar in string.unicodeScalars {
+        switch scalar.value {
+        case 0x22:  // "
+            escaped += "\\\""
+        case 0x5C:  // \
+            escaped += "\\\\"
+        case 0x08:
+            escaped += "\\b"
+        case 0x09:
+            escaped += "\\t"
+        case 0x0A:
+            escaped += "\\n"
+        case 0x0C:
+            escaped += "\\f"
+        case 0x0D:
+            escaped += "\\r"
+        case 0x00 ..< 0x20:
+            escaped += String(format: "\\u%04x", scalar.value)
+        default:
+            escaped.unicodeScalars.append(scalar)
+        }
+    }
+    return escaped
+}
+
 protocol ResponseWriter {
     func writeHeaders(_ context: ChannelHandlerContext, extraHeaders: [(String, String)]?)
     func writeRole(
@@ -404,12 +437,13 @@ final class SSEResponseWriter: ResponseWriter {
             context.write(NIOAny(HTTPServerResponsePart.body(.byteBuffer(buffer))), promise: nil)
             context.flush()
         } catch {
-            // As a last resort, send a minimal JSON error payload
+            // As a last resort, send a minimal JSON error payload. The values
+            // are escaped by hand here because no encoder is involved.
             buffer.clear()
             buffer.writeString("data: {\"error\":{\"message\":\"")
-            buffer.writeString(message)
+            buffer.writeString(jsonEscape(message))
             buffer.writeString("\",\"type\":\"")
-            buffer.writeString(type)
+            buffer.writeString(jsonEscape(type))
             buffer.writeString("\"}}\n\n")
             context.write(NIOAny(HTTPServerResponsePart.body(.byteBuffer(buffer))), promise: nil)
             context.flush()
@@ -944,13 +978,14 @@ final class AnthropicSSEResponseWriter {
             context.write(NIOAny(HTTPServerResponsePart.body(.byteBuffer(buffer))), promise: nil)
             context.flush()
         } catch {
+            // Hand-built fallback: escape the values, no encoder is involved.
             buffer.clear()
             buffer.writeString(
                 "event: error\ndata: {\"type\":\"error\",\"error\":{\"type\":\""
             )
-            buffer.writeString(errorType)
+            buffer.writeString(jsonEscape(errorType))
             buffer.writeString("\",\"message\":\"")
-            buffer.writeString(message)
+            buffer.writeString(jsonEscape(message))
             buffer.writeString("\"}}\n\n")
             context.write(NIOAny(HTTPServerResponsePart.body(.byteBuffer(buffer))), promise: nil)
             context.flush()
