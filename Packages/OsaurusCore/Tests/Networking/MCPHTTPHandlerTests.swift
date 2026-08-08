@@ -236,19 +236,62 @@ struct MCPHTTPHandlerTests {
     }
 
     @Test func remote_dispatch_surface_binding_denies_agent_channel_tools() {
-        #expect(!HTTPHandler.shouldBindExternalSurfaceForDispatch(isLoopback: true))
-        #expect(HTTPHandler.shouldBindExternalSurfaceForDispatch(isLoopback: false))
+        // Loopback + native (App Intents Shortcut, CLI): internal surface, so
+        // the user's own local automation keeps its full tool set.
+        #expect(
+            !HTTPHandler.shouldBindExternalSurfaceForDispatch(
+                isLoopback: true,
+                isBrowserOriginated: false
+            )
+        )
+        // Loopback + browser: a web page's `fetch("http://localhost:1337/…")`
+        // also arrives from 127.0.0.1, so it must bind the EXTERNAL surface.
+        #expect(
+            HTTPHandler.shouldBindExternalSurfaceForDispatch(
+                isLoopback: true,
+                isBrowserOriginated: true
+            )
+        )
+        // Non-loopback is external either way.
+        #expect(
+            HTTPHandler.shouldBindExternalSurfaceForDispatch(
+                isLoopback: false,
+                isBrowserOriginated: false
+            )
+        )
+        #expect(
+            HTTPHandler.shouldBindExternalSurfaceForDispatch(
+                isLoopback: false,
+                isBrowserOriginated: true
+            )
+        )
 
         for toolName in Self.agentChannelToolNames {
             let local = ChatExecutionContext.$isExternalSurface.withValue(
-                HTTPHandler.shouldBindExternalSurfaceForDispatch(isLoopback: true)
+                HTTPHandler.shouldBindExternalSurfaceForDispatch(
+                    isLoopback: true,
+                    isBrowserOriginated: false
+                )
             ) {
                 ToolRegistry.isDeniedForCurrentSurface(toolName)
             }
-            #expect(!local, "\(toolName) should remain app-usable on loopback dispatch")
+            #expect(!local, "\(toolName) should remain app-usable on native loopback dispatch")
+
+            let browser = ChatExecutionContext.$isExternalSurface.withValue(
+                HTTPHandler.shouldBindExternalSurfaceForDispatch(
+                    isLoopback: true,
+                    isBrowserOriginated: true
+                )
+            ) {
+                ToolRegistry.isDeniedForCurrentSurface(toolName)
+            }
+            #expect(browser, "\(toolName) should be denied on browser-originated loopback dispatch")
 
             let remote = ChatExecutionContext.$isExternalSurface.withValue(
-                HTTPHandler.shouldBindExternalSurfaceForDispatch(isLoopback: false)
+                HTTPHandler.shouldBindExternalSurfaceForDispatch(
+                    isLoopback: false,
+                    isBrowserOriginated: false
+                )
             ) {
                 ToolRegistry.isDeniedForCurrentSurface(toolName)
             }
@@ -256,11 +299,55 @@ struct MCPHTTPHandlerTests {
         }
 
         let remoteHostWrite = ChatExecutionContext.$isExternalSurface.withValue(
-            HTTPHandler.shouldBindExternalSurfaceForDispatch(isLoopback: false)
+            HTTPHandler.shouldBindExternalSurfaceForDispatch(
+                isLoopback: false,
+                isBrowserOriginated: false
+            )
         ) {
             ToolRegistry.isDeniedForCurrentSurface("file_write")
         }
         #expect(remoteHostWrite)
+
+        // The localhost-CSRF case: a page driving `/dispatch` must not reach
+        // the workspace-mutating tools.
+        let browserHostWrite = ChatExecutionContext.$isExternalSurface.withValue(
+            HTTPHandler.shouldBindExternalSurfaceForDispatch(
+                isLoopback: true,
+                isBrowserOriginated: true
+            )
+        ) {
+            ToolRegistry.isDeniedForCurrentSurface("file_write")
+        }
+        #expect(browserHostWrite)
+    }
+
+    /// The native-vs-browser discriminator behind the loopback `/dispatch`
+    /// gate. Only headers the browser itself sets count; a native URLSession /
+    /// curl client sets none of them and keeps internal-surface trust.
+    @Test func browser_origination_detects_only_browser_set_headers() {
+        func makeHead(_ headers: [(String, String)]) -> HTTPRequestHead {
+            var httpHeaders = HTTPHeaders()
+            for (name, value) in headers {
+                httpHeaders.add(name: name, value: value)
+            }
+            return HTTPRequestHead(
+                version: .http1_1,
+                method: .POST,
+                uri: "/agents/00000000-0000-0000-0000-000000000000/dispatch",
+                headers: httpHeaders
+            )
+        }
+
+        #expect(!HTTPHandler.isBrowserOriginated(makeHead([])))
+        #expect(
+            !HTTPHandler.isBrowserOriginated(
+                makeHead([("User-Agent", "osaurus-cli/1.0"), ("Content-Type", "application/json")])
+            )
+        )
+        #expect(HTTPHandler.isBrowserOriginated(makeHead([("Origin", "https://evil.example")])))
+        #expect(HTTPHandler.isBrowserOriginated(makeHead([("Sec-Fetch-Site", "cross-site")])))
+        #expect(HTTPHandler.isBrowserOriginated(makeHead([("Sec-Fetch-Mode", "no-cors")])))
+        #expect(HTTPHandler.isBrowserOriginated(makeHead([("Sec-Fetch-Dest", "empty")])))
     }
 
     @Test func unattended_curation_auto_approval_is_scoped_and_still_externally_denied() {
@@ -296,13 +383,32 @@ struct MCPHTTPHandlerTests {
     @Test func remote_dispatch_surface_binding_propagates_to_unstructured_tasks() async {
         for toolName in Self.agentChannelToolNames {
             let inherited = await ChatExecutionContext.$isExternalSurface.withValue(
-                HTTPHandler.shouldBindExternalSurfaceForDispatch(isLoopback: false)
+                HTTPHandler.shouldBindExternalSurfaceForDispatch(
+                    isLoopback: false,
+                    isBrowserOriginated: false
+                )
             ) {
                 await Task {
                     ToolRegistry.isDeniedForCurrentSurface(toolName)
                 }.value
             }
             #expect(inherited, "\(toolName) should keep external-surface denial across unstructured tasks")
+
+            // Same guarantee for the browser-originated loopback case.
+            let inheritedFromBrowser = await ChatExecutionContext.$isExternalSurface.withValue(
+                HTTPHandler.shouldBindExternalSurfaceForDispatch(
+                    isLoopback: true,
+                    isBrowserOriginated: true
+                )
+            ) {
+                await Task {
+                    ToolRegistry.isDeniedForCurrentSurface(toolName)
+                }.value
+            }
+            #expect(
+                inheritedFromBrowser,
+                "\(toolName) should keep external-surface denial for browser loopback dispatch"
+            )
         }
     }
 

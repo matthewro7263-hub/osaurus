@@ -251,6 +251,16 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         /// `/agents/{id}/dispatch`) check this to reject non-loopback
         /// plaintext with 426.
         var isSecureChannel: Bool = false
+
+        /// Browser signal captured from the OUTER request head, before any
+        /// `/secure/call` envelope is rewritten to its inner request. The
+        /// rewrite rebuilds the head from the sealed payload and deliberately
+        /// carries over only a fixed header set, so `Origin`/`Sec-Fetch-*` do
+        /// not survive it. Without this snapshot a page could wrap its request
+        /// in a secure envelope to strip the browser signal and land back on
+        /// the trusted-native path.
+        var outerBrowserOriginated: Bool = false
+        var outerSecFetchSite: String?
     }
     let stateRef: NIOLoopBound<RequestState>
 
@@ -348,6 +358,10 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
             stateRef.value.authedAudience = nil
             stateRef.value.authedScopeIsMaster = false
             stateRef.value.callerHasVerifiedAccessKey = false
+            // Snapshot the browser signal from the wire head, before any
+            // `/secure/call` rewrite can drop it (see `outerBrowserOriginated`).
+            stateRef.value.outerBrowserOriginated = Self.isBrowserOriginated(head)
+            stateRef.value.outerSecFetchSite = head.headers.first(name: "Sec-Fetch-Site")
             // Clear last request's attribution so a keep-alive connection's
             // next (possibly loopback / public) request can't inherit it.
             _inboundConnection.value = nil
@@ -402,7 +416,16 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
                     )
                     return
                 }
-                stateRef.value.requestBodyBuffer = context.channel.allocator.buffer(capacity: length)
+                // Reserve a small fixed capacity, never the caller-declared
+                // `Content-Length`. This runs at `.head`, before the auth gate
+                // (which fires at `.end`), so honoring the declaration eagerly
+                // would let unauthenticated peers pin `maxRequestBodyBytes` ×
+                // the connection cap simply by declaring a huge body and then
+                // stalling. NIO grows the buffer as bytes actually arrive, and
+                // the streaming guard below still enforces the real limit.
+                stateRef.value.requestBodyBuffer = context.channel.allocator.buffer(
+                    capacity: min(length, Self.initialBodyBufferCapacity)
+                )
             } else {
                 stateRef.value.requestBodyBuffer = context.channel.allocator.buffer(capacity: 0)
             }
@@ -493,6 +516,57 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
                 stateRef.value.requestHead = head
                 stateRef.value.normalizedPath = path
                 stateRef.value.isSecureChannel = true
+                // The CORS headers computed at `.head` were derived from the
+                // outer `/secure/call` path, which is not control-plane. Redo
+                // them against the inner path so a sealed `/admin/*` or
+                // `/agents/*` response does not inherit `ACAO: *`.
+                stateRef.value.corsHeaders = computeCORSHeaders(
+                    for: head,
+                    isPreflight: false,
+                    isLoopback: isLoopbackConnection(context)
+                )
+            }
+
+            // Browser CSRF gate for the control plane. Loopback trust is
+            // granted by peer IP, which a page in any tab also satisfies via
+            // `fetch("http://localhost:1337/…")` — so a website could
+            // otherwise drive `/agents/*`, `/admin/*`, `/tasks/*` with the
+            // user's full local privileges. `Sec-Fetch-Site` is set by the
+            // browser itself and cannot be forged by page script; only the
+            // explicit "cross-site" value is rejected, so same-origin/
+            // same-site/none browser callers and native clients (which never
+            // send the header at all) are untouched. Placed after the
+            // `/secure/call` rewrite so a sealed inner request is judged on
+            // its own path, and falling back to the outer head's value because
+            // the rewrite does not carry `Sec-Fetch-*` across (otherwise a page
+            // could wrap the request in an envelope to erase the signal).
+            if Self.isCrossSiteProtectedPath(path),
+                (head.headers.first(name: "Sec-Fetch-Site")
+                    ?? stateRef.value.outerSecFetchSite) == "cross-site"
+            {
+                var headers = [("Content-Type", "application/json; charset=utf-8")]
+                headers.append(contentsOf: stateRef.value.corsHeaders)
+                let errorBody =
+                    #"{"error":"cross_site_denied","message":"Cross-site browser requests are not allowed on this endpoint."}"#
+                sendResponse(
+                    context: context,
+                    version: head.version,
+                    status: .forbidden,
+                    headers: headers,
+                    body: errorBody
+                )
+                logRequest(
+                    method: method,
+                    path: path,
+                    userAgent: userAgent,
+                    requestBody: nil,
+                    responseBody: errorBody,
+                    responseStatus: 403,
+                    startTime: startTime
+                )
+                stateRef.value.requestHead = nil
+                stateRef.value.requestBodyBuffer = nil
+                return
             }
 
             // Access key authentication gate (all data snapshotted at server start, zero locks)
@@ -858,6 +932,49 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         }
     }
 
+    /// Scope gate for `/admin/*`. These routes are server-global, so a key
+    /// minted for a single agent (a relay/LAN paired peer) must not read or
+    /// mutate them — that would escape the confinement `agentScopeRejection`
+    /// enforces on every agent-addressing route. Sends 403 and returns `true`
+    /// when the request must be rejected.
+    ///
+    /// `authedScopeIsMaster` is only set for authenticated non-loopback
+    /// callers, so loopback (CLI / local automation scripts, which skip the
+    /// auth gate entirely) is admitted explicitly and keeps working.
+    private func sendAdminScopeDeniedIfNeeded(
+        head: HTTPRequestHead,
+        context: ChannelHandlerContext,
+        startTime: Date,
+        userAgent: String?,
+        method: String,
+        path: String
+    ) -> Bool {
+        if stateRef.value.authedScopeIsMaster { return false }
+        if isLoopbackConnection(context) { return false }
+
+        var headers = [("Content-Type", "application/json; charset=utf-8")]
+        headers.append(contentsOf: stateRef.value.corsHeaders)
+        let body =
+            #"{"error":"admin_scope_denied","message":"This access key is not scoped to the admin endpoints."}"#
+        sendResponse(
+            context: context,
+            version: head.version,
+            status: .forbidden,
+            headers: headers,
+            body: body
+        )
+        logRequest(
+            method: method,
+            path: path,
+            userAgent: userAgent,
+            requestBody: nil,
+            responseBody: body,
+            responseStatus: 403,
+            startTime: startTime
+        )
+        return true
+    }
+
     /// `/admin/cache-stats` exposes the current vmlx `CacheCoordinator`
     /// counters for loaded models. It is intentionally read-only and does not
     /// load a model by itself; an empty `models` array is the correct cold
@@ -870,6 +987,18 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         method: String,
         path: String
     ) {
+        // Server-global route: agent-scoped keys are not admitted.
+        if sendAdminScopeDeniedIfNeeded(
+            head: head,
+            context: context,
+            startTime: startTime,
+            userAgent: userAgent,
+            method: method,
+            path: path
+        ) {
+            return
+        }
+
         let loop = context.eventLoop
         let ctx = NIOLoopBound(context, eventLoop: loop)
         let cors = stateRef.value.corsHeaders
@@ -1165,6 +1294,18 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         method: String,
         path: String
     ) {
+        // Server-global route: agent-scoped keys are not admitted.
+        if sendAdminScopeDeniedIfNeeded(
+            head: head,
+            context: context,
+            startTime: startTime,
+            userAgent: userAgent,
+            method: method,
+            path: path
+        ) {
+            return
+        }
+
         let loop = context.eventLoop
         let ctx = NIOLoopBound(context, eventLoop: loop)
         let cors = stateRef.value.corsHeaders
@@ -1240,6 +1381,20 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         method: String,
         path: String
     ) {
+        // Server-global route: agent-scoped keys are not admitted. PUT here
+        // rewrites concurrency / memory-safety / cache defaults for the whole
+        // server, so this gate runs before the body is even read.
+        if sendAdminScopeDeniedIfNeeded(
+            head: head,
+            context: context,
+            startTime: startTime,
+            userAgent: userAgent,
+            method: method,
+            path: path
+        ) {
+            return
+        }
+
         let loop = context.eventLoop
         let ctx = NIOLoopBound(context, eventLoop: loop)
         let cors = stateRef.value.corsHeaders
@@ -1319,9 +1474,13 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
                     from: parsedBody.data
                 )
             } catch {
+                // Keep the decoder's detail (which names internal types and
+                // coding paths) on the server side only; the wire gets a
+                // generic message with the same error code/shape.
+                print("[Intelligence][NIO] runtime-settings decode failed: \(error)")
                 let body = Self.errorBody(
                     .openai(type: "invalid_request_error"),
-                    message: "Invalid runtime settings JSON: \(error.localizedDescription)"
+                    message: "Invalid runtime settings JSON"
                 )
                 let headers = [("Content-Type", "application/json; charset=utf-8")] + cors
                 hop {
@@ -2714,6 +2873,11 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
     /// A body within the size cap can still be a depth bomb that overflows
     /// the decoder's recursion; this is far beyond any real chat/tool payload.
     static let maxJSONNestingDepth = 256
+    /// Initial capacity for the request-body buffer. Deliberately independent
+    /// of the caller's `Content-Length`: the buffer is created before the auth
+    /// gate runs, so pre-reserving a declared size is an unauthenticated
+    /// memory-pinning primitive. NIO grows the buffer as body bytes arrive.
+    static let initialBodyBufferCapacity = 64 * 1024
 
     /// Reply 431 Request Header Fields Too Large and close. Done at `.head`
     /// before any body allocation or routing so a header-flood can't pin
@@ -2849,6 +3013,19 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         return trustLoopback && (context.channel.remoteAddress?.isLoopback ?? false)
     }
 
+    /// True when the request carries headers only a browser sends. Native
+    /// clients (App Intents, CLI, channels, relay) never set these, so this
+    /// separates the user's own Shortcut from hostile web content that can
+    /// reach the loopback server via `fetch()`. Loopback trust is granted by
+    /// peer IP alone, which a page in any tab also satisfies; these headers
+    /// are the only signal that distinguishes the two.
+    static func isBrowserOriginated(_ head: HTTPRequestHead) -> Bool {
+        head.headers.first(name: "Origin") != nil
+            || head.headers.first(name: "Sec-Fetch-Site") != nil
+            || head.headers.first(name: "Sec-Fetch-Mode") != nil
+            || head.headers.first(name: "Sec-Fetch-Dest") != nil
+    }
+
     /// Enforce that an agent-scoped access key only addresses its own agent.
     /// Returns a rejection when the validated key's audience is an agent
     /// address that does not match the target agent. Loopback callers,
@@ -2883,13 +3060,48 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         return nil
     }
 
-    /// Loopback callers always get `Access-Control-Allow-Origin: *` (issue
-    /// #952): a request reaching us via 127.0.0.1 / ::1 is by definition on
-    /// the user's machine, so it gets the same trust the auth gate already
-    /// grants. Non-loopback callers respect `configuration.allowedOrigins`:
-    /// a literal `"*"` matches everything; otherwise the request `Origin`
-    /// header must appear in the list verbatim, in which case it's echoed
-    /// back with `Vary: Origin`.
+    /// Routes that drive the local control plane — agent management and
+    /// dispatch, server administration, background tasks — as opposed to the
+    /// open inference/discovery API (health, models, tags, show, chat,
+    /// completions, embeddings, responses, messages, generate, mcp).
+    /// The loopback CORS auto-trust deliberately opens the latter to
+    /// browser-based clients (issue #952); it must not open the former,
+    /// because loopback trust is granted by peer IP and any web page's
+    /// `fetch("http://localhost:1337/…")` satisfies that too.
+    static func isControlPlanePath(_ path: String) -> Bool {
+        for prefix in ["/agents", "/admin", "/tasks"] {
+            if path == prefix || path.hasPrefix(prefix + "/") { return true }
+        }
+        return false
+    }
+
+    /// Paths a cross-site browser request may never reach. Wider than
+    /// `isControlPlanePath` because it also covers `/mcp`: `/mcp/call` executes
+    /// tools, and a `text/plain` POST is a CORS-*simple* request, so it ships
+    /// without a preflight. The external-surface deny list already blocks
+    /// shell/file tools there, but every other MCP tool would otherwise be
+    /// invokable by any website.
+    ///
+    /// This is deliberately a separate predicate from `isControlPlanePath`:
+    /// `/mcp` keeps its permissive loopback CORS so same-site local tooling
+    /// (an MCP inspector on another localhost port) still reads responses,
+    /// while genuinely cross-site invocation is refused outright.
+    static func isCrossSiteProtectedPath(_ path: String) -> Bool {
+        if isControlPlanePath(path) { return true }
+        return path == "/mcp" || path.hasPrefix("/mcp/")
+    }
+
+    /// Loopback callers get `Access-Control-Allow-Origin: *` on the open
+    /// inference/discovery API (issue #952): a request reaching us via
+    /// 127.0.0.1 / ::1 is by definition on the user's machine, so it gets the
+    /// same trust the auth gate already grants. Control-plane routes
+    /// (`isControlPlanePath`) are excluded from that auto-trust — loopback
+    /// alone must not make the admin/agent/task surface readable by any
+    /// website — and fall back to the explicit-allowlist rules below.
+    /// Non-loopback callers (and control-plane routes) respect
+    /// `configuration.allowedOrigins`: a literal `"*"` matches everything;
+    /// otherwise the request `Origin` header must appear in the list
+    /// verbatim, in which case it's echoed back with `Vary: Origin`.
     private func computeCORSHeaders(
         for head: HTTPRequestHead,
         isPreflight: Bool,
@@ -2898,7 +3110,11 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         let origin = head.headers.first(name: "Origin")
         var headers: [(String, String)] = []
 
-        let allowsAny = isLoopback || configuration.allowedOrigins.contains("*")
+        // Derived from the head (not `stateRef.normalizedPath`) because this
+        // runs at `.head`, before routing has extracted the path.
+        let isControlPlane = Self.isControlPlanePath(normalize(extractPath(from: head.uri)))
+        let allowsAny =
+            (isLoopback && !isControlPlane) || configuration.allowedOrigins.contains("*")
         if allowsAny {
             headers.append(("Access-Control-Allow-Origin", "*"))
         } else if let origin,
@@ -3097,17 +3313,14 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         startTime: Date,
         userAgent: String?
     ) {
-        let data: Data
-        let requestBodyString: String?
-        if let body = stateRef.value.requestBodyBuffer {
-            var bodyCopy = body
-            let bytes = bodyCopy.readBytes(length: bodyCopy.readableBytes) ?? []
-            data = Data(bytes)
-            requestBodyString = String(decoding: data, as: UTF8.self)
-        } else {
-            data = Data()
-            requestBodyString = nil
-        }
+        // Depth-guarded read (see `readRequestBody`): a body inside the size
+        // cap can still be a JSON depth bomb whose decode overflows the stack
+        // on the event-loop thread — an uncatchable trap that kills the whole
+        // server. Guarded bodies arrive empty, so the decode below falls into
+        // this route's existing 400 path instead.
+        let parsedBody = readRequestBody()
+        let data = parsedBody.data
+        let requestBodyString = parsedBody.text
 
         guard let req = try? JSONDecoder().decode(MemoryIngestRequest.self, from: data) else {
             sendResponse(
@@ -3518,13 +3731,11 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
             return
         }
 
-        let data: Data
-        if let body = stateRef.value.requestBodyBuffer {
-            var bodyCopy = body
-            data = Data(bodyCopy.readBytes(length: bodyCopy.readableBytes) ?? [])
-        } else {
-            data = Data()
-        }
+        // Depth-guarded read (see `readRequestBody`): this endpoint is
+        // unauthenticated, so a JSON depth bomb here would crash the process
+        // before any credential check. A guarded body arrives empty and falls
+        // into the malformed-request path below.
+        let data = readRequestBody().data
 
         let cors = stateRef.value.corsHeaders
         let loop = context.eventLoop
@@ -3654,13 +3865,11 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
             return nil
         }
 
-        let data: Data
-        if let body = stateRef.value.requestBodyBuffer {
-            var bodyCopy = body
-            data = Data(bodyCopy.readBytes(length: bodyCopy.readableBytes) ?? [])
-        } else {
-            data = Data()
-        }
+        // Depth-guarded read (see `readRequestBody`): this endpoint is
+        // unauthenticated, so a JSON depth bomb here would crash the process
+        // before any credential check. A guarded body arrives empty and falls
+        // into the malformed-request path below.
+        let data = readRequestBody().data
 
         guard let call = try? JSONDecoder().decode(SecureChannel.CallRequest.self, from: data) else {
             reject(status: .badRequest, code: "secure_malformed", message: "Malformed secure call")
@@ -3842,17 +4051,14 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
             )
             return
         }
-        let data: Data
-        let requestBodyString: String?
-        if let body = stateRef.value.requestBodyBuffer {
-            var bodyCopy = body
-            let bytes = bodyCopy.readBytes(length: bodyCopy.readableBytes) ?? []
-            data = Data(bytes)
-            requestBodyString = String(decoding: data, as: UTF8.self)
-        } else {
-            data = Data()
-            requestBodyString = nil
-        }
+        // Depth-guarded read (see `readRequestBody`): a body inside the size
+        // cap can still be a JSON depth bomb whose decode overflows the stack
+        // on the event-loop thread — an uncatchable trap that kills the whole
+        // server. Guarded bodies arrive empty, so the decode below falls into
+        // this route's existing 400 path instead.
+        let parsedBody = readRequestBody()
+        let data = parsedBody.data
+        let requestBodyString = parsedBody.text
 
         guard let req = try? JSONDecoder().decode(PairRequest.self, from: data) else {
             var headers = [("Content-Type", "application/json; charset=utf-8")]
@@ -3925,7 +4131,7 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
                 let recovered = try? recoverAddress(
                     payload: signedPayload,
                     signature: sigBytes,
-                    domainPrefix: "Osaurus Signed Pairing"
+                    domainPrefix: SigningDomain.pairing
                 ),
                 recovered == req.connectorAddress
             else {
@@ -4156,17 +4362,14 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         startTime: Date,
         userAgent: String?
     ) {
-        let data: Data
-        let requestBodyString: String?
-        if let body = stateRef.value.requestBodyBuffer {
-            var bodyCopy = body
-            let bytes = bodyCopy.readBytes(length: bodyCopy.readableBytes) ?? []
-            data = Data(bytes)
-            requestBodyString = String(decoding: data, as: UTF8.self)
-        } else {
-            data = Data()
-            requestBodyString = nil
-        }
+        // Depth-guarded read (see `readRequestBody`): a body inside the size
+        // cap can still be a JSON depth bomb whose decode overflows the stack
+        // on the event-loop thread — an uncatchable trap that kills the whole
+        // server. Guarded bodies arrive empty, so the decode below falls into
+        // this route's existing 400 path instead.
+        let parsedBody = readRequestBody()
+        let data = parsedBody.data
+        let requestBodyString = parsedBody.text
 
         let cors = stateRef.value.corsHeaders
         let loop = context.eventLoop
@@ -4675,17 +4878,14 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
             return
         }
 
-        let data: Data
-        let requestBodyString: String?
-        if let body = stateRef.value.requestBodyBuffer {
-            var bodyCopy = body
-            let bytes = bodyCopy.readBytes(length: bodyCopy.readableBytes) ?? []
-            data = Data(bytes)
-            requestBodyString = String(decoding: data, as: UTF8.self)
-        } else {
-            data = Data()
-            requestBodyString = nil
-        }
+        // Depth-guarded read (see `readRequestBody`): a body inside the size
+        // cap can still be a JSON depth bomb whose decode overflows the stack
+        // on the event-loop thread — an uncatchable trap that kills the whole
+        // server. Guarded bodies arrive empty, so the decode below falls into
+        // this route's existing 400 path instead.
+        let parsedBody = readRequestBody()
+        let data = parsedBody.data
+        let requestBodyString = parsedBody.text
 
         // `/agents/{id}/run` does NOT require a `model`: a Mode 2 caller omits
         // it on purpose because the agent runs its own effective model
@@ -5659,8 +5859,19 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
 
     // MARK: - Dispatch & Task Endpoints
 
-    nonisolated static func shouldBindExternalSurfaceForDispatch(isLoopback: Bool) -> Bool {
-        !isLoopback
+    /// Whether a `/dispatch` run must execute as an EXTERNAL surface (which
+    /// activates `ToolRegistry`'s deny list — no `shell_run` / `file_write` /
+    /// `git_commit`). Non-loopback callers are always external. Loopback is
+    /// only trusted when the request looks native: loopback trust is granted
+    /// by peer IP, and a web page's `fetch("http://localhost:1337/…")` also
+    /// arrives from 127.0.0.1, so a browser-originated loopback dispatch is
+    /// treated as external too. The App Intents client (URLSession, no
+    /// `Origin`/`Sec-Fetch-*`) keeps its full tool set.
+    nonisolated static func shouldBindExternalSurfaceForDispatch(
+        isLoopback: Bool,
+        isBrowserOriginated: Bool
+    ) -> Bool {
+        !isLoopback || isBrowserOriginated
     }
 
     /// POST /agents/{identifier}/dispatch — dispatch work/chat task
@@ -5692,17 +5903,14 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         let logStartTime = startTime
         let logUserAgent = userAgent
 
-        let data: Data
-        let requestBodyString: String?
-        if let body = stateRef.value.requestBodyBuffer {
-            var bodyCopy = body
-            let bytes = bodyCopy.readBytes(length: bodyCopy.readableBytes) ?? []
-            data = Data(bytes)
-            requestBodyString = String(decoding: data, as: UTF8.self)
-        } else {
-            data = Data()
-            requestBodyString = nil
-        }
+        // Depth-guarded read (see `readRequestBody`): a body inside the size
+        // cap can still be a JSON depth bomb whose decode overflows the stack
+        // on the event-loop thread — an uncatchable trap that kills the whole
+        // server. Guarded bodies arrive empty, so the decode below falls into
+        // this route's existing 400 path instead.
+        let parsedBody = readRequestBody()
+        let data = parsedBody.data
+        let requestBodyString = parsedBody.text
 
         // Extract identifier from path: /agents/{identifier}/dispatch
         let components = path.split(separator: "/")
@@ -5727,6 +5935,15 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         // can drive it as a detached background task. Remote callers remain
         // blocked from the built-in agent.
         let isLoopback = isLoopbackConnection(context)
+        // A loopback caller is only "the user's own machine" when it also
+        // looks native; a hostile page's `fetch()` reaches 127.0.0.1 too, so
+        // browser-marked dispatches run on the external (deny-listed) surface.
+        // `outerBrowserOriginated` covers the `/secure/call` case: the rewrite
+        // rebuilds the head without `Origin`/`Sec-Fetch-*`, so reading the
+        // (inner) head alone would let an envelope launder a browser request
+        // back onto the trusted-native path.
+        let isBrowserOriginated =
+            Self.isBrowserOriginated(head) || stateRef.value.outerBrowserOriginated
         // Capture the validated key's scope on the event loop; the resolution
         // below runs in a detached task that must not touch `stateRef`.
         let authedAudience = stateRef.value.authedAudience
@@ -5781,7 +5998,10 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
                 return
             }
 
-            if !isLoopback,
+            // Browser-originated loopback counts as external here too: the
+            // built-in agent's UUID is a documented constant, so blocking the
+            // `GET /agents` enumeration alone would not keep a page out.
+            if !isLoopback || isBrowserOriginated,
                 let rejection = Agent.rejectBuiltInForExternalSurface(
                     agentId,
                     source: "http/agents/dispatch"
@@ -5860,11 +6080,17 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
                 showToast: true,
                 source: .http,
                 externalSessionKey: externalSessionKey,
-                externalSurface: Self.shouldBindExternalSurfaceForDispatch(isLoopback: isLoopback)
+                externalSurface: Self.shouldBindExternalSurfaceForDispatch(
+                    isLoopback: isLoopback,
+                    isBrowserOriginated: isBrowserOriginated
+                )
             )
 
             let handle: DispatchHandle?
-            if Self.shouldBindExternalSurfaceForDispatch(isLoopback: isLoopback) {
+            if Self.shouldBindExternalSurfaceForDispatch(
+                isLoopback: isLoopback,
+                isBrowserOriginated: isBrowserOriginated
+            ) {
                 handle = await ChatExecutionContext.$isExternalSurface.withValue(true) {
                     await TaskDispatcher.shared.dispatch(request)
                 }
@@ -6058,17 +6284,14 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         let logStartTime = startTime
         let logUserAgent = userAgent
 
-        let data: Data
-        let requestBodyString: String?
-        if let body = stateRef.value.requestBodyBuffer {
-            var bodyCopy = body
-            let bytes = bodyCopy.readBytes(length: bodyCopy.readableBytes) ?? []
-            data = Data(bytes)
-            requestBodyString = String(decoding: data, as: UTF8.self)
-        } else {
-            data = Data()
-            requestBodyString = nil
-        }
+        // Depth-guarded read (see `readRequestBody`): a body inside the size
+        // cap can still be a JSON depth bomb whose decode overflows the stack
+        // on the event-loop thread — an uncatchable trap that kills the whole
+        // server. Guarded bodies arrive empty, so the decode below falls into
+        // this route's existing 400 path instead.
+        let parsedBody = readRequestBody()
+        let data = parsedBody.data
+        let requestBodyString = parsedBody.text
 
         // Extract task_id from path: /tasks/{task_id}/clarify
         let components = path.split(separator: "/")
@@ -6149,17 +6372,14 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
     ) {
         let logPath = ollamaFormat ? "/embed" : "/embeddings"
 
-        let data: Data
-        let requestBodyString: String?
-        if let body = stateRef.value.requestBodyBuffer {
-            var bodyCopy = body
-            let bytes = bodyCopy.readBytes(length: bodyCopy.readableBytes) ?? []
-            data = Data(bytes)
-            requestBodyString = String(decoding: data, as: UTF8.self)
-        } else {
-            data = Data()
-            requestBodyString = nil
-        }
+        // Depth-guarded read (see `readRequestBody`): a body inside the size
+        // cap can still be a JSON depth bomb whose decode overflows the stack
+        // on the event-loop thread — an uncatchable trap that kills the whole
+        // server. Guarded bodies arrive empty, so the decode below falls into
+        // this route's existing 400 path instead.
+        let parsedBody = readRequestBody()
+        let data = parsedBody.data
+        let requestBodyString = parsedBody.text
 
         guard let request = try? JSONDecoder().decode(EmbeddingRequest.self, from: data) else {
             let errorBody =
@@ -6273,14 +6493,14 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
 
     // MARK: - Image generation (/v1/images/*)
 
+    /// Every `/v1/images/*` and `/v1/videos/*` route JSON-decodes this, so the
+    /// depth guard lives here (see `readRequestBody`): a depth bomb inside the
+    /// size cap would otherwise overflow the decoder's recursion on the
+    /// event-loop thread and take the process down. A guarded body comes back
+    /// empty, so each caller's existing "Invalid request body" 400 fires.
     private func requestBodyData() -> (data: Data, string: String?) {
-        if let body = stateRef.value.requestBodyBuffer {
-            var copy = body
-            let bytes = copy.readBytes(length: copy.readableBytes) ?? []
-            let data = Data(bytes)
-            return (data, String(decoding: data, as: UTF8.self))
-        }
-        return (Data(), nil)
+        let parsed = readRequestBody()
+        return (parsed.data, parsed.text)
     }
 
     private func sendImageError(
@@ -7471,17 +7691,14 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         startTime: Date,
         userAgent: String?
     ) {
-        let data: Data
-        let requestBodyString: String?
-        if let body = stateRef.value.requestBodyBuffer {
-            var bodyCopy = body
-            let bytes = bodyCopy.readBytes(length: bodyCopy.readableBytes) ?? []
-            data = Data(bytes)
-            requestBodyString = String(decoding: data, as: UTF8.self)
-        } else {
-            data = Data()
-            requestBodyString = nil
-        }
+        // Depth-guarded read (see `readRequestBody`): a body inside the size
+        // cap can still be a JSON depth bomb whose decode overflows the stack
+        // on the event-loop thread — an uncatchable trap that kills the whole
+        // server. Guarded bodies arrive empty, so the decode below falls into
+        // this route's existing 400 path instead.
+        let parsedBody = readRequestBody()
+        let data = parsedBody.data
+        let requestBodyString = parsedBody.text
 
         guard let req = try? JSONDecoder().decode(CompletionRequest.self, from: data) else {
             let body = Self.errorBody(
@@ -7868,17 +8085,14 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         startTime: Date,
         userAgent: String?
     ) {
-        let data: Data
-        let requestBodyString: String?
-        if let body = stateRef.value.requestBodyBuffer {
-            var bodyCopy = body
-            let bytes = bodyCopy.readBytes(length: bodyCopy.readableBytes) ?? []
-            data = Data(bytes)
-            requestBodyString = String(decoding: data, as: UTF8.self)
-        } else {
-            data = Data()
-            requestBodyString = nil
-        }
+        // Depth-guarded read (see `readRequestBody`): a body inside the size
+        // cap can still be a JSON depth bomb whose decode overflows the stack
+        // on the event-loop thread — an uncatchable trap that kills the whole
+        // server. Guarded bodies arrive empty, so the decode below falls into
+        // this route's existing 400 path instead.
+        let parsedBody = readRequestBody()
+        let data = parsedBody.data
+        let requestBodyString = parsedBody.text
 
         guard var req = try? JSONDecoder().decode(ChatCompletionRequest.self, from: data) else {
             let body = Self.errorBody(.openai(type: "invalid_request_error"), message: "Invalid request format")
@@ -8655,17 +8869,14 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         startTime: Date,
         userAgent: String?
     ) {
-        let data: Data
-        let requestBodyString: String?
-        if let body = stateRef.value.requestBodyBuffer {
-            var bodyCopy = body
-            let bytes = bodyCopy.readBytes(length: bodyCopy.readableBytes) ?? []
-            data = Data(bytes)
-            requestBodyString = String(decoding: data, as: UTF8.self)
-        } else {
-            data = Data()
-            requestBodyString = nil
-        }
+        // Depth-guarded read (see `readRequestBody`): a body inside the size
+        // cap can still be a JSON depth bomb whose decode overflows the stack
+        // on the event-loop thread — an uncatchable trap that kills the whole
+        // server. Guarded bodies arrive empty, so the decode below falls into
+        // this route's existing 400 path instead.
+        let parsedBody = readRequestBody()
+        let data = parsedBody.data
+        let requestBodyString = parsedBody.text
 
         guard var decodedReq = try? JSONDecoder().decode(ChatCompletionRequest.self, from: data) else {
             sendResponse(
@@ -9083,17 +9294,14 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         startTime: Date,
         userAgent: String?
     ) {
-        let data: Data
-        let requestBodyString: String?
-        if let body = stateRef.value.requestBodyBuffer {
-            var bodyCopy = body
-            let bytes = bodyCopy.readBytes(length: bodyCopy.readableBytes) ?? []
-            data = Data(bytes)
-            requestBodyString = String(decoding: data, as: UTF8.self)
-        } else {
-            data = Data()
-            requestBodyString = nil
-        }
+        // Depth-guarded read (see `readRequestBody`): a body inside the size
+        // cap can still be a JSON depth bomb whose decode overflows the stack
+        // on the event-loop thread — an uncatchable trap that kills the whole
+        // server. Guarded bodies arrive empty, so the decode below falls into
+        // this route's existing 400 path instead.
+        let parsedBody = readRequestBody()
+        let data = parsedBody.data
+        let requestBodyString = parsedBody.text
 
         guard let ollama = try? JSONDecoder().decode(OllamaGenerateRequest.self, from: data) else {
             sendResponse(
@@ -10033,17 +10241,14 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         startTime: Date,
         userAgent: String?
     ) {
-        let data: Data
-        let requestBodyString: String?
-        if let body = stateRef.value.requestBodyBuffer {
-            var bodyCopy = body
-            let bytes = bodyCopy.readBytes(length: bodyCopy.readableBytes) ?? []
-            data = Data(bytes)
-            requestBodyString = String(decoding: data, as: UTF8.self)
-        } else {
-            data = Data()
-            requestBodyString = nil
-        }
+        // Depth-guarded read (see `readRequestBody`): a body inside the size
+        // cap can still be a JSON depth bomb whose decode overflows the stack
+        // on the event-loop thread — an uncatchable trap that kills the whole
+        // server. Guarded bodies arrive empty, so the decode below falls into
+        // this route's existing 400 path instead.
+        let parsedBody = readRequestBody()
+        let data = parsedBody.data
+        let requestBodyString = parsedBody.text
 
         struct ShowRequest: Decodable {
             let model: String
@@ -10297,17 +10502,14 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         startTime: Date,
         userAgent: String?
     ) {
-        let data: Data
-        let requestBodyString: String?
-        if let body = stateRef.value.requestBodyBuffer {
-            var bodyCopy = body
-            let bytes = bodyCopy.readBytes(length: bodyCopy.readableBytes) ?? []
-            data = Data(bytes)
-            requestBodyString = String(decoding: data, as: UTF8.self)
-        } else {
-            data = Data()
-            requestBodyString = nil
-        }
+        // Depth-guarded read (see `readRequestBody`): a body inside the size
+        // cap can still be a JSON depth bomb whose decode overflows the stack
+        // on the event-loop thread — an uncatchable trap that kills the whole
+        // server. Guarded bodies arrive empty, so the decode below falls into
+        // this route's existing 400 path instead.
+        let parsedBody = readRequestBody()
+        let data = parsedBody.data
+        let requestBodyString = parsedBody.text
 
         // Tool calls attributed to the Default agent are not exposable
         // externally. A PRESENT header must parse to a valid custom-agent
@@ -10642,17 +10844,14 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         startTime: Date,
         userAgent: String?
     ) {
-        let data: Data
-        let requestBodyString: String?
-        if let body = stateRef.value.requestBodyBuffer {
-            var bodyCopy = body
-            let bytes = bodyCopy.readBytes(length: bodyCopy.readableBytes) ?? []
-            data = Data(bytes)
-            requestBodyString = String(decoding: data, as: UTF8.self)
-        } else {
-            data = Data()
-            requestBodyString = nil
-        }
+        // Depth-guarded read (see `readRequestBody`): a body inside the size
+        // cap can still be a JSON depth bomb whose decode overflows the stack
+        // on the event-loop thread — an uncatchable trap that kills the whole
+        // server. Guarded bodies arrive empty, so the decode below falls into
+        // this route's existing 400 path instead.
+        let parsedBody = readRequestBody()
+        let data = parsedBody.data
+        let requestBodyString = parsedBody.text
 
         // Parse Anthropic request
         guard let anthropicReq = try? JSONDecoder().decode(AnthropicMessagesRequest.self, from: data) else {
@@ -11423,17 +11622,14 @@ final class HTTPHandler: ChannelInboundHandler, Sendable {
         startTime: Date,
         userAgent: String?
     ) {
-        let data: Data
-        let requestBodyString: String?
-        if let body = stateRef.value.requestBodyBuffer {
-            var bodyCopy = body
-            let bytes = bodyCopy.readBytes(length: bodyCopy.readableBytes) ?? []
-            data = Data(bytes)
-            requestBodyString = String(decoding: data, as: UTF8.self)
-        } else {
-            data = Data()
-            requestBodyString = nil
-        }
+        // Depth-guarded read (see `readRequestBody`): a body inside the size
+        // cap can still be a JSON depth bomb whose decode overflows the stack
+        // on the event-loop thread — an uncatchable trap that kills the whole
+        // server. Guarded bodies arrive empty, so the decode below falls into
+        // this route's existing 400 path instead.
+        let parsedBody = readRequestBody()
+        let data = parsedBody.data
+        let requestBodyString = parsedBody.text
 
         // Parse Open Responses request
         guard let openResponsesReq = try? JSONDecoder().decode(OpenResponsesRequest.self, from: data) else {

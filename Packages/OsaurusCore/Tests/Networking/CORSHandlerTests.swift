@@ -22,6 +22,13 @@
 //    loopback. They lock down the explicit-allowlist mode used by
 //    `exposeToNetwork=true` / hardened deployments.
 //
+//  The auto-trust covers the OPEN API only (health, models, tags, show,
+//  inference, mcp). Control-plane routes (`/agents*`, `/admin*`, `/tasks*`)
+//  are excluded: loopback trust is granted by peer IP, which any web page's
+//  `fetch("http://localhost:1337/…")` also satisfies, so `*` there would hand
+//  every website the local control plane. The "controlPlane_*" tests below
+//  lock that split down in both directions.
+//
 
 import Foundation
 import NIOCore
@@ -196,6 +203,233 @@ struct CORSHandlerTests {
         // branch, so loopback callers always see "*" (not the echoed
         // origin + Vary). This is intentional: the wildcard branch is
         // strictly more permissive.
+        #expect(http?.value(forHTTPHeaderField: "Access-Control-Allow-Origin") == "*")
+    }
+
+    // MARK: - Control plane (loopback auto-trust does NOT apply)
+
+    /// A website doing `fetch("http://localhost:1337/admin/runtime-settings")`
+    /// arrives over loopback like any local app, so the auto-trust `*` would
+    /// make the server's full runtime configuration cross-origin readable.
+    /// Control-plane routes must therefore emit no `*` for an unlisted origin.
+    @Test func loopback_controlPlane_emptyAllowlist_returnsNoAllowOriginStar() async throws {
+        var config = ServerConfiguration.default
+        config.allowedOrigins = []
+        let server = try await startCORSTestServer(config: config)
+        defer { Task { await server.shutdown() } }
+
+        var request = URLRequest(
+            url: URL(string: "http://\(server.host):\(server.port)/admin/runtime-settings")!
+        )
+        request.httpMethod = "GET"
+        request.setValue("https://evil.example", forHTTPHeaderField: "Origin")
+
+        let (_, resp) = try await URLSession.shared.data(for: request)
+        let http = resp as? HTTPURLResponse
+
+        #expect(http?.value(forHTTPHeaderField: "Access-Control-Allow-Origin") == nil)
+    }
+
+    /// The same exclusion applies to the other control-plane prefixes; a
+    /// task id is enough to read another run's prompt and results.
+    @Test func loopback_controlPlane_tasks_emptyAllowlist_returnsNoAllowOriginStar() async throws {
+        var config = ServerConfiguration.default
+        config.allowedOrigins = []
+        let server = try await startCORSTestServer(config: config)
+        defer { Task { await server.shutdown() } }
+
+        var request = URLRequest(
+            url: URL(string: "http://\(server.host):\(server.port)/v1/tasks/\(UUID().uuidString)")!
+        )
+        request.httpMethod = "GET"
+        request.setValue("https://evil.example", forHTTPHeaderField: "Origin")
+
+        let (_, resp) = try await URLSession.shared.data(for: request)
+        let http = resp as? HTTPURLResponse
+
+        #expect(http?.value(forHTTPHeaderField: "Access-Control-Allow-Origin") == nil)
+    }
+
+    /// The control-plane preflight must fail closed too: without CORS headers
+    /// on the 204, the browser never sends the follow-up PUT.
+    @Test func loopback_controlPlane_OPTIONS_emptyAllowlist_returnsNoCORSHeaders() async throws {
+        var config = ServerConfiguration.default
+        config.allowedOrigins = []
+        let server = try await startCORSTestServer(config: config)
+        defer { Task { await server.shutdown() } }
+
+        var request = URLRequest(
+            url: URL(string: "http://\(server.host):\(server.port)/admin/runtime-settings")!
+        )
+        request.httpMethod = "OPTIONS"
+        request.setValue("https://evil.example", forHTTPHeaderField: "Origin")
+        request.setValue("PUT", forHTTPHeaderField: "Access-Control-Request-Method")
+
+        let (_, resp) = try await URLSession.shared.data(for: request)
+        let http = resp as? HTTPURLResponse
+
+        #expect(http?.value(forHTTPHeaderField: "Access-Control-Allow-Origin") == nil)
+    }
+
+    /// Opting an origin in explicitly still works for the control plane: the
+    /// origin is echoed (never `*`) with `Vary: Origin`, the same shape the
+    /// non-loopback allowlist path uses.
+    @Test func loopback_controlPlane_allowlistedOrigin_echoesOriginAndVary() async throws {
+        var config = ServerConfiguration.default
+        config.allowedOrigins = ["http://localhost:3000"]
+        let server = try await startCORSTestServer(config: config)
+        defer { Task { await server.shutdown() } }
+
+        var request = URLRequest(
+            url: URL(string: "http://\(server.host):\(server.port)/admin/runtime-settings")!
+        )
+        request.httpMethod = "GET"
+        request.setValue("http://localhost:3000", forHTTPHeaderField: "Origin")
+
+        let (_, resp) = try await URLSession.shared.data(for: request)
+        let http = resp as? HTTPURLResponse
+
+        #expect(
+            http?.value(forHTTPHeaderField: "Access-Control-Allow-Origin") == "http://localhost:3000"
+        )
+        let vary = http?.value(forHTTPHeaderField: "Vary") ?? ""
+        #expect(vary.contains("Origin"))
+    }
+
+    /// Beyond hiding the response, a control-plane request the browser marks
+    /// cross-site is refused outright — this is what stops the "blind" CSRF
+    /// shapes (`text/plain` POST) that never need to read a response.
+    @Test func loopback_controlPlane_crossSiteFetch_isRejectedWith403() async throws {
+        var config = ServerConfiguration.default
+        config.allowedOrigins = []
+        let server = try await startCORSTestServer(config: config)
+        defer { Task { await server.shutdown() } }
+
+        var request = URLRequest(
+            url: URL(string: "http://\(server.host):\(server.port)/agents/\(UUID().uuidString)/dispatch")!
+        )
+        request.httpMethod = "POST"
+        request.setValue("text/plain", forHTTPHeaderField: "Content-Type")
+        request.setValue("https://evil.example", forHTTPHeaderField: "Origin")
+        request.setValue("cross-site", forHTTPHeaderField: "Sec-Fetch-Site")
+        request.httpBody = Data(#"{"prompt":"write a file"}"#.utf8)
+
+        let (data, resp) = try await URLSession.shared.data(for: request)
+        let status = (resp as? HTTPURLResponse)?.statusCode ?? -1
+        let body = String(decoding: data, as: UTF8.self)
+
+        #expect(status == 403)
+        #expect(body.contains("cross_site_denied"))
+    }
+
+    /// ...and the gate is scoped to the control plane: the issue-#952 clients
+    /// (Obsidian and friends) are cross-site by construction and must keep
+    /// working against the open API.
+    @Test func loopback_openAPI_crossSiteFetch_stillReturnsAllowOriginStar() async throws {
+        var config = ServerConfiguration.default
+        config.allowedOrigins = []
+        let server = try await startCORSTestServer(config: config)
+        defer { Task { await server.shutdown() } }
+
+        var request = URLRequest(
+            url: URL(string: "http://\(server.host):\(server.port)/api/tags")!
+        )
+        request.httpMethod = "GET"
+        request.setValue("app://obsidian.md", forHTTPHeaderField: "Origin")
+        request.setValue("cross-site", forHTTPHeaderField: "Sec-Fetch-Site")
+
+        let (_, resp) = try await URLSession.shared.data(for: request)
+        let http = resp as? HTTPURLResponse
+
+        #expect(http?.statusCode == 200)
+        #expect(http?.value(forHTTPHeaderField: "Access-Control-Allow-Origin") == "*")
+    }
+
+    /// A native loopback caller (no `Sec-Fetch-*`, no `Origin`) is untouched
+    /// by the gate — the CLI and the live-proof scripts drive these routes.
+    @Test func loopback_controlPlane_nativeCaller_isNotRejected() async throws {
+        var config = ServerConfiguration.default
+        config.allowedOrigins = []
+        let server = try await startCORSTestServer(config: config)
+        defer { Task { await server.shutdown() } }
+
+        var request = URLRequest(
+            url: URL(string: "http://\(server.host):\(server.port)/admin/runtime-settings")!
+        )
+        request.httpMethod = "GET"
+
+        let (_, resp) = try await URLSession.shared.data(for: request)
+        #expect((resp as? HTTPURLResponse)?.statusCode == 200)
+    }
+
+    /// The path classifier itself: prefix matching must not leak into
+    /// similarly-named open-API routes.
+    @Test func controlPlanePath_classification() {
+        #expect(HTTPHandler.isControlPlanePath("/agents"))
+        #expect(HTTPHandler.isControlPlanePath("/agents/123/dispatch"))
+        #expect(HTTPHandler.isControlPlanePath("/admin/runtime-settings"))
+        #expect(HTTPHandler.isControlPlanePath("/tasks/abc"))
+        #expect(!HTTPHandler.isControlPlanePath("/tags"))
+        #expect(!HTTPHandler.isControlPlanePath("/models"))
+        #expect(!HTTPHandler.isControlPlanePath("/chat/completions"))
+        #expect(!HTTPHandler.isControlPlanePath("/mcp/call"))
+        #expect(!HTTPHandler.isControlPlanePath("/agentsx"))
+    }
+
+    /// `/mcp` is not control-plane for CORS purposes (same-site local MCP
+    /// tooling keeps reading responses) but IS cross-site protected, because
+    /// `/mcp/call` executes tools and a `text/plain` POST ships preflight-free.
+    @Test func crossSiteProtectedPath_classification() {
+        #expect(HTTPHandler.isCrossSiteProtectedPath("/mcp"))
+        #expect(HTTPHandler.isCrossSiteProtectedPath("/mcp/call"))
+        #expect(HTTPHandler.isCrossSiteProtectedPath("/agents/123/dispatch"))
+        #expect(HTTPHandler.isCrossSiteProtectedPath("/admin/runtime-settings"))
+        #expect(!HTTPHandler.isCrossSiteProtectedPath("/mcpx"))
+        #expect(!HTTPHandler.isCrossSiteProtectedPath("/api/tags"))
+        #expect(!HTTPHandler.isCrossSiteProtectedPath("/chat/completions"))
+    }
+
+    /// A website may not invoke MCP tools. `/mcp/call` already binds the
+    /// external surface (so shell/file tools are denied), but every other
+    /// registered tool would otherwise be reachable from any tab.
+    @Test func loopback_mcpCall_crossSiteFetch_isRejectedWith403() async throws {
+        var config = ServerConfiguration.default
+        config.allowedOrigins = []
+        let server = try await startCORSTestServer(config: config)
+        defer { Task { await server.shutdown() } }
+
+        var request = URLRequest(
+            url: URL(string: "http://\(server.host):\(server.port)/mcp/call")!
+        )
+        request.httpMethod = "POST"
+        request.setValue("text/plain", forHTTPHeaderField: "Content-Type")
+        request.setValue("https://evil.example", forHTTPHeaderField: "Origin")
+        request.setValue("cross-site", forHTTPHeaderField: "Sec-Fetch-Site")
+        request.httpBody = Data(#"{"name":"memory_store","arguments":{}}"#.utf8)
+
+        let (data, resp) = try await URLSession.shared.data(for: request)
+        #expect((resp as? HTTPURLResponse)?.statusCode == 403)
+        #expect(String(decoding: data, as: UTF8.self).contains("cross_site_denied"))
+    }
+
+    /// Same-site local tooling (an MCP inspector on another localhost port) is
+    /// NOT cross-site, so it keeps both access and its readable `ACAO: *`.
+    @Test func loopback_mcpTools_sameSiteFetch_stillReturnsAllowOriginStar() async throws {
+        var config = ServerConfiguration.default
+        config.allowedOrigins = []
+        let server = try await startCORSTestServer(config: config)
+        defer { Task { await server.shutdown() } }
+
+        var request = URLRequest(
+            url: URL(string: "http://\(server.host):\(server.port)/mcp/health")!
+        )
+        request.httpMethod = "GET"
+        request.setValue("http://localhost:3000", forHTTPHeaderField: "Origin")
+        request.setValue("same-site", forHTTPHeaderField: "Sec-Fetch-Site")
+
+        let (_, resp) = try await URLSession.shared.data(for: request)
+        let http = resp as? HTTPURLResponse
+        #expect(http?.statusCode == 200)
         #expect(http?.value(forHTTPHeaderField: "Access-Control-Allow-Origin") == "*")
     }
 

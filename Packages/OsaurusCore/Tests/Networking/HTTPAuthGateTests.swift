@@ -278,6 +278,100 @@ struct HTTPAuthGateTests {
         let (_, resp) = try await URLSession.shared.data(for: request)
         #expect((resp as? HTTPURLResponse)?.statusCode == 200)
     }
+
+    // MARK: - JSON Depth Bomb
+
+    /// A body well inside the size cap can still nest thousands of levels
+    /// deep. `JSONDecoder` recurses the whole structure on the NIO event-loop
+    /// thread, and a stack overflow there is a SIGSEGV — `try?` catches Swift
+    /// throws, not traps — so it would take the process and every concurrent
+    /// stream down. The structural depth guard must turn it into a plain 400.
+    @Test func deeplyNestedJSONBody_returns400_insteadOfCrashing() async throws {
+        let server = try await startAuthTestServer(validator: .empty, trustLoopback: true)
+        defer { Task { await server.shutdown() } }
+
+        let depth = 5_000
+        let payload =
+            #"{"model":"x","messages":[],"z":"#
+            + String(repeating: "[", count: depth)
+            + String(repeating: "]", count: depth)
+            + "}"
+
+        var request = URLRequest(
+            url: URL(string: "http://\(server.host):\(server.port)/v1/chat/completions")!
+        )
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = Data(payload.utf8)
+
+        let (_, resp) = try await URLSession.shared.data(for: request)
+        #expect((resp as? HTTPURLResponse)?.statusCode == 400)
+
+        // The server is still alive and serving after the depth bomb.
+        let (_, healthResp) = try await URLSession.shared.data(
+            from: URL(string: "http://\(server.host):\(server.port)/health")!
+        )
+        #expect((healthResp as? HTTPURLResponse)?.statusCode == 200)
+    }
+
+    // MARK: - Admin Scope Confinement
+
+    /// `/admin/*` is server-global. A key minted for a single agent (a paired
+    /// relay/LAN peer) must not read or mutate the whole server's runtime
+    /// settings — that would escape the per-agent confinement enforced on
+    /// every other addressing route.
+    @Test func adminRoute_agentScopedKey_returns403() async throws {
+        // Alice is master; Bob is the agent audience, so a Bob-audience token
+        // validates but is NOT master-scoped.
+        let validator = APIKeyValidator.forAlice(agentAddress: TestKeys.bobAddress)
+        let server = try await startAuthTestServer(validator: validator, trustLoopback: false)
+        defer { Task { await server.shutdown() } }
+
+        let token = try TokenBuilder.build(
+            privateKey: TestKeys.alicePrivateKey,
+            iss: TestKeys.aliceAddress,
+            aud: TestKeys.bobAddress
+        )
+
+        var request = URLRequest(
+            url: URL(string: "http://\(server.host):\(server.port)/admin/runtime-settings")!
+        )
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        let (data, resp) = try await URLSession.shared.data(for: request)
+        let status = (resp as? HTTPURLResponse)?.statusCode ?? -1
+        let body = String(decoding: data, as: UTF8.self)
+        #expect(status == 403)
+        #expect(body.contains("admin_scope_denied"))
+    }
+
+    /// A master-scoped key keeps full admin access — the gate confines agent
+    /// keys only.
+    @Test func adminRoute_masterScopedKey_returns200() async throws {
+        let server = try await startAuthTestServer(validator: .forAlice(), trustLoopback: false)
+        defer { Task { await server.shutdown() } }
+
+        var request = URLRequest(
+            url: URL(string: "http://\(server.host):\(server.port)/admin/runtime-settings")!
+        )
+        request.authenticate()
+
+        let (_, resp) = try await URLSession.shared.data(for: request)
+        #expect((resp as? HTTPURLResponse)?.statusCode == 200)
+    }
+
+    /// Loopback callers never populate `authedScopeIsMaster` (they skip the
+    /// auth gate entirely), so the gate has to admit them explicitly — the CLI
+    /// and the local automation scripts drive these endpoints unauthenticated.
+    @Test func adminRoute_loopbackCaller_returns200() async throws {
+        let server = try await startAuthTestServer(validator: .empty, trustLoopback: true)
+        defer { Task { await server.shutdown() } }
+
+        let (_, resp) = try await URLSession.shared.data(
+            from: URL(string: "http://\(server.host):\(server.port)/admin/runtime-settings")!
+        )
+        #expect((resp as? HTTPURLResponse)?.statusCode == 200)
+    }
 }
 
 // MARK: - Test Server Bootstrap
