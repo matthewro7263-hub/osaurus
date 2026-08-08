@@ -87,4 +87,49 @@ struct HostAPIBridgeConfigScopingTests {
             #expect(untouched?["city"] == "Berlin")
         }
     }
+
+    // MARK: - Plugin scope reconciliation
+
+    /// A token that names its own plugin is authoritative: a guest that sets
+    /// `OSAURUS_PLUGIN` to a sibling's id must be refused, not served the
+    /// sibling's secrets.
+    @Test
+    func tokenBoundPluginBeatsTheGuestHeader() {
+        #expect(
+            HostAPIBridgePluginScope.resolve(tokenPluginId: "weather", header: "weather")
+                == .allowed("weather")
+        )
+        // Header absent — the token still supplies the scope.
+        #expect(
+            HostAPIBridgePluginScope.resolve(tokenPluginId: "weather", header: nil)
+                == .allowed("weather")
+        )
+        // Header contradicts the credential → refused, never silently
+        // downgraded to the header's claim.
+        #expect(
+            HostAPIBridgePluginScope.resolve(tokenPluginId: "weather", header: "billing")
+                == .mismatch
+        )
+        // Case and whitespace variants are contradictions too — matching is
+        // exact so a near-miss cannot widen the scope.
+        #expect(
+            HostAPIBridgePluginScope.resolve(tokenPluginId: "weather", header: "Weather")
+                == .mismatch
+        )
+        #expect(
+            HostAPIBridgePluginScope.resolve(tokenPluginId: "weather", header: "") == .mismatch
+        )
+    }
+
+    /// Staged tightening: agent-scoped tokens are the only kind provisioning
+    /// mints today, so they must keep resolving through the header or every
+    /// working plugin's secret/config lookup breaks.
+    @Test
+    func agentScopedTokenPreservesHeaderBehavior() {
+        #expect(
+            HostAPIBridgePluginScope.resolve(tokenPluginId: nil, header: "weather")
+                == .allowed("weather")
+        )
+        #expect(HostAPIBridgePluginScope.resolve(tokenPluginId: nil, header: nil) == .allowed(nil))
+    }
 }

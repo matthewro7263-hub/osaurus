@@ -212,6 +212,56 @@ public enum SeatbeltSandbox {
         }
     }
 
+    /// Port the host's HTTP control plane binds when nothing else is
+    /// known. Referencing `ServerConfiguration` keeps one source of truth
+    /// for the default rather than re-hardcoding 1337 here.
+    static let defaultControlPlanePort = ServerConfiguration.default.port
+
+    /// `(deny network-outbound …)` covering the host's own control plane.
+    ///
+    /// Unlike the VM backend (host-only vmnet, no route to host loopback),
+    /// a Seatbelt-confined process shares the host network stack and runs
+    /// as the logged-in user, so it can reach `127.0.0.1:<port>` — which
+    /// the server trusts without a token. This closes exactly that one
+    /// endpoint and nothing else: `curl localhost:3000` against the user's
+    /// own dev server stays a legitimate, intended workflow, and SBPL has
+    /// no CIDR syntax to express anything broader anyway.
+    ///
+    /// An unknown or out-of-range port falls back to the default so the
+    /// rule is always emitted and always well formed — a malformed line
+    /// would fail to compile and break *every* sandboxed exec.
+    static func controlPlaneDenyRule(port: Int?) -> String {
+        let resolved: Int
+        if let port, (1 ..< 65536).contains(port) {
+            resolved = port
+        } else {
+            resolved = defaultControlPlanePort
+        }
+        return "(deny network-outbound (remote ip \"localhost:\(resolved)\"))"
+    }
+
+    /// Deny rules for every port the control plane might currently be on.
+    ///
+    /// `resolveControlPlanePorts` collects candidates because the CONFIGURED port is not
+    /// necessarily the bound one: the settings UI mutates `configuration.port`
+    /// before `restartServer()` lands, and a failed bind leaves the new value
+    /// in place while the old socket keeps serving. Denying the whole
+    /// candidate set closes that window — a stale extra deny costs nothing,
+    /// a missing one leaves the control plane reachable.
+    static func controlPlaneDenyRules(ports: [Int]) -> [String] {
+        // No candidates at all still emits the fallback rule, so the profile
+        // is never silently left without a control-plane deny.
+        guard !ports.isEmpty else { return [controlPlaneDenyRule(port: nil)] }
+        var seen = Set<String>()
+        var rules: [String] = []
+        for port in ports {
+            let rule = controlPlaneDenyRule(port: port)
+            guard seen.insert(rule).inserted else { continue }
+            rules.append(rule)
+        }
+        return rules
+    }
+
     /// Build the Seatbelt profile (`.sb` scheme text) for one exec.
     ///
     /// - Parameters:
@@ -219,11 +269,16 @@ public enum SeatbeltSandbox {
     ///     VM's `/workspace` mount. Read-write.
     ///   - tempDir: Per-process scratch directory. Read-write.
     ///   - network: Whether the process may use the network.
+    ///   - controlPlanePort: Port the host's own HTTP server is listening
+    ///     on. Denied even when the network is otherwise unrestricted;
+    ///     `nil` falls back to the default port (fail safer, never open).
     public static func profile(
         workspaceRoot: String,
         tempDir: String,
         network: NetworkPolicy,
-        developerDirectory: String? = activeDeveloperDirectory
+        developerDirectory: String? = activeDeveloperDirectory,
+        controlPlanePort: Int? = nil,
+        additionalControlPlanePorts: [Int] = []
     ) -> String {
         let workspaces = profilePathVariants(workspaceRoot).map(escapeProfilePath)
         let temps = profilePathVariants(tempDir).map(escapeProfilePath)
@@ -292,6 +347,16 @@ public enum SeatbeltSandbox {
         switch network {
         case .allowed:
             lines.append("(allow network*)")
+            // Last match wins in SBPL, so this deny MUST stay after the
+            // blanket allow: outbound egress remains open except to the
+            // host's loopback control plane (see `controlPlaneDenyRule`).
+            // Every candidate port is denied, because the configured port and
+            // the actually-bound one can disagree across a restart.
+            lines.append(
+                contentsOf: controlPlaneDenyRules(
+                    ports: ([controlPlanePort].compactMap { $0 } + additionalControlPlanePorts)
+                )
+            )
             // DNS via the system resolver daemon.
             lines.append("(allow system-socket)")
         case .denied:

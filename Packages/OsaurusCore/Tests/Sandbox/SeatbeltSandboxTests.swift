@@ -88,7 +88,7 @@ struct SeatbeltSandboxTests {
     // MARK: - Profile generation
 
     @Test("profile is deny-by-default and grants workspace + temp writes")
-    func profileShape() {
+    func profileShape() throws {
         let profile = SeatbeltSandbox.profile(
             workspaceRoot: "/Users/me/.osaurus/container/workspace",
             tempDir: "/tmp/osaurus-seatbelt",
@@ -103,6 +103,19 @@ struct SeatbeltSandboxTests {
             #expect(profile.contains("(literal \"\(cacheFile)\")"))
         }
         #expect(profile.contains("(allow network*)"))
+        // The blanket network grant must stay paired with a deny for the
+        // host's own loopback control plane — Seatbelt shares the host
+        // network stack and the server trusts loopback without a token.
+        let allow = try #require(profile.range(of: "(allow network*)"))
+        let denyControlPlane = try #require(
+            profile.range(
+                of: SeatbeltSandbox.controlPlaneDenyRule(
+                    port: SeatbeltSandbox.defaultControlPlanePort
+                )
+            )
+        )
+        // Last match wins in SBPL, so ordering is load-bearing.
+        #expect(allow.upperBound <= denyControlPlane.lowerBound)
         // No blanket home-directory read grant.
         #expect(!profile.contains("(subpath \"/Users\")"))
 
@@ -192,6 +205,112 @@ struct SeatbeltSandboxTests {
             workspaceRoot: "/w", tempDir: "/t", network: .denied)
         #expect(profile.contains("(deny network*)"))
         #expect(!profile.contains("(allow network*)"))
+    }
+
+    @Test("open network still denies the host control plane on its live port")
+    func profileDeniesControlPlanePort() {
+        let profile = SeatbeltSandbox.profile(
+            workspaceRoot: "/w",
+            tempDir: "/t",
+            network: .allowed,
+            developerDirectory: nil,
+            controlPlanePort: 4242
+        )
+        #expect(profile.contains("(allow network*)"))
+        #expect(profile.contains("(deny network-outbound (remote ip \"localhost:4242\"))"))
+        // Only the control-plane port is closed — a blanket loopback deny
+        // would break `curl localhost:3000` against a user's dev server.
+        #expect(!profile.contains("(deny network-outbound (remote ip \"localhost:*\"))"))
+    }
+
+    /// The configured port is not always the bound port (the settings UI
+    /// mutates it before the restart lands, and a failed bind leaves the new
+    /// value in place while the old socket serves), so every candidate must be
+    /// denied — otherwise the live control plane stays reachable from a
+    /// confined exec during that window.
+    @Test("every candidate control-plane port is denied, deduplicated")
+    func controlPlaneDenyRulesCoverAllCandidates() {
+        let rules = SeatbeltSandbox.controlPlaneDenyRules(ports: [8080, 1337, 8080])
+        #expect(rules.count == 2)
+        #expect(rules.contains("(deny network-outbound (remote ip \"localhost:8080\"))"))
+        #expect(rules.contains("(deny network-outbound (remote ip \"localhost:1337\"))"))
+
+        // An empty candidate set still emits the fallback rather than nothing.
+        #expect(
+            SeatbeltSandbox.controlPlaneDenyRules(ports: [])
+                == [SeatbeltSandbox.controlPlaneDenyRule(port: nil)]
+        )
+
+        // ...and the profile really carries both denies.
+        let profile = SeatbeltSandbox.profile(
+            workspaceRoot: "/w",
+            tempDir: "/t",
+            network: .allowed,
+            developerDirectory: nil,
+            controlPlanePort: 8080,
+            additionalControlPlanePorts: [1337]
+        )
+        #expect(profile.contains("(deny network-outbound (remote ip \"localhost:8080\"))"))
+        #expect(profile.contains("(deny network-outbound (remote ip \"localhost:1337\"))"))
+    }
+
+    @Test("an unknown or out-of-range control-plane port falls back to the default")
+    func controlPlaneDenyRuleFallsBack() {
+        let fallback = "(deny network-outbound (remote ip \"localhost:\(SeatbeltSandbox.defaultControlPlanePort)\"))"
+        #expect(SeatbeltSandbox.controlPlaneDenyRule(port: nil) == fallback)
+        #expect(SeatbeltSandbox.controlPlaneDenyRule(port: 0) == fallback)
+        #expect(SeatbeltSandbox.controlPlaneDenyRule(port: -1) == fallback)
+        #expect(SeatbeltSandbox.controlPlaneDenyRule(port: 65_536) == fallback)
+        #expect(
+            SeatbeltSandbox.controlPlaneDenyRule(port: 65_535)
+                == "(deny network-outbound (remote ip \"localhost:65535\"))"
+        )
+        // A nil port must never silently drop the rule from the profile.
+        let profile = SeatbeltSandbox.profile(
+            workspaceRoot: "/w", tempDir: "/t", network: .allowed, developerDirectory: nil)
+        #expect(profile.contains(fallback))
+    }
+
+    /// The control-plane deny only protects anything if `sandbox-exec`
+    /// accepts the profile it lives in — a syntax error there would fail
+    /// every sandboxed exec, not just the denied endpoint. Compile the
+    /// network-open profile for real and run a trivial command through it.
+    @Test("the network-open profile compiles under sandbox-exec")
+    func networkOpenProfileCompiles() async throws {
+        guard FileManager.default.isExecutableFile(atPath: SeatbeltSandbox.sandboxExecPath) else {
+            return
+        }
+        let workspace = FileManager.default.temporaryDirectory
+            .appendingPathComponent("osaurus-seatbelt-netprofile-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: workspace) }
+        try FileManager.default.createDirectory(at: workspace, withIntermediateDirectories: true)
+        let scratch = SeatbeltSandbox.scratchDir
+        try FileManager.default.createDirectory(atPath: scratch, withIntermediateDirectories: true)
+
+        let profile = SeatbeltSandbox.profile(
+            workspaceRoot: workspace.path,
+            tempDir: scratch,
+            network: .allowed,
+            developerDirectory: nil,
+            controlPlanePort: 1337
+        )
+        let result = try await SeatbeltExecutor.run(
+            SeatbeltExecutor.Request(
+                command: "/bin/echo seatbelt-net-profile-ok",
+                env: [:],
+                cwd: workspace.path,
+                timeout: 10,
+                profile: profile,
+                stdoutTee: nil,
+                stderrTee: nil,
+                onProcessStarted: nil
+            )
+        )
+        #expect(
+            result.exitCode == 0,
+            "sandbox-exec rejected the network-open profile: \(result.stderr)\nProfile:\n\(profile)"
+        )
+        #expect(result.stdout.contains("seatbelt-net-profile-ok"))
     }
 
     @Test("proxy allowlist mode fails closed to no network")

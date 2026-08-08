@@ -148,6 +148,26 @@ struct SandboxEgressPolicyTests {
         #expect(!SandboxEgressPolicy.isBlockedAddress("::ffff:8.8.8.8"))
     }
 
+    /// IPv4-MAPPED was already rechecked; IPv4-COMPATIBLE (`::/96`) and
+    /// NAT64 (`64:ff9b::/96`) embed the same 32 bits and must be rechecked
+    /// too, or a rebinding answer in either form reaches the host's LAN.
+    @Test func blockedV6EmbeddedIPv4Forms() {
+        for addr in [
+            "::127.0.0.1", "::10.0.0.1", "::192.168.1.1", "::169.254.169.254",
+            "64:ff9b::127.0.0.1", "64:ff9b::10.0.0.1", "64:ff9b::169.254.169.254",
+        ] {
+            #expect(SandboxEgressPolicy.isBlockedAddress(addr), "expected \(addr) blocked")
+        }
+        // A public embedded IPv4 stays allowed in both forms, exactly as
+        // it already does for `::ffff:`-mapped addresses.
+        #expect(!SandboxEgressPolicy.isBlockedAddress("::8.8.8.8"))
+        #expect(!SandboxEgressPolicy.isBlockedAddress("64:ff9b::8.8.8.8"))
+        #expect(!SandboxEgressPolicy.isBlockedAddress("64:ff9b::93.184.216.34"))
+        // The unspecified/loopback branch must keep answering first.
+        #expect(SandboxEgressPolicy.isBlockedAddress("::"))
+        #expect(SandboxEgressPolicy.isBlockedAddress("::1"))
+    }
+
     @Test func garbageFailsClosed() {
         #expect(SandboxEgressPolicy.isBlockedAddress("not-an-address"))
         #expect(SandboxEgressPolicy.isBlockedAddress(""))

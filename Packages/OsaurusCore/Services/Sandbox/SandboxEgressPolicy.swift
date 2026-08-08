@@ -161,6 +161,19 @@ import Foundation
                     let mapped = "\(bytes[12]).\(bytes[13]).\(bytes[14]).\(bytes[15])"
                     return isBlockedAddress(mapped)
                 }
+                // The other two embedded-IPv4 forms carry the same payload
+                // in the low 32 bits and must get the same recheck, or a
+                // rebinding answer of `::10.0.0.1` / `64:ff9b::10.0.0.1`
+                // reaches the LAN through the v6 path. `::` and `::1` were
+                // already answered above, so this only sees real embeddings.
+                let isIPv4Compatible = bytes[0..<12].allSatisfy { $0 == 0 }  // ::/96
+                let isNAT64 =
+                    bytes[0] == 0x00 && bytes[1] == 0x64 && bytes[2] == 0xFF && bytes[3] == 0x9B
+                    && bytes[4..<12].allSatisfy { $0 == 0 }  // 64:ff9b::/96
+                if isIPv4Compatible || isNAT64 {
+                    let embedded = "\(bytes[12]).\(bytes[13]).\(bytes[14]).\(bytes[15])"
+                    return isBlockedAddress(embedded)
+                }
                 if bytes[0] == 0xFC || bytes[0] == 0xFD { return true }  // fc00::/7 ULA
                 if bytes[0] == 0xFE, (bytes[1] & 0xC0) == 0x80 { return true }  // fe80::/10
                 if bytes[0] == 0xFF { return true }  // ff00::/8 multicast

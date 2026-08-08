@@ -111,6 +111,49 @@ enum HostAPIBridgeConfigStore {
     }
 }
 
+// MARK: - Plugin scope reconciliation
+
+/// Decides which plugin a bridge request is allowed to act as.
+///
+/// Per-plugin isolation is an intended boundary — it is what host-Keychain
+/// secrets buy over on-disk sharing. But `X-Osaurus-Plugin` is guest
+/// controlled: anything running as the agent's Linux user can set
+/// `OSAURUS_PLUGIN` to a sibling's id, or hit the Unix socket directly with
+/// the agent-readable token. The bearer token is the only unforgeable input,
+/// so when it carries its own plugin scope that scope wins and a header
+/// claiming otherwise is refused.
+///
+/// STAGED TIGHTENING: the guest provisioning path still mints only
+/// agent-scoped tokens — one Linux user and one 0600 token file per agent,
+/// shared by all of that agent's plugins — so a token with no plugin scope
+/// keeps today's header-derived behavior rather than break every working
+/// plugin's secret/config lookup. Once per-plugin credentials are provisioned
+/// end to end (see `SandboxBridgeTokenStore.register(agentId:linuxName:pluginId:)`),
+/// the unscoped branch becomes a rejection too.
+///
+/// Split out of the connection handler so the trust rule is unit-testable
+/// without a socket — same reason as `HostAPIBridgeConfigStore`.
+enum HostAPIBridgePluginScope {
+    enum Resolution: Equatable {
+        /// Plugin the request may act as. `nil` when neither the token nor
+        /// the header names one; scoped handlers reject that with a 400,
+        /// exactly as they do today.
+        case allowed(String?)
+        /// The header contradicted the token-bound plugin identity.
+        case mismatch
+    }
+
+    static func resolve(tokenPluginId: String?, header: String?) -> Resolution {
+        guard let tokenPluginId else {
+            return .allowed(header)
+        }
+        if let header, header != tokenPluginId {
+            return .mismatch
+        }
+        return .allowed(tokenPluginId)
+    }
+}
+
 // MARK: - HTTP Handler
 
 /// Wraps a non-Sendable NIO context so it can cross Task boundaries.
@@ -211,6 +254,9 @@ private final class HostAPIBridgeHandler: ChannelInboundHandler, RemovableChanne
         // ignore X-Osaurus-User even if present — trusting it would let any
         // sandboxed code claim any agent.
         let bearerToken = Self.extractBearerToken(headers: head.headers)
+        // Untrusted: the guest sets this from `OSAURUS_PLUGIN` (or by calling
+        // the socket directly). `routeRequest` reconciles it against the
+        // token-bound plugin scope before it is used to scope anything.
         let pluginName = head.headers["X-Osaurus-Plugin"].first
         let path = head.uri.split(separator: "?").first.map(String.init) ?? head.uri
         let version = head.version
@@ -309,13 +355,28 @@ private final class HostAPIBridgeHandler: ChannelInboundHandler, RemovableChanne
         let service = components[1]
         let remaining = Array(components.dropFirst(2))
 
+        // The header is guest-supplied; the token is not. Reconcile them
+        // before anything is scoped by plugin, and refuse a contradiction on
+        // every service rather than only the scoped ones. See
+        // `HostAPIBridgePluginScope` for the full trust rationale.
+        let scopedPluginName: String?
+        switch HostAPIBridgePluginScope.resolve(
+            tokenPluginId: identity.pluginId,
+            header: pluginName
+        ) {
+        case .allowed(let resolved):
+            scopedPluginName = resolved
+        case .mismatch:
+            return .error(403, "X-Osaurus-Plugin does not match the token-bound plugin identity")
+        }
+
         switch service {
         case "secrets":
             return await handleSecrets(
                 method: method,
                 remaining: remaining,
                 identity: identity,
-                pluginName: pluginName
+                pluginName: scopedPluginName
             )
         case "config":
             return await handleConfig(
@@ -323,7 +384,7 @@ private final class HostAPIBridgeHandler: ChannelInboundHandler, RemovableChanne
                 remaining: remaining,
                 body: body,
                 identity: identity,
-                pluginName: pluginName
+                pluginName: scopedPluginName
             )
         case "inference":
             return await handleInference(method: method, remaining: remaining, body: body, identity: identity)

@@ -1658,10 +1658,17 @@
             let root = OsaurusPaths.containerWorkspace().path
             let network = SeatbeltSandbox.NetworkPolicy.from(
                 configNetwork: SandboxConfigurationStore.load().network)
+            // Seatbelt shares the host network stack, so the confined
+            // command can reach our own loopback control plane — which
+            // trusts loopback callers without a token. Hand the live port
+            // to the profile builder so exactly that endpoint is denied.
+            let controlPlanePorts = await Self.resolveControlPlanePorts()
             let profile = SeatbeltSandbox.profile(
                 workspaceRoot: root,
                 tempDir: SeatbeltSandbox.scratchDir,
-                network: network
+                network: network,
+                controlPlanePort: controlPlanePorts.first,
+                additionalControlPlanePorts: Array(controlPlanePorts.dropFirst())
             )
             let mappedCwd = cwd.map { SeatbeltPathMapper.mapToHost($0, workspaceRoot: root) }
             let netLabel = network == .allowed ? "allowed" : "denied"
@@ -1684,6 +1691,30 @@
                     stderrTee: stderrTee,
                     onProcessStarted: onProcessStarted
                 ))
+        }
+
+        /// Every port the host's HTTP control plane might currently be on, most
+        /// likely first: the live controller's configuration, the persisted
+        /// config, then the default.
+        ///
+        /// Returns the whole set rather than just the best guess because the
+        /// configured port is not always the BOUND port — the settings UI
+        /// mutates `configuration.port` before `restartServer()` lands, and a
+        /// failed bind leaves the new value in place while the old socket
+        /// keeps serving. Denying a port nothing listens on is free; missing
+        /// the live one would leave the control plane reachable from a
+        /// confined exec. Never empty — an unresolvable port must still
+        /// produce a deny rule rather than leave loopback open.
+        private static func resolveControlPlanePorts() async -> [Int] {
+            var ports: [Int] = []
+            func add(_ port: Int?) {
+                guard let port, port > 0, !ports.contains(port) else { return }
+                ports.append(port)
+            }
+            add(await ServerController.sharedConfiguration()?.port)
+            add(await MainActor.run(body: { ServerConfigurationStore.load()?.port }))
+            add(ServerConfiguration.default.port)
+            return ports
         }
 
         public func execAsRoot(
