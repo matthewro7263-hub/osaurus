@@ -4,8 +4,10 @@ Branch: `claude/intelligence-rename-review-2c9svi` · Author: Claude Code (autom
 
 ## How to read this
 
-This is a **report-first** audit: findings below are documented, not fixed (with two
-exceptions noted under "Already fixed in this branch"). Each finding names an exact
+This began as a **report-first** audit. The findings were subsequently remediated — see
+**Remediation status** below for what landed, and the per-finding **Status** column. The finding
+text itself is left as originally written (describing the vulnerable state) so the fixes stay
+reviewable against it. Each finding names an exact
 `file:line`, the **trust boundary** that makes it reachable, a concrete failure scenario,
 and a recommended fix. Severity reflects reachability and impact; **Confidence** is
 `CONFIRMED` (a reachable failure path was traced in the code) or `PLAUSIBLE` (looks wrong,
@@ -44,33 +46,66 @@ a few seams:
 Counts: **1 Critical, 6 High, 7 Medium, 11 Low/Info.** Plus one regression introduced by this
 branch's rename, already fixed here.
 
-| # | Sev | Finding | File | Conf |
-|---|-----|---------|------|------|
-| C1 | **Critical** | Web page → loopback `/agents/{id}/dispatch` bypasses external-tool deny → silent file-write/shell | `Networking/HTTPHandler.swift:5662` | CONFIRMED |
-| H1 | High | JSON depth-bomb crashes the whole server; depth guard wired to only one route | `Networking/HTTPHandler.swift` (18 decode sites) | CONFIRMED |
-| H2 | High | Seatbelt-confined shell reaches the loopback-trusted control plane unauthenticated | `Services/Sandbox/Seatbelt/SeatbeltSandbox.swift:294` | CONFIRMED |
-| H3 | High | `plugin_id` path traversal in `osaurus tools install` → arbitrary file write | `Packages/OsaurusRepository/PluginInstallManager.swift:323` | CONFIRMED |
-| H4 | High | `ExternalPlugin.shutdown()` hangs forever on a wedged accessibility plugin call | `Models/Plugin/ExternalPlugin.swift:908` | CONFIRMED |
-| H5 | High | Loopback CORS `*` lets any website read admin/agent/model/inference endpoints | `Networking/HTTPHandler.swift:2901` | CONFIRMED |
-| H6 | High | Seatbelt profile grants unrestricted `mach-lookup` → LaunchServices escape | `Services/Sandbox/Seatbelt/SeatbeltSandbox.swift:244` | PLAUSIBLE |
-| M1 | Medium | Host-API bridge trusts guest `X-Osaurus-Plugin` header → cross-plugin secret disclosure | `Networking/HostAPIBridgeServer.swift:214` | CONFIRMED |
-| M2 | Medium | `/admin/*` routes accept agent-scoped keys (no master-scope gate) | `Networking/HTTPHandler.swift:644` | CONFIRMED |
-| M3 | Medium | `/tasks/{id}` GET/DELETE lack agent-scope confinement | `Networking/HTTPHandler.swift:5919` | CONFIRMED |
-| M4 | Medium | Pre-auth body pre-allocation → memory-exhaustion DoS (exposed mode) | `Networking/HTTPHandler.swift:405` | CONFIRMED |
-| M5 | Medium | Zip-bomb: unbounded in-memory decompression on conversation import | `Utils/ZipArchive.swift:194` | CONFIRMED |
-| M6 | Medium | Agent-bundle tar extraction: no entry-name/symlink validation, runs before passphrase check | `Services/AgentBridge/AgentBundleService.swift:649` | PLAUSIBLE |
-| M7 | Medium | WhatsApp inbound-media size cap absent/bypassable → remote memory exhaustion | `helpers/osaurus-wa/bridge.go:1328` | PLAUSIBLE |
-| L1 | Low | ZIP64 integer-conversion trap crashes conversation import | `Utils/ZipArchive.swift:85` | CONFIRMED |
-| L2 | Low | Undo replay re-derives destructive paths without re-validation (latent) | `Folder/FileOperationLog.swift:246` | PLAUSIBLE |
-| L3 | Low | Egress rebinding filter misses IPv4-compatible / NAT64 IPv6 | `Services/Sandbox/SandboxEgressPolicy.swift:152` | PLAUSIBLE |
-| L4 | Low | Go RPC reader silently exits on oversized frame; `scanner.Err()` unchecked | `helpers/osaurus-wa/rpc.go:86` | CONFIRMED |
-| L5 | Low | Proxy local-host rejection bypassed by IPv4-mapped IPv6 literal | `Packages/OsaurusNetworking/Sources/GlobalProxyConfiguration.swift:184` | CONFIRMED |
-| L6 | Low | Out-of-process config forwarding can deliver `on_config_changed` out of order (flag-off) | `Models/Plugin/ExternalPlugin.swift:1169` | CONFIRMED |
-| L7 | Low | `notifyConfigChanged` timeout orphans a pending continuation (flag-off, self-healing) | `Services/Plugin/PluginProcessHost.swift:153` | CONFIRMED |
-| L8 | Low | Error bodies echo internal exception text | `Networking/HTTPHandler.swift:1324` | CONFIRMED |
-| L9 | Low | Stop sequences split across streamed deltas not honored (remote path) | `Services/Provider/OpenAICompatibleStreamParser.swift:762` | PLAUSIBLE |
-| L10 | Low | SSE error writers emit unescaped strings in a near-dead fallback branch | `Models/Chat/ResponseWriters.swift:407` | PLAUSIBLE |
-| L11 | Info | Temporary pairing keys not revoked on unclean shutdown | `Identity/TemporaryPairedKeyStore.swift:38` | CONFIRMED |
+| # | Sev | Finding | File | Conf | Status |
+|---|-----|---------|------|------|------|
+| C1 | **Critical** | Web page → loopback `/agents/{id}/dispatch` bypasses external-tool deny → silent file-write/shell | `Networking/HTTPHandler.swift:5662` | CONFIRMED | FIXED |
+| H1 | High | JSON depth-bomb crashes the whole server; depth guard wired to only one route | `Networking/HTTPHandler.swift` (18 decode sites) | CONFIRMED | FIXED |
+| H2 | High | Seatbelt-confined shell reaches the loopback-trusted control plane unauthenticated | `Services/Sandbox/Seatbelt/SeatbeltSandbox.swift:294` | CONFIRMED | FIXED |
+| H3 | High | `plugin_id` path traversal in `osaurus tools install` → arbitrary file write | `Packages/OsaurusRepository/PluginInstallManager.swift:323` | CONFIRMED | FIXED |
+| H4 | High | `ExternalPlugin.shutdown()` hangs forever on a wedged accessibility plugin call | `Models/Plugin/ExternalPlugin.swift:908` | CONFIRMED | FIXED |
+| H5 | High | Loopback CORS `*` lets any website read admin/agent/model/inference endpoints | `Networking/HTTPHandler.swift:2901` | CONFIRMED | FIXED |
+| H6 | High | Seatbelt profile grants unrestricted `mach-lookup` → LaunchServices escape | `Services/Sandbox/Seatbelt/SeatbeltSandbox.swift:244` | PLAUSIBLE | DEFERRED |
+| M1 | Medium | Host-API bridge trusts guest `X-Osaurus-Plugin` header → cross-plugin secret disclosure | `Networking/HostAPIBridgeServer.swift:214` | CONFIRMED | PARTIAL |
+| M2 | Medium | `/admin/*` routes accept agent-scoped keys (no master-scope gate) | `Networking/HTTPHandler.swift:644` | CONFIRMED | FIXED |
+| M3 | Medium | `/tasks/{id}` GET/DELETE lack agent-scope confinement | `Networking/HTTPHandler.swift:5919` | CONFIRMED | FIXED |
+| M4 | Medium | Pre-auth body pre-allocation → memory-exhaustion DoS (exposed mode) | `Networking/HTTPHandler.swift:405` | CONFIRMED | FIXED |
+| M5 | Medium | Zip-bomb: unbounded in-memory decompression on conversation import | `Utils/ZipArchive.swift:194` | CONFIRMED | FIXED |
+| M6 | Medium | Agent-bundle tar extraction: no entry-name/symlink validation, runs before passphrase check | `Services/AgentBridge/AgentBundleService.swift:649` | PLAUSIBLE | FIXED |
+| M7 | Medium | WhatsApp inbound-media size cap absent/bypassable → remote memory exhaustion | `helpers/osaurus-wa/bridge.go:1328` | PLAUSIBLE | FIXED |
+| L1 | Low | ZIP64 integer-conversion trap crashes conversation import | `Utils/ZipArchive.swift:85` | CONFIRMED | FIXED |
+| L2 | Low | Undo replay re-derives destructive paths without re-validation (latent) | `Folder/FileOperationLog.swift:246` | PLAUSIBLE | FIXED |
+| L3 | Low | Egress rebinding filter misses IPv4-compatible / NAT64 IPv6 | `Services/Sandbox/SandboxEgressPolicy.swift:152` | PLAUSIBLE | FIXED |
+| L4 | Low | Go RPC reader silently exits on oversized frame; `scanner.Err()` unchecked | `helpers/osaurus-wa/rpc.go:86` | CONFIRMED | FIXED |
+| L5 | Low | Proxy local-host rejection bypassed by IPv4-mapped IPv6 literal | `Packages/OsaurusNetworking/Sources/GlobalProxyConfiguration.swift:184` | CONFIRMED | FIXED |
+| L6 | Low | Out-of-process config forwarding can deliver `on_config_changed` out of order (flag-off) | `Models/Plugin/ExternalPlugin.swift:1169` | CONFIRMED | FIXED |
+| L7 | Low | `notifyConfigChanged` timeout orphans a pending continuation (flag-off, self-healing) | `Services/Plugin/PluginProcessHost.swift:153` | CONFIRMED | FIXED |
+| L8 | Low | Error bodies echo internal exception text | `Networking/HTTPHandler.swift:1324` | CONFIRMED | FIXED |
+| L9 | Low | Stop sequences split across streamed deltas not honored (remote path) | `Services/Provider/OpenAICompatibleStreamParser.swift:762` | PLAUSIBLE | FIXED |
+| L10 | Low | SSE error writers emit unescaped strings in a near-dead fallback branch | `Models/Chat/ResponseWriters.swift:407` | PLAUSIBLE | FIXED |
+| L11 | Info | Temporary pairing keys not revoked on unclean shutdown | `Identity/TemporaryPairedKeyStore.swift:38` | CONFIRMED | FIXED |
+
+---
+
+## Remediation status (updated 2026-08-08)
+
+24 of the 25 findings are fixed on this branch; **H6 is deferred by decision** (see
+"Deferred fixes" at the end). Each fix was applied by a dedicated agent and then re-reviewed by an
+independent adversarial reviewer; the reviewers found 18 defects in the first-pass fixes, all of
+which were corrected before commit. Three are worth recording because they are the kind of thing
+that ships silently:
+
+- **The WhatsApp media cap (M7) did not work at all in its first form.** `cappedFile` embedded
+  `*os.File`, so Go promoted `ReadFrom` and `io.Copy` wrote straight to the file, never calling the
+  capped `Write`. The first-pass test passed only because `bytes.Reader` sends `io.Copy` down a
+  different branch than production does. Fixed by shadowing `ReadFrom`, and the test now drives the
+  production branch — verified failing before the fix and passing after (`go test` runs here).
+- **C1 was bypassable through `/secure/call`.** The envelope rewrite rebuilds the request head
+  without `Origin`/`Sec-Fetch-*`, so wrapping the attack in a secure envelope erased the browser
+  signal and restored the original Critical. The browser signal is now snapshotted from the outer
+  head before the rewrite.
+- **The first-pass L7 fix introduced a new bug.** Killing the plugin helper on a `config_changed`
+  deadline would have destroyed healthy in-flight tool calls, because the helper runs `invoke` and
+  `config_changed` on one serial queue and a long invoke starves the config push. The kill was
+  dropped; the deadline is now a diagnostic only.
+
+Two findings closed wider than the original text: **H5** also covers `/mcp` (a cross-site
+`text/plain` POST to `/mcp/call` is preflight-free and executes tools), and **H2** now denies every
+candidate control-plane port rather than only the configured one, since the configured port and the
+bound port disagree across a restart.
+
+Also landed alongside: the six signing domain prefixes are now defined once in
+`Identity/CryptoHelpers.swift` (`SigningDomain`) and referenced by both signers and verifiers, with
+parity tests — closing the drift that broke pairing earlier on this branch.
 
 ---
 
@@ -270,6 +305,58 @@ SwiftUI (178K lines — spot-checked for lifecycle/leak issues only), the evals 
 (`OsaurusEvals`, dev tooling), and the `ComputerUse`/`Browser`/`Memory`/`Knowledge` service
 subtrees beyond their trust-boundary entry points. No Critical/High is expected there, but they
 were not line-audited.
+
+## Deferred fixes and residual risk
+
+### H6 — Seatbelt blanket `mach-lookup` (DEFERRED, no code change)
+
+Deferred deliberately: this is the one fix that can break working tools, it has zero existing test
+coverage, and it cannot be validated without a macOS < 26 machine. **Only the Seatbelt tier is
+affected** — macOS 26+ runs the VM backend, where this does not apply.
+
+Recommended change when a suitable machine is available — replace the blanket
+`(allow mach-lookup)` at `Services/Sandbox/Seatbelt/SeatbeltSandbox.swift:244` with an allowlist:
+
+- **Must stay allowed** (or ordinary tools break): `opendirectoryd` (libinfo, membership — `id`,
+  `whoami`, `$HOME`, Python `pwd`), `dnssd`/`mDNSResponder` (**all** hostname resolution),
+  `trustd` + `securityd` (**all** HTTPS), `SystemConfiguration.configd`, `cfprefsd` (daemon+agent),
+  `notification_center`, `system.logger`, `bsd.dirhelper`.
+- **Must be excluded** (this is the escape): `com.apple.lsd`,
+  `com.apple.coreservices.launchservicesd`, and any launchd submission surface — asking those to
+  open something execs it *outside* the sandbox as the user.
+
+On-device checklist before shipping it (`OSAURUS_FORCE_SEATBELT=1` on macOS < 26): `python3` starts,
+`curl https://example.com` succeeds (proves DNS + TLS), `pip`/`npm` install works, `id`/`whoami`
+resolve. Note DNS and TLS ride on Mach services, so this fix is coupled to the network grant — do it
+after H2 is proven, not before.
+
+### M1 — host-bridge plugin scoping: credential plumbing landed, exploit still live
+
+The token store now carries an optional `pluginId` and the bridge validates a supplied
+`X-Osaurus-Plugin` header against it. **But no production call site mints a per-plugin token yet**
+(`SandboxManager` still calls the 2-arg `register`), so `identity.pluginId` is always nil, the
+validation never fires, and a plugin can still set `OSAURUS_PLUGIN` to a sibling's id and read that
+sibling's host-Keychain secrets. Impact is bounded to plugins under the *same* agent (the `agentId`
+binding is unforgeable). Closing it needs per-plugin Linux users in guest provisioning, a per-plugin
+token file, and a shim change — a larger piece of work than this pass. **Treat M1 as open.**
+
+### N1 (new, found during remediation) — `ShellSandboxProfile` has the same loopback hole as H2
+
+`Folder/ShellSandboxProfile.swift:50` emits `(allow default)` and restricts only filesystem writes,
+so the host `shell_run` / `git_commit` confinement leaves the loopback control plane reachable —
+the same mechanism as H2, but on **all** macOS versions rather than only the Seatbelt tier. Not
+fixed here because it is outside the approved scope and a blanket deny could break a user asking
+their agent to query their own local API. The parallel one-line fix is to append
+`SeatbeltSandbox.controlPlaneDenyRule(port:)` after `(allow default)`, threading the port from the
+same resolver. Severity is lower than H2 — `shell_run` is already a user-approved, fully-privileged
+local action — but it should be closed for consistency.
+
+### Test gaps knowingly left open
+
+`AgentBundleService.validateStagedTree` (M6) and `FileOperationLog`'s undo re-validation (L2) both
+shipped **without** direct tests — the existing undo tests only cover the happy path. Worth adding:
+a bundle containing a symlink must be refused, and an operation whose recorded path escapes the root
+must refuse to undo.
 
 ## Suggested fix order
 

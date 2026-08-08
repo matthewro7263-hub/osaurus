@@ -93,7 +93,7 @@ public struct APIKeyValidator: Sendable {
             recoveredAddress = try recoverAddress(
                 payload: payloadData,
                 signature: signatureData,
-                domainPrefix: "Osaurus Signed Access"
+                domainPrefix: SigningDomain.access
             )
         } catch {
             return .invalid(reason: "Signature recovery failed")

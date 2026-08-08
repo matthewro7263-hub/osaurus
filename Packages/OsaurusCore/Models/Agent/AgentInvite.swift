@@ -83,7 +83,7 @@ public struct AgentInvite: Codable, Sendable, Equatable {
     public let sig: String
 
     public static let currentVersion: Int = 1
-    public static let signingDomain: String = "Osaurus Signed Invite"
+    public static let signingDomain: String = SigningDomain.invite
 
     public init(
         v: Int = AgentInvite.currentVersion,

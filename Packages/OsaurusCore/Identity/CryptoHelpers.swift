@@ -156,16 +156,37 @@ private func signWithPrefix(_ payload: Data, privateKey: Data, prefix domainPref
     return result
 }
 
+/// The signature domain-separation prefixes, defined ONCE.
+///
+/// These strings are wire/protocol constants: the prefix is folded into the
+/// signed digest, so a signer and a verifier that disagree by even one
+/// character recover different addresses and every check fails. They are NOT
+/// user-facing text and must never be rebranded, localized, or "cleaned up".
+///
+/// Both sides referenced this literal separately once, and a mechanical
+/// rename updated the verifiers but not the signers — which silently broke
+/// LAN pairing and invite redemption (they failed closed, so it was a
+/// functional outage, not an exposure). Verifiers now reference these
+/// constants instead of re-spelling the literal, so the two cannot drift.
+public enum SigningDomain {
+    public static let message = "Osaurus Signed Message"
+    public static let access = "Osaurus Signed Access"
+    public static let pairing = "Osaurus Signed Pairing"
+    public static let pairingServer = "Osaurus Signed Pairing Server"
+    public static let invite = "Osaurus Signed Invite"
+    public static let secureChannel = "Osaurus Secure Channel"
+}
+
 func signPayload(_ payload: Data, privateKey: Data) throws -> Data {
-    try signWithPrefix(payload, privateKey: privateKey, prefix: "Osaurus Signed Message")
+    try signWithPrefix(payload, privateKey: privateKey, prefix: SigningDomain.message)
 }
 
 func signAccessPayload(_ payload: Data, privateKey: Data) throws -> Data {
-    try signWithPrefix(payload, privateKey: privateKey, prefix: "Osaurus Signed Access")
+    try signWithPrefix(payload, privateKey: privateKey, prefix: SigningDomain.access)
 }
 
 func signPairingPayload(_ payload: Data, privateKey: Data) throws -> Data {
-    try signWithPrefix(payload, privateKey: privateKey, prefix: "Osaurus Signed Pairing")
+    try signWithPrefix(payload, privateKey: privateKey, prefix: SigningDomain.pairing)
 }
 
 /// Signed by the advertiser's agent key in the `/pair` response so the
@@ -174,7 +195,7 @@ func signPairingPayload(_ payload: Data, privateKey: Data) throws -> Data {
 /// challenge nonce (anti-replay). Distinct domain prefix from the connector's
 /// pairing signature so the two can't be cross-substituted.
 func signPairingServerPayload(_ payload: Data, privateKey: Data) throws -> Data {
-    try signWithPrefix(payload, privateKey: privateKey, prefix: "Osaurus Signed Pairing Server")
+    try signWithPrefix(payload, privateKey: privateKey, prefix: SigningDomain.pairingServer)
 }
 
 /// Canonical bytes for the `/pair` server-identity signature. Centralised so
@@ -187,14 +208,14 @@ func pairingServerSigningPayload(agentAddress: String, nonce: String) -> Data {
 /// pairing so an attacker can't substitute an invite signature for any
 /// other class of token.
 func signInvitePayload(_ payload: Data, privateKey: Data) throws -> Data {
-    try signWithPrefix(payload, privateKey: privateKey, prefix: "Osaurus Signed Invite")
+    try signWithPrefix(payload, privateKey: privateKey, prefix: SigningDomain.invite)
 }
 
 /// Sign a Secure Channel handshake transcript with the agent key. Distinct
 /// domain prefix so a channel signature can never be replayed as a pairing /
 /// access / invite signature (or vice versa).
 func signSecureChannelPayload(_ payload: Data, privateKey: Data) throws -> Data {
-    try signWithPrefix(payload, privateKey: privateKey, prefix: "Osaurus Secure Channel")
+    try signWithPrefix(payload, privateKey: privateKey, prefix: SigningDomain.secureChannel)
 }
 
 /// EIP-191 personal_sign compatible signing.

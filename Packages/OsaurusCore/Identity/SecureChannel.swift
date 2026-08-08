@@ -237,7 +237,7 @@ public enum SecureChannel {
             let recovered = try? recoverAddress(
                 payload: transcript,
                 signature: sigBytes,
-                domainPrefix: "Osaurus Secure Channel"
+                domainPrefix: SigningDomain.secureChannel
             ),
             recovered.lowercased() == expectedAgentAddress.lowercased()
         else {

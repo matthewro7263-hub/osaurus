@@ -79,6 +79,60 @@ struct CryptoHelpersTests {
         #expect(recovered.lowercased() == expectedAddress.lowercased())
     }
 
+    // MARK: - Signer/Verifier Prefix Parity
+
+    /// Every signing helper must round-trip against the SAME `SigningDomain`
+    /// constant its verifier uses.
+    ///
+    /// This is the regression guard for a real outage: a mechanical rebrand
+    /// rewrote the verifier-side prefix literals but not the signer-side ones,
+    /// so `/pair` and `/pair-invite` recovered a different address and failed
+    /// closed — LAN pairing and invite redemption were both dead. The old
+    /// tests missed it because each spelled the SAME literal on both sides of
+    /// its own round trip; asserting against the shared constant is what makes
+    /// drift impossible to miss.
+    @Test func signingDomains_signerVerifierParity() throws {
+        let privateKey = TestKeys.alicePrivateKey
+        let expected = TestKeys.aliceAddress.lowercased()
+        let payload = Data("prefix parity payload".utf8)
+
+        let cases: [(name: String, sign: (Data, Data) throws -> Data, domain: String)] = [
+            ("message", signPayload, SigningDomain.message),
+            ("access", signAccessPayload, SigningDomain.access),
+            ("pairing", signPairingPayload, SigningDomain.pairing),
+            ("pairingServer", signPairingServerPayload, SigningDomain.pairingServer),
+            ("invite", signInvitePayload, SigningDomain.invite),
+            ("secureChannel", signSecureChannelPayload, SigningDomain.secureChannel),
+        ]
+
+        for c in cases {
+            let signature = try c.sign(payload, privateKey)
+            #expect(signature.count == 65, "\(c.name): signature must be 65 bytes")
+            let recovered = try recoverAddress(
+                payload: payload,
+                signature: signature,
+                domainPrefix: c.domain
+            )
+            #expect(
+                recovered.lowercased() == expected,
+                "\(c.name): signer prefix drifted from its SigningDomain constant"
+            )
+        }
+    }
+
+    /// The prefixes are wire constants. Pinning the exact bytes means a rename
+    /// (or a well-meaning rebrand) fails the suite instead of silently
+    /// invalidating every signature already in the wild.
+    @Test func signingDomains_areFrozenWireConstants() {
+        #expect(SigningDomain.message == "Osaurus Signed Message")
+        #expect(SigningDomain.access == "Osaurus Signed Access")
+        #expect(SigningDomain.pairing == "Osaurus Signed Pairing")
+        #expect(SigningDomain.pairingServer == "Osaurus Signed Pairing Server")
+        #expect(SigningDomain.invite == "Osaurus Signed Invite")
+        #expect(SigningDomain.secureChannel == "Osaurus Secure Channel")
+        #expect(AgentInvite.signingDomain == SigningDomain.invite)
+    }
+
     // MARK: - Domain Separation
 
     @Test func domainSeparation_differentPrefixes_differentSignatures() throws {
