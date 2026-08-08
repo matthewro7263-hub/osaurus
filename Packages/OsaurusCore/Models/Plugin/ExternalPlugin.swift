@@ -607,6 +607,56 @@ public struct PluginManifest: Decodable, Sendable {
 /// tool-body timeout queue.
 private let routeHandlerTimeoutQueue = DispatchQueue(label: "com.osaurus.plugin.route-timeout")
 
+/// Take-once resume latch for `shutdown()`'s drain.
+///
+/// The drain is a CHAIN of waits — the per-task event queues, the serial
+/// `configEventQueue`, a barrier on the concurrent `invokeQueue`, then
+/// `inFlightCallbacks` — and plugin C that ignores cancellation can park ANY
+/// link, not just the last one. Bounding only the tail still hangs teardown on
+/// a wedged `on_task_event`, `on_config_changed`, or ordinary invoke. This
+/// latch lets a single wall-clock timer resume the caller no matter which link
+/// is stuck, while the drain block keeps running and destroys `ctx` only if it
+/// eventually completes cleanly — the same "orphan the stuck work, unblock the
+/// caller" contract as `RouteHandlerRaceState`.
+private final class ShutdownDrainLatch: @unchecked Sendable {
+    private let lock = NSLock()
+    private var continuation: CheckedContinuation<Void, Never>?
+    private var timer: DispatchSourceTimer?
+
+    init(_ continuation: CheckedContinuation<Void, Never>) {
+        self.continuation = continuation
+    }
+
+    /// Hand the latch its timer so whichever side wins cancels the other.
+    func arm(_ timer: DispatchSourceTimer) {
+        lock.lock()
+        guard continuation != nil else {
+            lock.unlock()
+            timer.cancel()
+            return
+        }
+        self.timer = timer
+        lock.unlock()
+    }
+
+    /// Resume the caller exactly once. Returns true for the winning caller.
+    @discardableResult
+    func resumeOnce() -> Bool {
+        lock.lock()
+        guard let continuation else {
+            lock.unlock()
+            return false
+        }
+        self.continuation = nil
+        let pendingTimer = timer
+        timer = nil
+        lock.unlock()
+        pendingTimer?.cancel()
+        continuation.resume()
+        return true
+    }
+}
+
 /// One-shot race between a route-handler body and its timeout, mirroring
 /// `ToolBodyRaceState` in `ToolRegistry`. Whichever side completes first
 /// resumes the continuation; the loser is cancelled/ignored. Crucially the
@@ -754,6 +804,13 @@ final class ExternalPlugin: @unchecked Sendable {
     /// The key format is `"<agentId-or-default>|<configKey>"`.
     private let lastDeliveredConfig = OSAllocatedUnfairLock<[String: String]>(initialState: [:])
 
+    /// Tail of the out-of-process config-forwarding chain (see
+    /// `notifyConfigBatch`). Each forwarded batch awaits its predecessor so
+    /// the helper observes `on_config_changed` in submission order — the
+    /// ordering the in-process path gets for free from the serial
+    /// `configEventQueue`. Nil until the first forward.
+    private let configForwardTail = OSAllocatedUnfairLock<Task<Void, Never>?>(initialState: nil)
+
     /// Per-task serial queues for event delivery. Each task gets its own queue
     /// so a slow event handler (e.g. http_request inside on_task_event) for one
     /// task doesn't block event delivery to other tasks. Serial ordering within
@@ -855,6 +912,19 @@ final class ExternalPlugin: @unchecked Sendable {
         }
     #endif
 
+    /// Upper bound on how long `shutdown()` waits for `inFlightCallbacks`
+    /// before giving up on `destroy`. Generous on purpose: it must clear a
+    /// callback that is merely slow (a task-event delivery doing one
+    /// `http_request`, whose own default budget is 30s — see
+    /// `PluginHostContext.httpRequest`) so the normal path still frees
+    /// `ctx`. Bounded on purpose: past it the callback is wedged, not slow
+    /// (accessibility/automation C can block in a syscall Swift
+    /// cancellation cannot unblock), and every reload/unload/quit queues
+    /// behind this wait. Sits between the plugin subsystem's other long
+    /// bounds — 30s route handler / helper `callTimeoutSeconds`, 150s
+    /// process-host invoke deadline.
+    static let shutdownInFlightWaitSeconds: TimeInterval = 60
+
     /// Tears down the plugin context by draining the per-task event queues
     /// and the config event queue first, then the invoke queue (barrier),
     /// before calling `destroy`. Uses async dispatch so the destroy callback
@@ -864,6 +934,11 @@ final class ExternalPlugin: @unchecked Sendable {
         // Tear down the out-of-process helper (if any) first: it holds its
         // own copy of the plugin and must not outlive an unload/reload.
         await PluginProcessHostManager.shared.shutdownClient(pluginId: self.id)
+        // Drop the config-forward chain so this instance stops retaining the
+        // tail task (and through it the helper client) for its whole lifetime.
+        // Any still-queued forward no-ops against the now-dead helper via
+        // `notifyConfigChanged`'s `guard loaded, process?.isRunning == true`.
+        configForwardTail.withLock { $0 = nil }
 
         let queues: [DispatchQueue] = taskEventQueuesLock.withLock {
             Array(taskEventQueues.values)
@@ -873,6 +948,32 @@ final class ExternalPlugin: @unchecked Sendable {
         #endif
 
         await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            // Bound the WHOLE drain, not just its `inFlightCallbacks` tail:
+            // a plugin wedged inside `on_task_event` or `on_config_changed`,
+            // or an ordinary invoke that never returns, parks an earlier link
+            // in the chain and the tail's own timeout is never even reached.
+            let latch = ShutdownDrainLatch(continuation)
+            let drainTimer = DispatchSource.makeTimerSource(queue: routeHandlerTimeoutQueue)
+            drainTimer.schedule(deadline: .now() + ExternalPlugin.shutdownInFlightWaitSeconds)
+            drainTimer.setEventHandler { [id] in
+                guard latch.resumeOnce() else { return }
+                // `ctx` is deliberately NOT destroyed here — the drain never
+                // proved the plugin is idle, and freeing under a live callback
+                // is the use-after-free behind APPLE-MACOS-9T. If the drain
+                // later completes it will destroy `ctx` then.
+                NSLog(
+                    "[ExternalPlugin] plugin=%@ shutdown: drain still blocked after %.0fs — unblocking caller, ctx left alive",
+                    id, ExternalPlugin.shutdownInFlightWaitSeconds
+                )
+                CrashReportingService.recordBreadcrumb(
+                    category: "plugin.shutdown",
+                    message:
+                        "plugin=\(id) drain blocked after \(Int(ExternalPlugin.shutdownInFlightWaitSeconds))s — caller unblocked, destroy deferred"
+                )
+            }
+            drainTimer.resume()
+            latch.arm(drainTimer)
+
             let group = DispatchGroup()
             for q in queues {
                 group.enter()
@@ -905,7 +1006,40 @@ final class ExternalPlugin: @unchecked Sendable {
                 // Safe to block: we're on an invokeQueue worker (never the
                 // main thread), and the waited-on callbacks never dispatch
                 // to invokeQueue themselves.
-                self.inFlightCallbacks.wait()
+                //
+                // Bounded, unlike the sibling wait in
+                // `PluginHostContext.teardown()` — that one is bounded FOR
+                // it by SQLite's 5s busy_timeout, so a SQL call always
+                // returns. Nothing bounds accessibility/automation C, and
+                // an unbounded wait here parked this invokeQueue worker
+                // (and every reload/unload/quit behind it) forever.
+                let waitResult = self.inFlightCallbacks.wait(
+                    timeout: .now() + ExternalPlugin.shutdownInFlightWaitSeconds
+                )
+                guard waitResult == .success else {
+                    // A callback is still inside plugin code and cannot be
+                    // recalled. Deliberately LEAK `ctx` — freeing it under a
+                    // live callback is the use-after-free behind production
+                    // crash APPLE-MACOS-9T, and a leak is strictly cheaper
+                    // than either that or a permanent hang. `didDestroy`
+                    // stays false so a later teardown of this same instance
+                    // can still free `ctx` if the callback ever returns.
+                    // Resuming without destroying orphans the stuck work and
+                    // unblocks the caller — the contract `handleRoute`'s
+                    // `RouteHandlerRaceState` already uses for C that
+                    // ignores cancellation.
+                    NSLog(
+                        "[ExternalPlugin] plugin=%@ shutdown: in-flight callback still running after %.0fs — leaking ctx instead of destroying it",
+                        self.id, ExternalPlugin.shutdownInFlightWaitSeconds
+                    )
+                    CrashReportingService.recordBreadcrumb(
+                        category: "plugin.shutdown",
+                        message:
+                            "plugin=\(self.id) wedged callback after \(Int(ExternalPlugin.shutdownInFlightWaitSeconds))s — destroy skipped, ctx leaked"
+                    )
+                    latch.resumeOnce()
+                    return
+                }
                 // Destroy exactly once. Concurrent shutdown attempts (re-entry
                 // from PluginManager hot reload, etc.) all drain and await here,
                 // but only the winner of `didDestroy` frees `ctx`.
@@ -915,7 +1049,7 @@ final class ExternalPlugin: @unchecked Sendable {
                     return true
                 }
                 guard shouldDestroy else {
-                    continuation.resume()
+                    latch.resumeOnce()
                     return
                 }
                 // Drop the dedup snapshot so a future re-load of the
@@ -933,7 +1067,7 @@ final class ExternalPlugin: @unchecked Sendable {
                 PluginHostContext.withTLSScope(pluginId: self.id, agentId: nil) {
                     self.api.destroy?(self.ctx)
                 }
-                continuation.resume()
+                latch.resumeOnce()
             }
         }
     }
@@ -1166,11 +1300,20 @@ final class ExternalPlugin: @unchecked Sendable {
         // host-API bridge on load.
         if let hostClient = PluginProcessHostManager.shared.existingClient(pluginId: self.id) {
             let forwarded = changes
-            Task.detached {
-                for change in forwarded {
-                    await hostClient.notifyConfigChanged(
-                        key: change.key, value: change.value, agentId: agentId
-                    )
+            // Chain onto the previous forward rather than spawning an
+            // independent task per batch: two racing detached tasks could
+            // deliver two quick writes of the same key to the helper in
+            // reverse order, stranding its copy of the plugin on a stale
+            // value while the in-process copy is current.
+            configForwardTail.withLock { tail in
+                let previous = tail
+                tail = Task.detached {
+                    if let previous { await previous.value }
+                    for change in forwarded {
+                        await hostClient.notifyConfigChanged(
+                            key: change.key, value: change.value, agentId: agentId
+                        )
+                    }
                 }
             }
         }

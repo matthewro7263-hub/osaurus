@@ -103,6 +103,12 @@ actor PluginProcessHostClient {
     static let defaultInvokeDeadlineSeconds: Double = 150
     /// Budget for load (dlopen + init + manifest) — generous but bounded.
     static let loadDeadlineSeconds: Double = 30
+    /// Budget for a forwarded `on_config_changed`. Must sit ABOVE the helper's
+    /// own reverse-RPC bound (`PluginHost/main.swift` `callTimeoutSeconds`, 30s):
+    /// a plugin whose `on_config_changed` makes one host call (the webhook-
+    /// registration case) legitimately blocks for that long, and treating it as
+    /// wedged would be wrong. This is a diagnostic bound, not a kill trigger.
+    static let configChangedDeadlineSeconds: Double = 45
 
     init(pluginId: String, dylibPath: String, helperURL: URL) {
         self.pluginId = pluginId
@@ -155,9 +161,37 @@ actor PluginProcessHostClient {
         var params: [String: Any] = ["key": key]
         if let value { params["value"] = value }
         if let agentId { params["agent_id"] = agentId.uuidString }
-        _ = try? await callWithDeadline(
-            method: "config_changed", params: params, deadlineSeconds: 15
-        )
+        do {
+            _ = try await callWithDeadline(
+                method: "config_changed", params: params,
+                deadlineSeconds: Self.configChangedDeadlineSeconds
+            )
+        } catch is DeadlineExceededError {
+            // Deliberately do NOT kill the helper here, unlike `invoke`.
+            // There, the timed-out call IS the wedged one; here it is not.
+            // The helper runs `invoke` and `config_changed` on one serial
+            // queue, and this actor's `notifyConfigChanged` is reentrant, so a
+            // config push is routinely queued behind a legitimate long invoke
+            // (budget 150s). Killing on this deadline would call
+            // `failAllPending` and fail that healthy in-flight tool call —
+            // turning a fire-and-forget config push into a user-visible error.
+            // A missed deadline here is therefore a diagnostic signal only;
+            // the orphaned `pending` entry is swept by the next kill/EOF, as
+            // it was before this bound existed.
+            NSLog(
+                "[PluginProcessHost] plugin=%@ config_changed exceeded %.0fs (not killing; may be queued behind an invoke)",
+                pluginId, Self.configChangedDeadlineSeconds
+            )
+            CrashReportingService.recordBreadcrumb(
+                category: "plugin.host",
+                message:
+                    "plugin=\(pluginId) config_changed exceeded \(Int(Self.configChangedDeadlineSeconds))s"
+            )
+        } catch {
+            // Other failures (helper already gone, malformed reply) stay
+            // silent for a fire-and-forget config push, as with the
+            // previous `try?`.
+        }
     }
 
     /// Graceful shutdown: ask the helper to destroy the plugin and exit,

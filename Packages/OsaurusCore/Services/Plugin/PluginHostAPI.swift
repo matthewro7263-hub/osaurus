@@ -2897,9 +2897,35 @@ final class PluginHostContext: @unchecked Sendable {
     func teardown() {
         PluginHostContext.removeContext(for: pluginId)
         isTornDown.withLock { $0 = true }
-        inFlightDatabaseCalls.wait()
+        // Bounded, and deliberately so. The "SQLite's 5s busy_timeout bounds
+        // this" argument above only holds while the plugin is blocked in SQL;
+        // a plugin wedged in its own C code BETWEEN `enter()` and `leave()` is
+        // not. This runs synchronously from `@MainActor PluginManager._loadAll`,
+        // so an unbounded wait freezes the UI outright — and it became
+        // reachable once `ExternalPlugin.shutdown()` stopped hanging first.
+        // On timeout leave the connection open: leaking a SQLite handle is the
+        // same leak-over-hang trade `shutdown()` makes for `ctx`.
+        let drained = inFlightDatabaseCalls.wait(
+            timeout: .now() + Self.teardownDatabaseWaitSeconds
+        )
+        guard drained == .success else {
+            NSLog(
+                "[PluginHostContext] plugin=%@ teardown: database call still in flight after %.0fs — leaving connection open",
+                pluginId, Self.teardownDatabaseWaitSeconds
+            )
+            CrashReportingService.recordBreadcrumb(
+                category: "plugin.shutdown",
+                message:
+                    "plugin=\(pluginId) teardown db drain timed out after \(Int(Self.teardownDatabaseWaitSeconds))s — close skipped"
+            )
+            return
+        }
         database.close()
     }
+
+    /// Bound for the teardown SQL drain. Comfortably above SQLite's 5s
+    /// `busy_timeout` so a genuinely busy query still completes normally.
+    static let teardownDatabaseWaitSeconds: TimeInterval = 15
 }
 
 // MARK: - Rate Limiting
